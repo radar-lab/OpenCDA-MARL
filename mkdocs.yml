@@ -6,7 +6,7 @@ repo_name: opencda-marl
 
 theme:
   name: material
-  logo: images/logo.png
+  logo: images/logo.PNG
   favicon: images/favicon.ico
   palette:
     # Light mode
