@@ -80,6 +80,15 @@ class GnssSensor(object):
         self.lon = event.longitude
         self.alt = event.altitude
         self.timestamp = event.timestamp
+    
+    def destroy(self):
+        """Destroy the GNSS sensor."""
+        try:
+            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+                self.sensor.stop()
+                self.sensor.destroy()
+        except Exception as e:
+            print(f"Warning: Failed to destroy GNSS sensor: {e}")
 
 
 class ImuSensor(object):
@@ -137,6 +146,15 @@ class ImuSensor(object):
             max(limits[0], min(limits[1], sensor_data.gyroscope.y)),
             max(limits[0], min(limits[1], sensor_data.gyroscope.z)))
         self.compass = sensor_data.compass
+    
+    def destroy(self):
+        """Destroy the IMU sensor."""
+        try:
+            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+                self.sensor.stop()
+                self.sensor.destroy()
+        except Exception as e:
+            print(f"Warning: Failed to destroy IMU sensor: {e}")
 
 
 class LocalizationManager(object):
@@ -193,6 +211,9 @@ class LocalizationManager(object):
         self.dt = config_yaml['dt']
         # Kalman Filter
         self.kf = KalmanFilter(self.dt)
+        
+        # Add option to disable kalman filter (disabled by default to prevent route following issues)
+        self.use_kalman = config_yaml.get('use_kalman', True)
 
         # DebugHelper
         self.debug_helper = LocDebugHelper(
@@ -206,6 +227,27 @@ class LocalizationManager(object):
         if not self.activate:
             self._ego_pos = self.vehicle.get_transform()
             self._speed = get_speed(self.vehicle)
+            
+            # Still collect data for debugging even when not activated
+            # Use ground truth values for all fields since localization is disabled
+            location = self._ego_pos.location
+            rotation = self._ego_pos.rotation
+            
+            # Add data to debug helper for plotting
+            self.debug_helper.run_step(
+                location.x,  # gnss_x (using ground truth)
+                location.y,  # gnss_y (using ground truth)
+                rotation.yaw,  # gnss_yaw (using ground truth)
+                self._speed,  # gnss_spd (using ground truth)
+                location.x,  # filter_x (using ground truth)
+                location.y,  # filter_y (using ground truth)
+                rotation.yaw,  # filter_yaw (using ground truth)
+                self._speed,  # filter_spd (using ground truth)
+                location.x,  # gt_x
+                location.y,  # gt_y
+                rotation.yaw,  # gt_yaw
+                self._speed  # gt_spd
+            )
         else:
             speed_true = get_speed(self.vehicle)
             speed_noise = self.add_speed_noise(speed_true)
@@ -215,7 +257,7 @@ class LocalizationManager(object):
                                        self.gnss.lon,
                                        self.gnss.alt,
                                        self.geo_ref.latitude,
-                                       self.geo_ref.longitude, 0.0)
+                                       self.geo_ref.longitude, self.geo_ref.altitude)
 
             # only use this for debugging purpose
             location = self.vehicle.get_transform().location
@@ -224,20 +266,25 @@ class LocalizationManager(object):
             rotation = self.vehicle.get_transform().rotation
             heading_angle = self.add_heading_direction_noise(rotation.yaw)
 
-            # assume the initial position is accurate
-            if len(self._ego_pos_history) == 0:
-                x_kf, y_kf, heading_angle_kf = x, y, heading_angle
-                self._speed = speed_true
-                self.kf.run_step_init(
-                    x, y, np.deg2rad(heading_angle), self._speed / 3.6)
+            if self.use_kalman:
+                # assume the initial position is accurate
+                if len(self._ego_pos_history) == 0:
+                    x_kf, y_kf, heading_angle_kf = x, y, heading_angle
+                    self._speed = speed_true
+                    self.kf.run_step_init(
+                        x, y, np.deg2rad(heading_angle), self._speed / 3.6)
+                else:
+                    x_kf, y_kf, heading_angle_kf, speed_kf = self.kf.run_step(
+                        x, y, np.deg2rad(heading_angle),
+                        speed_noise / 3.6,
+                        self.imu.gyroscope[2])
+                    self._speed = speed_kf * 3.6
+                    heading_angle_kf = np.rad2deg(heading_angle_kf)
             else:
-                x_kf, y_kf, heading_angle_kf, speed_kf = self.kf.run_step(
-                    x, y, np.deg2rad(heading_angle),
-                    speed_noise / 3.6,
-                    self.imu.gyroscope[2])
-                self._speed = speed_kf * 3.6
-                heading_angle_kf = np.rad2deg(heading_angle_kf)
-
+                # Use direct values without Kalman filtering to avoid lag
+                x_kf, y_kf, heading_angle_kf = x, y, rotation.yaw
+                self._speed = speed_true
+                
             # add data to debug helper
             self.debug_helper.run_step(x,
                                        y,
@@ -310,5 +357,14 @@ class LocalizationManager(object):
         """
         Destroy the sensors
         """
-        self.gnss.sensor.destroy()
-        self.imu.sensor.destroy()
+        try:
+            if hasattr(self, 'gnss') and self.gnss:
+                self.gnss.destroy()
+        except Exception as e:
+            print(f"Warning: Failed to destroy GNSS sensor: {e}")
+        
+        try:
+            if hasattr(self, 'imu') and self.imu:
+                self.imu.destroy()
+        except Exception as e:
+            print(f"Warning: Failed to destroy IMU sensor: {e}")

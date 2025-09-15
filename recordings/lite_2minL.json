@@ -1,0 +1,3367 @@
+{
+  "version": "1.0",
+  "timestamp": "2025-09-02T17:30:54.609060",
+  "total_events": 80,
+  "events": [
+    {
+      "event_id": "c6bd39ad",
+      "vehicle_id": "west_W_0_0",
+      "flow_name": "west",
+      "spawn_step": 304,
+      "junction_id": 4,
+      "route_id": 188,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 49.709261043828576,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 0,
+        "peak_density": 1.0164869684168476
+      }
+    },
+    {
+      "event_id": "8e5faf35",
+      "vehicle_id": "west_W_1_7",
+      "flow_name": "west",
+      "spawn_step": 364,
+      "junction_id": 4,
+      "route_id": 146,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 35.247441595338806,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.0274015339210927
+      }
+    },
+    {
+      "event_id": "cc115611",
+      "vehicle_id": "east_E_0_0",
+      "flow_name": "east",
+      "spawn_step": 371,
+      "junction_id": 4,
+      "route_id": 120,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 49.46509242216087,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 1.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "east",
+        "exit_direction": "south",
+        "lane_id": 0,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "654093b3",
+      "vehicle_id": "west_W_2_14",
+      "flow_name": "west",
+      "spawn_step": 421,
+      "junction_id": 4,
+      "route_id": 147,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 34.96371639413679,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.0427378512124055
+      }
+    },
+    {
+      "event_id": "4524fe34",
+      "vehicle_id": "south_S_0_0",
+      "flow_name": "south",
+      "spawn_step": 433,
+      "junction_id": 4,
+      "route_id": 54,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 41.62448915791382,
+      "spawn_transform": {
+        "location": {
+          "x": -1.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.0900311150163926
+      }
+    },
+    {
+      "event_id": "1e4c76c5",
+      "vehicle_id": "east_E_2_14",
+      "flow_name": "east",
+      "spawn_step": 447,
+      "junction_id": 4,
+      "route_id": 111,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 49.02254500768194,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "east",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "d3dfd1c9",
+      "vehicle_id": "south_S_1_7",
+      "flow_name": "south",
+      "spawn_step": 456,
+      "junction_id": 4,
+      "route_id": 68,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 40.92913542456643,
+      "spawn_transform": {
+        "location": {
+          "x": -1.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "south",
+        "exit_direction": "east",
+        "lane_id": 1,
+        "peak_density": 1.099901325214986
+      }
+    },
+    {
+      "event_id": "b52cc42c",
+      "vehicle_id": "west_W_2_15",
+      "flow_name": "west",
+      "spawn_step": 466,
+      "junction_id": 4,
+      "route_id": 190,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 51.45788200375384,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 1.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.059008854688477
+      }
+    },
+    {
+      "event_id": "7b60a3c8",
+      "vehicle_id": "north_N_1_7",
+      "flow_name": "north",
+      "spawn_step": 472,
+      "junction_id": 4,
+      "route_id": 44,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 43.551356777309856,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "d7684939",
+      "vehicle_id": "east_E_0_1",
+      "flow_name": "east",
+      "spawn_step": 475,
+      "junction_id": 4,
+      "route_id": 129,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 49.23970539852257,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "18818306",
+      "vehicle_id": "west_W_1_8",
+      "flow_name": "west",
+      "spawn_step": 503,
+      "junction_id": 4,
+      "route_id": 159,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 48.43063468862316,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.0760963327229178
+      }
+    },
+    {
+      "event_id": "42801dff",
+      "vehicle_id": "south_S_2_14",
+      "flow_name": "south",
+      "spawn_step": 534,
+      "junction_id": 4,
+      "route_id": 82,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 47.67354633258868,
+      "spawn_transform": {
+        "location": {
+          "x": -8.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "south",
+        "exit_direction": "west",
+        "lane_id": 2,
+        "peak_density": 1.1367837826569525
+      }
+    },
+    {
+      "event_id": "edfb21ea",
+      "vehicle_id": "north_N_0_0",
+      "flow_name": "north",
+      "spawn_step": 544,
+      "junction_id": 4,
+      "route_id": 40,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 36.397386692314306,
+      "spawn_transform": {
+        "location": {
+          "x": 5.25,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.0144874132307435
+      }
+    },
+    {
+      "event_id": "5d48b3f0",
+      "vehicle_id": "north_N_0_1",
+      "flow_name": "north",
+      "spawn_step": 554,
+      "junction_id": 4,
+      "route_id": 17,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 39.95360608319581,
+      "spawn_transform": {
+        "location": {
+          "x": 1.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 0,
+        "peak_density": 1.0160396659114048
+      }
+    },
+    {
+      "event_id": "da789875",
+      "vehicle_id": "south_S_0_1",
+      "flow_name": "south",
+      "spawn_step": 614,
+      "junction_id": 4,
+      "route_id": 88,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 39.72209543077318,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "south",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.178939306044181
+      }
+    },
+    {
+      "event_id": "e17cd999",
+      "vehicle_id": "west_W_0_1",
+      "flow_name": "west",
+      "spawn_step": 618,
+      "junction_id": 4,
+      "route_id": 169,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 42.95544114757605,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 8.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "west",
+        "exit_direction": "south",
+        "lane_id": 0,
+        "peak_density": 1.1494730147575547
+      }
+    },
+    {
+      "event_id": "8c706736",
+      "vehicle_id": "west_W_1_9",
+      "flow_name": "west",
+      "spawn_step": 627,
+      "junction_id": 4,
+      "route_id": 157,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 36.15040209983501,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -1.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.157000091462898
+      }
+    },
+    {
+      "event_id": "ea97f88c",
+      "vehicle_id": "north_N_1_8",
+      "flow_name": "north",
+      "spawn_step": 652,
+      "junction_id": 4,
+      "route_id": 28,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 40.8445158509248,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 1,
+        "peak_density": 1.0397286263267653
+      }
+    },
+    {
+      "event_id": "ccdd3f17",
+      "vehicle_id": "north_N_0_2",
+      "flow_name": "north",
+      "spawn_step": 668,
+      "junction_id": 4,
+      "route_id": 47,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 47.963004105323,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -1.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.0451606476375068
+      }
+    },
+    {
+      "event_id": "bb11a66c",
+      "vehicle_id": "west_W_1_10",
+      "flow_name": "west",
+      "spawn_step": 668,
+      "junction_id": 4,
+      "route_id": 180,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 43.53338149969304,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 1,
+        "peak_density": 1.1918924659255288
+      }
+    },
+    {
+      "event_id": "c85bff18",
+      "vehicle_id": "south_S_0_2",
+      "flow_name": "south",
+      "spawn_step": 682,
+      "junction_id": 4,
+      "route_id": 70,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 46.28187099467271,
+      "spawn_transform": {
+        "location": {
+          "x": -1.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 1.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "south",
+        "exit_direction": "east",
+        "lane_id": 0,
+        "peak_density": 1.2147041093216755
+      }
+    },
+    {
+      "event_id": "b52f08c1",
+      "vehicle_id": "north_N_2_14",
+      "flow_name": "north",
+      "spawn_step": 745,
+      "junction_id": 4,
+      "route_id": 46,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 45.28093109995231,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 2,
+        "peak_density": 1.0813050221843
+      }
+    },
+    {
+      "event_id": "a5e260a4",
+      "vehicle_id": "east_E_1_7",
+      "flow_name": "east",
+      "spawn_step": 752,
+      "junction_id": 4,
+      "route_id": 107,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 48.71365055410338,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "east",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "057d0b5b",
+      "vehicle_id": "south_S_0_3",
+      "flow_name": "south",
+      "spawn_step": 785,
+      "junction_id": 4,
+      "route_id": 92,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 45.25094808534887,
+      "spawn_transform": {
+        "location": {
+          "x": -8.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "south",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.263015821480964
+      }
+    },
+    {
+      "event_id": "bad07d2a",
+      "vehicle_id": "east_E_0_2",
+      "flow_name": "east",
+      "spawn_step": 813,
+      "junction_id": 4,
+      "route_id": 96,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 46.63539332123918,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "east",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "393df552",
+      "vehicle_id": "north_N_1_9",
+      "flow_name": "north",
+      "spawn_step": 843,
+      "junction_id": 4,
+      "route_id": 0,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 47.83600559951651,
+      "spawn_transform": {
+        "location": {
+          "x": 1.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 1.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "north",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.1504130158130617
+      }
+    },
+    {
+      "event_id": "beb4b597",
+      "vehicle_id": "west_W_0_2",
+      "flow_name": "west",
+      "spawn_step": 895,
+      "junction_id": 4,
+      "route_id": 177,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 34.969655444617736,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 0,
+        "peak_density": 1.4120734998024458
+      }
+    },
+    {
+      "event_id": "eec3a049",
+      "vehicle_id": "west_W_0_3",
+      "flow_name": "west",
+      "spawn_step": 910,
+      "junction_id": 4,
+      "route_id": 158,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 39.60043060071099,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.424715943293041
+      }
+    },
+    {
+      "event_id": "4176710c",
+      "vehicle_id": "east_E_0_3",
+      "flow_name": "east",
+      "spawn_step": 924,
+      "junction_id": 4,
+      "route_id": 130,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 47.330416427365115,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.0183418296812432
+      }
+    },
+    {
+      "event_id": "7459633f",
+      "vehicle_id": "north_N_1_10",
+      "flow_name": "north",
+      "spawn_step": 965,
+      "junction_id": 4,
+      "route_id": 21,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 37.783237140249504,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 1,
+        "peak_density": 1.2617086815385905
+      }
+    },
+    {
+      "event_id": "f53dc59a",
+      "vehicle_id": "south_S_2_15",
+      "flow_name": "south",
+      "spawn_step": 996,
+      "junction_id": 4,
+      "route_id": 75,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 42.34008544221271,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "south",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.2982961726603797
+      }
+    },
+    {
+      "event_id": "8b65151e",
+      "vehicle_id": "west_W_2_16",
+      "flow_name": "west",
+      "spawn_step": 1090,
+      "junction_id": 4,
+      "route_id": 150,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 36.15902460336122,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.499661906180712
+      }
+    },
+    {
+      "event_id": "0bf918b9",
+      "vehicle_id": "north_N_2_15",
+      "flow_name": "north",
+      "spawn_step": 1091,
+      "junction_id": 4,
+      "route_id": 24,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 44.25956149755259,
+      "spawn_transform": {
+        "location": {
+          "x": 5.25,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.3651043109957461
+      }
+    },
+    {
+      "event_id": "9b5657f5",
+      "vehicle_id": "north_N_2_16",
+      "flow_name": "north",
+      "spawn_step": 1106,
+      "junction_id": 4,
+      "route_id": 40,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 49.9954678370025,
+      "spawn_transform": {
+        "location": {
+          "x": 5.25,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 2,
+        "peak_density": 1.374034177037942
+      }
+    },
+    {
+      "event_id": "d8d826b5",
+      "vehicle_id": "south_S_2_16",
+      "flow_name": "south",
+      "spawn_step": 1114,
+      "junction_id": 4,
+      "route_id": 62,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 43.908292102953176,
+      "spawn_transform": {
+        "location": {
+          "x": -8.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.2704078405781574
+      }
+    },
+    {
+      "event_id": "1f03b5e8",
+      "vehicle_id": "east_E_0_4",
+      "flow_name": "east",
+      "spawn_step": 1123,
+      "junction_id": 4,
+      "route_id": 117,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 42.64554907944113,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 8.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "east",
+        "exit_direction": "south",
+        "lane_id": 0,
+        "peak_density": 1.1149593929454007
+      }
+    },
+    {
+      "event_id": "f7383ff7",
+      "vehicle_id": "west_W_2_17",
+      "flow_name": "west",
+      "spawn_step": 1200,
+      "junction_id": 4,
+      "route_id": 178,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 35.20425334199135,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 1.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.4606123073167578
+      }
+    },
+    {
+      "event_id": "17d53266",
+      "vehicle_id": "east_E_2_15",
+      "flow_name": "east",
+      "spawn_step": 1213,
+      "junction_id": 4,
+      "route_id": 101,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 46.89694507086056,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -1.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "east",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.1979893124288181
+      }
+    },
+    {
+      "event_id": "370e6e17",
+      "vehicle_id": "south_S_1_8",
+      "flow_name": "south",
+      "spawn_step": 1214,
+      "junction_id": 4,
+      "route_id": 50,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 42.67734819232376,
+      "spawn_transform": {
+        "location": {
+          "x": -8.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.2263506310659726
+      }
+    },
+    {
+      "event_id": "77ff6ac7",
+      "vehicle_id": "south_S_0_4",
+      "flow_name": "south",
+      "spawn_step": 1217,
+      "junction_id": 4,
+      "route_id": 58,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 47.012026984739705,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.2248102690060017
+      }
+    },
+    {
+      "event_id": "aebbcb66",
+      "vehicle_id": "north_N_0_3",
+      "flow_name": "north",
+      "spawn_step": 1220,
+      "junction_id": 4,
+      "route_id": 34,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 44.770020693015596,
+      "spawn_transform": {
+        "location": {
+          "x": 1.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.3986467442718444
+      }
+    },
+    {
+      "event_id": "6b3ad81a",
+      "vehicle_id": "north_N_2_17",
+      "flow_name": "north",
+      "spawn_step": 1233,
+      "junction_id": 4,
+      "route_id": 23,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 37.89623230946024,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.3965825997024588
+      }
+    },
+    {
+      "event_id": "ccea979c",
+      "vehicle_id": "east_E_2_16",
+      "flow_name": "east",
+      "spawn_step": 1272,
+      "junction_id": 4,
+      "route_id": 130,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 40.58825010711093,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 2,
+        "peak_density": 1.2562140604409948
+      }
+    },
+    {
+      "event_id": "1b022519",
+      "vehicle_id": "east_E_2_17",
+      "flow_name": "east",
+      "spawn_step": 1280,
+      "junction_id": 4,
+      "route_id": 126,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 40.879428591267015,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 5.25,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "east",
+        "exit_direction": "south",
+        "lane_id": 2,
+        "peak_density": 1.263590311030178
+      }
+    },
+    {
+      "event_id": "78995e32",
+      "vehicle_id": "north_N_1_11",
+      "flow_name": "north",
+      "spawn_step": 1283,
+      "junction_id": 4,
+      "route_id": 21,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 36.24079087141457,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 1,
+        "peak_density": 1.3792556702337606
+      }
+    },
+    {
+      "event_id": "f74738b9",
+      "vehicle_id": "west_W_0_4",
+      "flow_name": "west",
+      "spawn_step": 1296,
+      "junction_id": 4,
+      "route_id": 181,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 37.43537420353054,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 0,
+        "peak_density": 1.3833290492315558
+      }
+    },
+    {
+      "event_id": "d05af783",
+      "vehicle_id": "south_S_2_17",
+      "flow_name": "south",
+      "spawn_step": 1297,
+      "junction_id": 4,
+      "route_id": 53,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 48.96250668674115,
+      "spawn_transform": {
+        "location": {
+          "x": -1.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -1.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.1829342594882821
+      }
+    },
+    {
+      "event_id": "5f49799f",
+      "vehicle_id": "north_N_1_12",
+      "flow_name": "north",
+      "spawn_step": 1327,
+      "junction_id": 4,
+      "route_id": 6,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 49.44666602172334,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 5.25,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "north",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.3527921471165778
+      }
+    },
+    {
+      "event_id": "dcaaad71",
+      "vehicle_id": "south_S_1_9",
+      "flow_name": "south",
+      "spawn_step": 1328,
+      "junction_id": 4,
+      "route_id": 52,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 49.73603282703142,
+      "spawn_transform": {
+        "location": {
+          "x": -1.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.1663402796830582
+      }
+    },
+    {
+      "event_id": "d1679f61",
+      "vehicle_id": "west_W_2_18",
+      "flow_name": "west",
+      "spawn_step": 1330,
+      "junction_id": 4,
+      "route_id": 155,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 42.61265615971614,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.3502051162258628
+      }
+    },
+    {
+      "event_id": "c95e4dd7",
+      "vehicle_id": "north_N_0_4",
+      "flow_name": "north",
+      "spawn_step": 1345,
+      "junction_id": 4,
+      "route_id": 2,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 36.405184933564314,
+      "spawn_transform": {
+        "location": {
+          "x": 1.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 5.25,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "north",
+        "exit_direction": "south",
+        "lane_id": 0,
+        "peak_density": 1.3399967885459378
+      }
+    },
+    {
+      "event_id": "e2bde8e4",
+      "vehicle_id": "south_S_0_5",
+      "flow_name": "south",
+      "spawn_step": 1361,
+      "junction_id": 4,
+      "route_id": 58,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 42.72687032328156,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.148890640373677
+      }
+    },
+    {
+      "event_id": "a2505042",
+      "vehicle_id": "west_W_1_11",
+      "flow_name": "west",
+      "spawn_step": 1378,
+      "junction_id": 4,
+      "route_id": 174,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 36.88635419806733,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 5.25,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "west",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.3017989542911101
+      }
+    },
+    {
+      "event_id": "fc9262ee",
+      "vehicle_id": "south_S_2_18",
+      "flow_name": "south",
+      "spawn_step": 1412,
+      "junction_id": 4,
+      "route_id": 57,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 48.339935183349766,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -1.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.1232321997914794
+      }
+    },
+    {
+      "event_id": "11105405",
+      "vehicle_id": "east_E_2_18",
+      "flow_name": "east",
+      "spawn_step": 1413,
+      "junction_id": 4,
+      "route_id": 129,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 42.76943571895029,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 2,
+        "peak_density": 1.3472956028246086
+      }
+    },
+    {
+      "event_id": "802a43f5",
+      "vehicle_id": "west_W_0_5",
+      "flow_name": "west",
+      "spawn_step": 1415,
+      "junction_id": 4,
+      "route_id": 158,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 34.414530379326365,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.2638993312741909
+      }
+    },
+    {
+      "event_id": "0d1c6141",
+      "vehicle_id": "north_N_1_13",
+      "flow_name": "north",
+      "spawn_step": 1423,
+      "junction_id": 4,
+      "route_id": 38,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 49.152374791272464,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.2723095542092548
+      }
+    },
+    {
+      "event_id": "8f3ce4f7",
+      "vehicle_id": "east_E_1_8",
+      "flow_name": "east",
+      "spawn_step": 1442,
+      "junction_id": 4,
+      "route_id": 136,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 46.39249355624608,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.349980183604706
+      }
+    },
+    {
+      "event_id": "513e1717",
+      "vehicle_id": "north_N_0_5",
+      "flow_name": "north",
+      "spawn_step": 1465,
+      "junction_id": 4,
+      "route_id": 14,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 45.75059465469314,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 5.25,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "north",
+        "exit_direction": "south",
+        "lane_id": 0,
+        "peak_density": 1.231816263803356
+      }
+    },
+    {
+      "event_id": "be4cc762",
+      "vehicle_id": "west_W_0_6",
+      "flow_name": "west",
+      "spawn_step": 1477,
+      "junction_id": 4,
+      "route_id": 184,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 38.10597621616326,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "west",
+        "exit_direction": "east",
+        "lane_id": 0,
+        "peak_density": 1.204418917984951
+      }
+    },
+    {
+      "event_id": "e26715f8",
+      "vehicle_id": "east_E_2_19",
+      "flow_name": "east",
+      "spawn_step": 1478,
+      "junction_id": 4,
+      "route_id": 109,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 45.66841808253759,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -1.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "east",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.3444098709122452
+      }
+    },
+    {
+      "event_id": "0b48187b",
+      "vehicle_id": "east_E_1_9",
+      "flow_name": "east",
+      "spawn_step": 1490,
+      "junction_id": 4,
+      "route_id": 128,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 40.85102290836623,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.3403098141836542
+      }
+    },
+    {
+      "event_id": "8ac69ea2",
+      "vehicle_id": "west_W_1_12",
+      "flow_name": "west",
+      "spawn_step": 1490,
+      "junction_id": 4,
+      "route_id": 150,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 40.9174143732119,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.1927728176592989
+      }
+    },
+    {
+      "event_id": "238509c7",
+      "vehicle_id": "north_N_2_18",
+      "flow_name": "north",
+      "spawn_step": 1509,
+      "junction_id": 4,
+      "route_id": 4,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 46.98657136629529,
+      "spawn_transform": {
+        "location": {
+          "x": 8.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 1.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "north",
+        "exit_direction": "south",
+        "lane_id": 2,
+        "peak_density": 1.191255943398378
+      }
+    },
+    {
+      "event_id": "74e8b1bb",
+      "vehicle_id": "east_E_1_10",
+      "flow_name": "east",
+      "spawn_step": 1530,
+      "junction_id": 4,
+      "route_id": 119,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 43.90550938121663,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 8.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "east",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.319462175619507
+      }
+    },
+    {
+      "event_id": "3c3de4a8",
+      "vehicle_id": "south_S_1_10",
+      "flow_name": "south",
+      "spawn_step": 1550,
+      "junction_id": 4,
+      "route_id": 84,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 40.849006158902185,
+      "spawn_transform": {
+        "location": {
+          "x": -1.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "south",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.0660139008065064
+      }
+    },
+    {
+      "event_id": "f4f8d7ed",
+      "vehicle_id": "south_S_1_11",
+      "flow_name": "south",
+      "spawn_step": 1601,
+      "junction_id": 4,
+      "route_id": 79,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 49.94121022663965,
+      "spawn_transform": {
+        "location": {
+          "x": -8.75,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "south",
+        "exit_direction": "east",
+        "lane_id": 1,
+        "peak_density": 1.0502084420743987
+      }
+    },
+    {
+      "event_id": "78356b37",
+      "vehicle_id": "west_W_1_13",
+      "flow_name": "west",
+      "spawn_step": 1617,
+      "junction_id": 4,
+      "route_id": 170,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 52.66914092000593,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 5.25,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "west",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.097240390351144
+      }
+    },
+    {
+      "event_id": "27da68fb",
+      "vehicle_id": "east_E_1_11",
+      "flow_name": "east",
+      "spawn_step": 1627,
+      "junction_id": 4,
+      "route_id": 129,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 44.804409794675294,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -5.25,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.2366702118396957
+      }
+    },
+    {
+      "event_id": "641760a9",
+      "vehicle_id": "west_W_2_19",
+      "flow_name": "west",
+      "spawn_step": 1657,
+      "junction_id": 4,
+      "route_id": 148,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 51.539423484132904,
+      "spawn_transform": {
+        "location": {
+          "x": -56.0,
+          "y": 8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "west",
+        "exit_direction": "north",
+        "lane_id": 2,
+        "peak_density": 1.0753077706774143
+      }
+    },
+    {
+      "event_id": "94275dbc",
+      "vehicle_id": "north_N_2_19",
+      "flow_name": "north",
+      "spawn_step": 1757,
+      "junction_id": 4,
+      "route_id": 18,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 51.209141388558216,
+      "spawn_transform": {
+        "location": {
+          "x": 1.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 1.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "north",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.036302165515635
+      }
+    },
+    {
+      "event_id": "719eed1b",
+      "vehicle_id": "north_N_0_6",
+      "flow_name": "north",
+      "spawn_step": 1782,
+      "junction_id": 4,
+      "route_id": 35,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 48.745078729168355,
+      "spawn_transform": {
+        "location": {
+          "x": 1.75,
+          "y": 56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -1.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "north",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.0293064287396545
+      }
+    },
+    {
+      "event_id": "1da83097",
+      "vehicle_id": "south_S_1_12",
+      "flow_name": "south",
+      "spawn_step": 1795,
+      "junction_id": 4,
+      "route_id": 89,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 40.12042043049382,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "south",
+        "exit_direction": "west",
+        "lane_id": 1,
+        "peak_density": 1.0145216106911035
+      }
+    },
+    {
+      "event_id": "c5c2d561",
+      "vehicle_id": "south_S_0_6",
+      "flow_name": "south",
+      "spawn_step": 1806,
+      "junction_id": 4,
+      "route_id": 88,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 41.159862189378295,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -5.25,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "south",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.013330806592963
+      }
+    },
+    {
+      "event_id": "d5241968",
+      "vehicle_id": "south_S_2_19",
+      "flow_name": "south",
+      "spawn_step": 1911,
+      "junction_id": 4,
+      "route_id": 75,
+      "lane_id": 2,
+      "blueprint_id": "vehicle.lincoln.mkz_2017",
+      "target_speed": 39.08448786751989,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 56.0,
+          "y": 8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": -0.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "south",
+        "exit_direction": "east",
+        "lane_id": 2,
+        "peak_density": 1.00591602433121
+      }
+    },
+    {
+      "event_id": "5dfd05b2",
+      "vehicle_id": "east_E_1_12",
+      "flow_name": "east",
+      "spawn_step": 1984,
+      "junction_id": 4,
+      "route_id": 127,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.audi.a2",
+      "target_speed": 41.45320935091265,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 8.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "east",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.012913586369336
+      }
+    },
+    {
+      "event_id": "ad54f31c",
+      "vehicle_id": "east_E_0_5",
+      "flow_name": "east",
+      "spawn_step": 1986,
+      "junction_id": 4,
+      "route_id": 106,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.seat.leon",
+      "target_speed": 40.47809160978244,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -5.25,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "left",
+        "entry_direction": "east",
+        "exit_direction": "north",
+        "lane_id": 0,
+        "peak_density": 1.0126121969441695
+      }
+    },
+    {
+      "event_id": "67eb1a06",
+      "vehicle_id": "east_E_1_13",
+      "flow_name": "east",
+      "spawn_step": 2031,
+      "junction_id": 4,
+      "route_id": 119,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 42.62461495711411,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -8.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": 8.75,
+          "y": -56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 270.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "right",
+        "entry_direction": "east",
+        "exit_direction": "south",
+        "lane_id": 1,
+        "peak_density": 1.0071400270500497
+      }
+    },
+    {
+      "event_id": "3fa52d69",
+      "vehicle_id": "east_E_0_6",
+      "flow_name": "east",
+      "spawn_step": 2043,
+      "junction_id": 4,
+      "route_id": 142,
+      "lane_id": 0,
+      "blueprint_id": "vehicle.citroen.c3",
+      "target_speed": 49.246992889831034,
+      "spawn_transform": {
+        "location": {
+          "x": 56.0,
+          "y": -1.75,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -56.0,
+          "y": -8.75,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 360.0,
+          "yaw": 180.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "east",
+        "exit_direction": "west",
+        "lane_id": 0,
+        "peak_density": 1.0
+      }
+    },
+    {
+      "event_id": "d797a9c1",
+      "vehicle_id": "south_S_1_13",
+      "flow_name": "south",
+      "spawn_step": 2078,
+      "junction_id": 4,
+      "route_id": 56,
+      "lane_id": 1,
+      "blueprint_id": "vehicle.bmw.grandtourer",
+      "target_speed": 48.307351258236686,
+      "spawn_transform": {
+        "location": {
+          "x": -5.25,
+          "y": -56.0,
+          "z": 0.30000001192092896
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "destination_transform": {
+        "location": {
+          "x": -8.75,
+          "y": 56.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "pitch": 0.0,
+          "yaw": 90.0,
+          "roll": 0.0
+        }
+      },
+      "metadata": {
+        "route_type": "straight",
+        "entry_direction": "south",
+        "exit_direction": "north",
+        "lane_id": 1,
+        "peak_density": 1.0
+      }
+    }
+  ]
+}

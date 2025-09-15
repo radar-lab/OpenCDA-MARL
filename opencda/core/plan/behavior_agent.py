@@ -6,10 +6,7 @@
 # Author: Runsheng Xu <rxx3386@ucla.edu>
 # License: TDG-Attribution-NonCommercial-NoDistrib
 
-
-import math
 import random
-import sys
 
 import numpy as np
 import carla
@@ -90,6 +87,7 @@ class BehaviorAgent(object):
         self._ego_pos = None
         self._ego_speed = 0.0
         self._map = carla_map
+        self._world = self.vehicle.get_world()
 
         # speed related, check yaml file to see the meaning
         self.max_speed = config_yaml['max_speed']
@@ -141,7 +139,7 @@ class BehaviorAgent(object):
         self.objects = {}
 
         # debug helper
-        self.debug_helper = PlanDebugHelper(self.vehicle.id)
+        self.debug_helper = PlanDebugHelper(self.vehicle.id, self._world)
         # print message in debug mode
         self.debug = False if 'debug' not in \
                               config_yaml else config_yaml['debug']
@@ -349,7 +347,7 @@ class BehaviorAgent(object):
             wld = self.vehicle.get_world()
             dao = GlobalRoutePlannerDAO(
                 wld.get_map(), sampling_resolution=self._sampling_resolution)
-            grp = GlobalRoutePlanner(dao)
+            grp = GlobalRoutePlanner(dao, wld, debug=self.debug)
             grp.setup()
             self._global_planner = grp
 
@@ -358,6 +356,14 @@ class BehaviorAgent(object):
             start_waypoint.transform.location,
             end_waypoint.transform.location)
 
+        # <OpenCDA-MARL> debug the route trace
+        if self.debug:
+            # visualize the route trace
+            #for waypoint, _ in route:
+            #    self.debug_helper.draw_point(waypoint.transform.location, size=0.1, life_time=10)
+            print(f"route trace length: {len(route)}, vehicle id: {self.vehicle.id}")
+        # </OpenCDA-MARL>
+        
         return route
 
     def traffic_light_manager(self, waypoint):
@@ -793,7 +799,8 @@ class BehaviorAgent(object):
         # 0. Simulation ends condition
         if self.is_close_to_destination():
             print('Simulation is Over')
-            sys.exit(0)
+            # Signal completion without forceful exit - let the scenario manager handle cleanup
+            raise StopIteration("Destination reached - simulation complete")
 
         # 1. Traffic light management
         if self.traffic_light_manager(ego_vehicle_wp) != 0:

@@ -73,9 +73,12 @@ class CollisionSensor(object):
         Clear collision sensor in Carla world.
         """
         self._history.clear()
-        if self.sensor.is_alive:
-            self.sensor.stop()
-            self.sensor.destroy()
+        try:
+            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+                self.sensor.stop()
+                self.sensor.destroy()
+        except Exception as e:
+            print(f"Warning: Failed to destroy collision sensor: {e}")
 
 
 class IMUSensor(object):
@@ -89,6 +92,9 @@ class IMUSensor(object):
         self.vehicle = vehicle
 
     def get_signed_forward_acceleration(self, acceleration, gravity=9.81):
+        # Check if vehicle is still alive before accessing it
+        if not self.vehicle.is_alive:
+            return 0.0
         acceleration.z -= gravity
         forward_vector = self.vehicle.get_transform().get_forward_vector()
         forward_vector = carla.Vector3D(forward_vector.x, forward_vector.y, 0)
@@ -103,6 +109,9 @@ class IMUSensor(object):
         self = weak_self()
         if not self:
             return
+        # Check if vehicle is still alive before accessing it
+        if not hasattr(self, 'vehicle') or not self.vehicle.is_alive:
+            return
         linear_acceleration = imu_data.accelerometer
         angular_velocity = imu_data.gyroscope
         signed_forward_acceleration = self.get_signed_forward_acceleration(linear_acceleration)
@@ -115,9 +124,12 @@ class IMUSensor(object):
         pass
 
     def destroy(self) -> None:
-        if self.sensor.is_alive:
-            self.sensor.stop()
-            self.sensor.destroy()
+        try:
+            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+                self.sensor.stop()
+                self.sensor.destroy()
+        except Exception as e:
+            print(f"Warning: Failed to destroy IMU sensor: {e}")
 
 
 class StuckDetector(object):
@@ -203,7 +215,10 @@ class OffRoadDetector(object):
         return {'offroad': self.off_road}
 
     def destroy(self):
-        pass
+        """
+        Clean up off-road detector by resetting state.
+        """
+        self.off_road = False
 
 
 class TrafficLightDector(object):
@@ -395,6 +410,24 @@ class TrafficLightDector(object):
             wps.append(wpx)
 
         return wps
+
+    def destroy(self):
+        """
+        Clean up traffic light detector by clearing references and resetting state.
+        """
+        # Clear references to CARLA objects to help with garbage collection
+        self._map = None
+        self._active_light = None
+        self._last_light = None
+        
+        # Reset state variables
+        self.ran_light = False
+        self.active_light_state = carla.TrafficLightState.Off
+        self.active_light_dis = 200
+        
+        # Reset counters
+        self.total_lights_ran = 0
+        self.total_lights = 0
 
     def return_status(self):
         return {'ran_light': self.ran_light}

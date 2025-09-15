@@ -8,6 +8,7 @@ import warnings
 
 import numpy as np
 import matplotlib.pyplot as plt
+import carla
 
 import opencda.core.plan.drive_profile_plotting as open_plt
 
@@ -32,12 +33,12 @@ class PlanDebugHelper(object):
 
     """
 
-    def __init__(self, actor_id):
+    def __init__(self, actor_id, world):
         self.actor_id = actor_id
         self.speed_list = [[]]
         self.acc_list = [[]]
         self.ttc_list = [[]]
-
+        self.world = world
         self.count = 0
 
     def update(self, ego_speed, ttc):
@@ -61,6 +62,13 @@ class PlanDebugHelper(object):
                     (self.speed_list[0][-1] - self.speed_list[0][-2]) / 0.05)
             self.ttc_list[0].append(ttc)
 
+    # <OpenCDA-MARL> debug the route trace
+    def draw_point(self, location: carla.Waypoint, size=0.1, color=carla.Color(r=0, g=0, b=0), life_time=1):
+        if self.world is None:
+            return
+        self.world.debug.draw_point(location, size=size, color=color, life_time=life_time)
+    # </OpenCDA-MARL>
+    
     def evaluate(self):
         """
         Evaluate the target vehicle and visulize the plot.
@@ -85,17 +93,19 @@ class PlanDebugHelper(object):
 
         figure.suptitle('planning profile of actor id %d' % self.actor_id)
 
-        # calculate the statistics
-        spd_avg = np.mean(np.array(self.speed_list[0]))
-        spd_std = np.std(np.array(self.speed_list[0]))
+        # calculate the statistics with empty array checks
+        speed_array = np.array(self.speed_list[0])
+        spd_avg = np.mean(speed_array) if len(speed_array) > 0 else 0.0
+        spd_std = np.std(speed_array) if len(speed_array) > 0 else 0.0
 
-        acc_avg = np.mean(np.array(self.acc_list[0]))
-        acc_std = np.std(np.array(self.acc_list[0]))
+        acc_array = np.array(self.acc_list[0])
+        acc_avg = np.mean(acc_array) if len(acc_array) > 0 else 0.0
+        acc_std = np.std(acc_array) if len(acc_array) > 0 else 0.0
 
         ttc_array = np.array(self.ttc_list[0])
         ttc_array = ttc_array[ttc_array < 1000]
-        ttc_avg = np.mean(ttc_array)
-        ttc_std = np.std(ttc_array)
+        ttc_avg = np.mean(ttc_array) if len(ttc_array) > 0 else 0.0
+        ttc_std = np.std(ttc_array) if len(ttc_array) > 0 else 0.0
 
         perform_txt = 'Speed average: %f (m/s), ' \
                       'Speed std: %f (m/s) \n' % (spd_avg, spd_std)

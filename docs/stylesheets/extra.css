@@ -1,0 +1,134 @@
+/* Custom styles for OpenCDA-MARL */
+
+:root {
+  --md-primary-fg-color: #3f51b5;
+  --md-primary-fg-color--light: #7986cb;
+  --md-primary-fg-color--dark: #303f9f;
+  --md-accent-fg-color: #673ab7;
+}
+
+/* Enhanced hero section */
+.md-hero {
+  background: linear-gradient(135deg, var(--md-primary-fg-color), var(--md-accent-fg-color));
+  color: white;
+}
+
+.md-hero__inner {
+  padding: 2rem 0;
+}
+
+/* Custom admonition styles */
+.md-typeset .admonition.info {
+  border-color: var(--md-primary-fg-color);
+}
+
+.md-typeset .admonition.info > .admonition-title {
+  background-color: rgba(63, 81, 181, 0.1);
+}
+
+/* Enhanced code blocks */
+.md-typeset pre > code {
+  border-radius: 0.5rem;
+}
+
+/* Custom button styles */
+.md-button {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.md-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.md-button--primary {
+  background: linear-gradient(135deg, var(--md-primary-fg-color), var(--md-accent-fg-color));
+  border: none;
+  color: white;
+}
+
+/* Enhanced navigation */
+.md-nav__title {
+  font-weight: 600;
+  color: var(--md-primary-fg-color);
+}
+
+.md-nav__item .md-nav__link--active {
+  color: var(--md-accent-fg-color);
+  font-weight: 500;
+}
+
+/* Custom cards */
+.feature-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card h3 {
+  color: var(--md-primary-fg-color);
+  margin-bottom: 1rem;
+}
+
+/* Mermaid diagram enhancements */
+.mermaid {
+  background: transparent !important;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Enhanced tables */
+.md-typeset table:not([class]) {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.md-typeset table:not([class]) th {
+  background: linear-gradient(135deg, var(--md-primary-fg-color), var(--md-accent-fg-color));
+  color: white;
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Progress indicators */
+.progress-bar {
+  height: 4px;
+  background: linear-gradient(135deg, var(--md-primary-fg-color), var(--md-accent-fg-color));
+  border-radius: 2px;
+  margin: 1rem 0;
+}
+
+/* Enhanced search */
+.md-search__form {
+  border-radius: 2rem;
+}
+
+.md-search__input {
+  border-radius: 2rem;
+}

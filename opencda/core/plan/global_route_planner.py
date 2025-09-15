@@ -49,7 +49,7 @@ class GlobalRoutePlanner(object):
         The previous behavioral option of the ego vehicle.
     """
 
-    def __init__(self, dao):
+    def __init__(self, dao, world, debug=False):
 
         self._dao = dao
         self._topology = None
@@ -58,6 +58,8 @@ class GlobalRoutePlanner(object):
         self._road_id_to_edge = None
         self._intersection_end_node = -1
         self._previous_decision = RoadOption.VOID
+        self._world = world
+        self._debug = debug
 
     def setup(self):
         """
@@ -65,6 +67,7 @@ class GlobalRoutePlanner(object):
         and builds graph representation of the world map.
         """
         self._topology = self._dao.get_topology()
+
         self._graph, self._id_map, self._road_id_to_edge = self._build_graph()
         self._find_loose_ends()
         self._lane_change_link()
@@ -199,6 +202,7 @@ class GlobalRoutePlanner(object):
             -edge (string) : pair node ids representing an edge in the graph.
         """
         waypoint = self._dao.get_waypoint(location)
+
         edge = None
         try:
             edge = \
@@ -213,6 +217,22 @@ class GlobalRoutePlanner(object):
                 "Lane id : ", waypoint.lane_id,
                 "Location : ", waypoint.transform.location.x,
                 waypoint.transform.location.y)
+        if self._debug:
+            # visualize the waypoint
+            self._world.debug.draw_point(
+                waypoint.transform.location,
+                size=0.2,
+                color=carla.Color(0, 255, 0),  # Green for waypoint
+                life_time=10.0
+            )
+
+            # visualize the waypoint by a text
+            self._world.debug.draw_string(
+                waypoint.transform.location,
+                "Waypoint" + str(edge),
+                color=carla.Color(0, 255, 0),  # Green for waypoint
+                life_time=10.0
+            )
         return edge
 
     def _lane_change_link(self):
@@ -238,6 +258,18 @@ class GlobalRoutePlanner(object):
                                 == carla.LaneType.Driving and \
                                 waypoint.road_id == next_waypoint.road_id:
                             next_road_option = RoadOption.CHANGELANERIGHT
+
+                            # <OpenCDA-MARL> - visualize the next waypoint
+                            if self._debug:
+                                self._world.debug.draw_point(
+                                    next_waypoint.transform.location,
+                                    size=0.2,
+                                    # Yellow for waypoint
+                                    color=carla.Color(255, 255, 0),
+                                    life_time=10.0
+                                )
+                            # <OpenCDA-MARL>
+
                             next_segment = self._localize(
                                 next_waypoint.transform.location)
                             if next_segment is not None:
@@ -257,6 +289,18 @@ class GlobalRoutePlanner(object):
                                 carla.LaneType.Driving and \
                                 waypoint.road_id == next_waypoint.road_id:
                             next_road_option = RoadOption.CHANGELANELEFT
+
+                            # <OpenCDA-MARL> - visualize the next waypoint
+                            if self._debug:
+                                self._world.debug.draw_point(
+                                    next_waypoint.transform.location,
+                                    size=0.2,
+                                    # Green for waypoint
+                                    color=carla.Color(0, 255, 0),
+                                    life_time=10.0
+                                )
+                            # </OpenCDA-MARL>
+
                             next_segment = self._localize(
                                 next_waypoint.transform.location)
                             if next_segment is not None:
@@ -271,6 +315,7 @@ class GlobalRoutePlanner(object):
                                     type=next_road_option,
                                     change_waypoint=next_waypoint)
                                 left_found = True
+
                 if left_found and right_found:
                     break
 
@@ -281,6 +326,98 @@ class GlobalRoutePlanner(object):
         l1 = np.array(self._graph.nodes[n1]['vertex'])
         l2 = np.array(self._graph.nodes[n2]['vertex'])
         return np.linalg.norm(l1 - l2)
+
+# <OpenCDA-MARL> - visualize the road network graph and path
+    def visualize_graph(self, world, life_time=30.0):
+        """
+        Visualize the road network graph in Carla.
+
+        Args:
+            world: carla.World object
+            life_time: How long the visualization should last (seconds)
+        """
+        if self._graph is None:
+            print("Graph not initialized. Call setup() first.")
+            return
+
+        # Draw all nodes as points
+        for node_id, node_data in self._graph.nodes(data=True):
+            vertex = node_data['vertex']
+            location = carla.Location(
+                x=vertex[0], y=vertex[1], z=vertex[2] + 0.5)
+
+            world.debug.draw_point(
+                location,
+                size=0.2,
+                color=carla.Color(255, 0, 0),  # Red for nodes
+                life_time=life_time
+            )
+
+        # Draw all edges as lines
+        for source, target, edge_data in self._graph.edges(data=True):
+            source_vertex = self._graph.nodes[source]['vertex']
+            target_vertex = self._graph.nodes[target]['vertex']
+
+            start_loc = carla.Location(
+                x=source_vertex[0], y=source_vertex[1], z=source_vertex[2] + 0.3)
+            end_loc = carla.Location(
+                x=target_vertex[0], y=target_vertex[1], z=target_vertex[2] + 0.3)
+
+            # Color edges differently based on intersection status
+            color = carla.Color(0, 255, 255) if edge_data.get(
+                'intersection', False) else carla.Color(0, 255, 0)
+
+            world.debug.draw_line(
+                start_loc,
+                end_loc,
+                thickness=0.1,
+                color=color,  # Cyan for intersections, Green for regular roads
+                life_time=life_time
+            )
+
+    def visualize_path(self, world, route, life_time=10.0):
+        """
+        Visualize a specific path/route through the graph.
+
+        Args:
+            world: carla.World object
+            route: List of node IDs representing the path
+            life_time: How long the visualization should last (seconds)
+        """
+        if not route or len(route) < 2:
+            return
+
+        # Draw the path with thicker lines and different color
+        for i in range(len(route) - 1):
+            source_node = route[i]
+            target_node = route[i + 1]
+
+            source_vertex = self._graph.nodes[source_node]['vertex']
+            target_vertex = self._graph.nodes[target_node]['vertex']
+
+            start_loc = carla.Location(
+                x=source_vertex[0], y=source_vertex[1], z=source_vertex[2] + 0.8)
+            end_loc = carla.Location(
+                x=target_vertex[0], y=target_vertex[1], z=target_vertex[2] + 0.8)
+
+            world.debug.draw_line(
+                start_loc,
+                end_loc,
+                thickness=0.25,
+                color=carla.Color(255, 255, 0),  # Yellow for the planned path
+                life_time=life_time
+            )
+
+            # Draw arrows to show direction
+            world.debug.draw_arrow(
+                start_loc,
+                end_loc,
+                thickness=0.15,
+                arrow_size=0.25,
+                color=carla.Color(255, 255, 0),
+                life_time=life_time
+            )
+# </OpenCDA-MARL> - visualize the road network graph and path
 
     def _path_search(self, origin, destination):
         """
@@ -296,12 +433,23 @@ class GlobalRoutePlanner(object):
         connecting origin and destination.
         """
 
+        # print("call localize from _path_search")
         start, end = self._localize(origin), self._localize(destination)
+        # Visualize the entire graph
+        if self._debug:
+            # visualize the start and end
+            self.visualize_graph(self._world, life_time=10.0)
 
+        # print(f"_graph: {self._graph}")
         route = nx.astar_path(
             self._graph, source=start[0], target=end[0],
             heuristic=self._distance_heuristic, weight='length')
         route.append(end[1])
+
+        # Visualize the path
+        if self._debug:
+            self.visualize_path(self._world, route, life_time=10.0)
+
         return route
 
     def _successive_last_intersection_edge(self, index, route):
@@ -437,6 +585,7 @@ class GlobalRoutePlanner(object):
         """
 
         route_trace = []
+
         route = self._path_search(origin, destination)
         current_waypoint = self._dao.get_waypoint(origin)
         destination_waypoint = self._dao.get_waypoint(destination)

@@ -26,7 +26,7 @@ class SafetyManager:
         self.cav_world = weakref.ref(cav_world)()
         self.print_message = params['print_message']
         self.imu_sensor = IMUSensor(vehicle)
-        self.status_queue = deque()
+        self.status_queue = deque(maxlen=params.get('queue_maxlen', 2000))
         self.sensors = [CollisionSensor(vehicle, params['collision_sensor']),
                         StuckDetector(params['stuck_dector']),
                         OffRoadDetector(params['offroad_dector']),

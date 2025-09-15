@@ -1,0 +1,119 @@
+# Extend fields - only these fields will extend instead of replace
+_extend_fields:
+  - "world.seed" # Add to base seed for variation
+
+description: |-
+  BALANCED Q-learning configuration for 4-way intersection.
+  Optimized state space: 36 states.
+  Features: distance_to_intersection, speed, distance_to_front_vehicle.
+  Expected: convergence in 20-30 episodes.
+
+# Demonstrate seed extension - adds variation to base seed
+world:
+  seed: 5 # This will be ADDED to default.yaml seed (11) = 16 total
+
+spectator:
+  preset: "intersection_bird_eye"
+
+meta:
+  # available scenario types: intersection
+  scenario_type: "intersection"
+  town: "intersection_12_lane_fixed"
+  # custom xodr path for this scenario
+  # xodr_path: "opencda_marl/assets/maps/intersection.xodr"
+
+# minimal scenario configuration
+scenario:
+  simulation:
+    max_steps: 2400 # 2 minute = 20fps * 60s * 2
+    max_episodes: 100
+  traffic:
+    # Traffic mode: 'record', 'replay', or 'live'
+    mode: "replay"
+    replay_file: "recordings/lite_2minL.json"
+    #replay_file: "recordings/quick_test.json"
+    base_speed: 45.0 # km/h base speed for vehicles
+    active_junctions: [4]
+
+    planner:
+      distance: 5.0 # base spacing (m)
+      spawn_offset: 7 # multiples of safe_distance upstream
+      dest_offset: 7 # multiples of safe_distance downstream
+      spawn_z_lift: 0.3 # small lift to avoid ground collision
+      wp_step: 1.0 # stepping granularity along lanes (m)
+      allow_uturn: false
+      visualize:
+        entry_wp: false
+        exit_wp: false
+        spawn_wp: false
+        dest_wp: false
+        route_line: false
+        junction_center: true
+        bbox: false
+        extent_box: true
+        text: true
+        life_time: 10.0
+
+agents:
+  debug: false
+  agent_type: "marl"
+
+  marl:
+    # Base VanillaAgent parameters
+    debug: false
+    max_speed: 65 # Maximum speed for the agent (km/h)
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: false # Keep trajectory clean for RL
+
+MARL:
+  # Algorithm selection: q_learning, td3, sac, ppo
+  algorithm: "q_learning"
+  
+  q_learning:
+    # Balanced speed actions
+    speed_actions: [15, 35, 65]
+
+    # Simplified state discretization for faster learning (36 states total)
+    state_features:
+      distance_to_intersection:
+        bins: [0, 5, 15]
+      speed:
+        bins: [0, 30] # 2 bins: slow/stopped (0-30), fast (30+) → 3 states
+      distance_to_front_vehicle:
+        bins: [0, 10] # 2 bins: close (0-15m), safe (15m+) → 3 states
+
+    # Learning parameters (optimized for smaller state space)
+    epsilon: 0.1
+    learning_rate: 0.2 # Slightly higher for faster convergence with fewer states
+    discount_factor: 0.95
+
+    use_experience_replay: true
+    memory_size: 128000 # Store last 5000 transitions
+    batch_size: 128     # Update with batches of 32
+
+  # Training configuration
+  training:
+    # Training control
+    training_mode: true # Set to false for evaluation only
+
+    # Checkpoint settings
+    checkpoint_dir: "checkpoints/"
+    save_freq: 1 # Save checkpoint every N episodes
+    keep_checkpoints: 5 # Keep last N episode checkpoints
+
+    # Resume training
+    #load_checkpoint: null # Path to checkpoint to resume from (null = start fresh)
+    load_checkpoint: "checkpoints/q_learning/best_checkpoint.pkl" # Example
+
+  rewards:
+    collision: -130.0 # Heavy penalty for collisions
+    success: 130.0 # High reward for reaching destination
+    step_penalty: -0.5 # Small penalty to encourage faster completion
+    # Optional reward shaping
+    # safe_distance_bonus: 0.1 # Small bonus for maintaining safe distance
+    # risky_distance_penalty: -0.5 # Small penalty for getting too close

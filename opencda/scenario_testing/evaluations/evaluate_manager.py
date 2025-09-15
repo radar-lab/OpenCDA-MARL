@@ -71,6 +71,9 @@ class EvaluationManager(object):
 
         self.platooning_eval(log_file)
         print('Platooning Evaluation Done.')
+        
+        # Close all matplotlib figures to prevent threading issues and memory leaks
+        plt.close('all')
 
     def calculate_route_dist(self, route):
         route_dist = 0.0
@@ -181,34 +184,41 @@ class EvaluationManager(object):
         timestamps = list(map(lambda e: e[2], real_route))
         imu_data = vm.safety_manager.imu_sensor.imu_data
         safety_data = vm.safety_manager.status_queue
+        
+        # Ensure consistent array lengths to prevent dimension mismatch
+        min_length = min(len(timestamps), len(imu_data))
+        end_index = min_length if self.skip_head < min_length else min_length
+        
         self.plot_2d(
-            timestamps[self.skip_head:],
-            list(map(lambda e: e[1], real_route))[self.skip_head:],
+            timestamps[self.skip_head:end_index],
+            list(map(lambda e: e[1], real_route))[self.skip_head:end_index],
             'velocity',
             'timestamp',
             'velocity',
             'velocity to timestamp plot'
         )
         self.plot_3d(
-            timestamps[self.skip_head:],
-            list(map(lambda e: e[0].x, imu_data))[self.skip_head:],
-            list(map(lambda e: e[0].y, imu_data))[self.skip_head:],
-            list(map(lambda e: e[0].z, imu_data))[self.skip_head:],  # z must subtracts gravity const.
-            list(map(lambda e: e[2], imu_data))[self.skip_head:], # signed magnitude
-            list(map(lambda e: e[1].x, imu_data))[self.skip_head:],
-            list(map(lambda e: e[1].y, imu_data))[self.skip_head:],
-            list(map(lambda e: e[1].z, imu_data))[self.skip_head:],
-            list(map(lambda e: math.sqrt(e[1].x * e[1].x + e[1].y * e[1].y + e[1].z * e[1].z), imu_data))[self.skip_head:],
+            timestamps[self.skip_head:end_index],
+            list(map(lambda e: e[0].x, imu_data))[self.skip_head:end_index],
+            list(map(lambda e: e[0].y, imu_data))[self.skip_head:end_index],
+            list(map(lambda e: e[0].z, imu_data))[self.skip_head:end_index],  # z must subtracts gravity const.
+            list(map(lambda e: e[2], imu_data))[self.skip_head:end_index], # signed magnitude
+            list(map(lambda e: e[1].x, imu_data))[self.skip_head:end_index],
+            list(map(lambda e: e[1].y, imu_data))[self.skip_head:end_index],
+            list(map(lambda e: e[1].z, imu_data))[self.skip_head:end_index],
+            list(map(lambda e: math.sqrt(e[1].x * e[1].x + e[1].y * e[1].y + e[1].z * e[1].z), imu_data))[self.skip_head:end_index],
         )
+        # Also fix safety_data and real_route to use consistent indexing
+        safety_min_length = min(len(safety_data), min_length)
         self.plot_hazard_condition(
-            list(map(lambda e: e[0], safety_data))[self.skip_head:],
-            list(map(lambda e: int(e[1]['collision']), safety_data))[self.skip_head:],
-            list(map(lambda e: int(e[1]['offroad']), safety_data))[self.skip_head:],
-            list(map(lambda e: int(e[1]['stuck']), safety_data))[self.skip_head:],
-            list(map(lambda e: int(e[1]['ran_light']), safety_data))[self.skip_head:]
+            list(map(lambda e: e[0], safety_data))[self.skip_head:safety_min_length],
+            list(map(lambda e: int(e[1]['collision']), safety_data))[self.skip_head:safety_min_length],
+            list(map(lambda e: int(e[1]['offroad']), safety_data))[self.skip_head:safety_min_length],
+            list(map(lambda e: int(e[1]['stuck']), safety_data))[self.skip_head:safety_min_length],
+            list(map(lambda e: int(e[1]['ran_light']), safety_data))[self.skip_head:safety_min_length]
         )
         self.plot_routes(
-            list(map(lambda e: e[0], real_route))[self.skip_head:],
+            list(map(lambda e: e[0], real_route))[self.skip_head:end_index],
             list(map(lambda e: e[0].transform, planned_route)),
         )
 
@@ -234,6 +244,7 @@ class EvaluationManager(object):
                 '%d_kinematics_plotting.png' %
                 actor_id)
             figure.savefig(figure_save_path, dpi=100)
+            plt.close(figure)
 
             lprint(log_file, perform_txt)
 
@@ -258,6 +269,7 @@ class EvaluationManager(object):
                 '%d_localization_plotting.png' %
                 actor_id)
             figure.savefig(figure_save_path, dpi=100)
+            plt.close(figure)
 
             # save log txt
             lprint(log_file, perform_txt)
@@ -282,6 +294,7 @@ class EvaluationManager(object):
                 '%s_platoon_plotting.png' %
                 pmid)
             figure.savefig(figure_save_path, dpi=100)
+            plt.close(figure)
 
             # save log txt
             lprint(log_file, perform_txt)

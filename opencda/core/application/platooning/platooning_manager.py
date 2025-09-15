@@ -265,24 +265,35 @@ class PlatooningManager(object):
 
             velocity_list += debug_helper.speed_list
             acceleration_list += debug_helper.acc_list
-            time_gap_list += debug_helper.time_gap_list
-            distance_gap_list += debug_helper.dist_gap_list
-
-            time_gap_list_tmp = \
-                np.array(debug_helper.time_gap_list)
-            time_gap_list_tmp = \
-                time_gap_list_tmp[time_gap_list_tmp < 100]
-            distance_gap_list_tmp = \
-                np.array(debug_helper.dist_gap_list)
-            distance_gap_list_tmp = \
-                distance_gap_list_tmp[distance_gap_list_tmp < 100]
+            
+            # Check if debug_helper has platoon-specific attributes
+            if hasattr(debug_helper, 'time_gap_list'):
+                time_gap_list += debug_helper.time_gap_list
+                time_gap_list_tmp = np.array(debug_helper.time_gap_list)
+                time_gap_list_tmp = time_gap_list_tmp[time_gap_list_tmp < 100]
+            else:
+                # Use empty list for non-platoon agents
+                time_gap_list_tmp = np.array([])
+            
+            if hasattr(debug_helper, 'dist_gap_list'):
+                distance_gap_list += debug_helper.dist_gap_list
+                distance_gap_list_tmp = np.array(debug_helper.dist_gap_list)
+                distance_gap_list_tmp = distance_gap_list_tmp[distance_gap_list_tmp < 100]
+            else:
+                # Use empty list for non-platoon agents
+                distance_gap_list_tmp = np.array([])
 
             perform_txt += '\n Platoon member ID:%d, Actor ID:%d : \n' % (
                 i, vm.vehicle.id)
-            perform_txt += 'Time gap mean: %f, std: %f \n' % (
-                np.mean(time_gap_list_tmp), np.std(time_gap_list_tmp))
-            perform_txt += 'Distance gap mean: %f, std: %f \n' % (
-                np.mean(distance_gap_list_tmp), np.std(distance_gap_list_tmp))
+            
+            # Calculate means only if arrays are not empty
+            time_gap_mean = np.mean(time_gap_list_tmp) if len(time_gap_list_tmp) > 0 else 0.0
+            time_gap_std = np.std(time_gap_list_tmp) if len(time_gap_list_tmp) > 0 else 0.0
+            distance_gap_mean = np.mean(distance_gap_list_tmp) if len(distance_gap_list_tmp) > 0 else 0.0
+            distance_gap_std = np.std(distance_gap_list_tmp) if len(distance_gap_list_tmp) > 0 else 0.0
+            
+            perform_txt += 'Time gap mean: %f, std: %f \n' % (time_gap_mean, time_gap_std)
+            perform_txt += 'Distance gap mean: %f, std: %f \n' % (distance_gap_mean, distance_gap_std)
 
         figure = plt.figure()
 
