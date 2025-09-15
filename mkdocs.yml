@@ -1,0 +1,197 @@
+site_name: OpenCDA-MARL
+site_description: Multi-Agent Reinforcement Learning for Cooperative Autonomous Driving
+site_author: OpenCDA-MARL
+repo_url: https://github.com/radar-lab/opencda-marl
+repo_name: opencda-marl
+
+theme:
+  name: material
+  logo: images/logo.png
+  favicon: images/favicon.ico
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.instant
+    - navigation.instant.prefetch
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - toc.follow
+    - toc.integrate
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+plugins:
+  - search
+  - meta
+  - git-revision-date-localized:
+      type: date
+  - mermaid2
+
+nav:
+  - Home:
+      - OpenCDA-MARL: index.md
+      - Getting Started:
+          - Installation: installation.md
+          - Quick Start: quick-start.md
+          - FAQ: faq.md
+  - MARL Framework:
+      - Overview: marl/overview.md
+      - Algorithms: marl/algorithms.md
+      - Training: marl/training.md
+      - Updates: marl/updates.md
+      - Changelog-MARL:
+          - v0.1.0-alpha: marl/changelog/v0.1.0-alpha.md
+      - Contributing: contributing.md
+  - OpenCDA Integration:
+      - Core Components: opencda/core.md
+      - Changelog-MARL:
+          - Overview: opencda/changelog/index.md
+          - Architecture Changes: opencda/changelog/architecture_changes.md
+          - API Changes: opencda/changelog/api_changes.md
+          - Platform Changes: opencda/changelog/platform_changes.md
+          - Config Changes: opencda/changelog/config_changes.md
+          - Breaking Changes: opencda/changelog/breaking_changes.md
+          - Migration & Docs: opencda/changelog/migration_and_docs.md
+      - Integration:
+        - Scenario Testing: opencda/scenarios.md
+        - Traffic Generation: opencda/traffic_generation.md
+        - YAML Configuration: opencda/yaml_define.md
+  - API Reference:
+      - OpenCDA Core:
+          - Overview: api/opencda/overview.md
+          - CavWorld: api/opencda/cav_world.md
+          - PerceptionManager: api/opencda/perception_manager.md
+          - VehicleManager: api/opencda/vehicle_manager.md
+          - ScenarioManager: api/opencda/scenario_manager.md
+          - LocalizationManager: api/opencda/localization_manager.md
+          - BehaviorAgent: api/opencda/behavior_agent.md
+          - V2XManager: api/opencda/v2x_manager.md
+      - MARL Extension:
+          - Overview: api/opencda-marl/overview.md
+          - Coordinator: api/opencda-marl/coordinator.md
+          - Scenario: api/opencda-marl/scenario.md
+          - Adapters: 
+            - Map Adapter: api/opencda-marl/adapters/map_adapter.md
+            - Vehicle Adapter: api/opencda-marl/adapters/vehicle_adapter.md
+          - Core Components:
+            - Agent Manager: api/opencda-marl/agent_manager.md
+            - Map Manager: api/opencda-marl/map_manager.md
+          - Environment Interface: api/opencda-marl/environment.md
+          - Traffic Configuration: api/opencda-marl/traffic_config.md
+          - Benchmark System: api/opencda-marl/benchmark.md
+          - Training Infrastructure: api/opencda-marl/training.md
+  - Development:
+      - Architecture: architecture.md
+      - Implementation Guide: marl/implementation.md
+      - Phase 1: marl/dev/phase1_setup.md
+      - Phase 2: marl/dev/phase2_baseline.md
+      - Phase 3: marl/dev/phase3_marl.md
+  - About Us: about.md
+
+extra:
+  homepage: https://lgcyaxi.github.io/opencda-marl
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/radar-lab/opencda-marl
+      name: GitHub Repository
+    - icon: fontawesome/solid/globe
+      link: https://opencda-documentation.readthedocs.io/en/latest/
+      name: OpenCDA Documentation
+    - icon: fontawesome/solid/university
+      link: https://github.com/radar-lab
+      name: UA Radar Lab
+  version:
+    provider: mike
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: >-
+            Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: >- 
+            Thanks for your feedback! Help us improve this page by
+            <a href="https://github.com/radar-lab/opencda-marl/issues/new/?title=[Feedback]+{title}+-+{url}" target="_blank" rel="noopener">telling us what you need</a>.
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
