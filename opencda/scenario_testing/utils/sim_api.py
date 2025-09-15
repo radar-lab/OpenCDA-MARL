@@ -26,8 +26,10 @@ from opencda.core.common.cav_world import CavWorld
 from opencda.scenario_testing.utils.customized_map_api import \
     load_customized_world, bcolors
 
+from opencda import CARLA_VERSION
 
-def car_blueprint_filter(blueprint_library, carla_version='0.9.11'):
+
+def car_blueprint_filter(blueprint_library, carla_version=CARLA_VERSION):
     """
     Exclude the uncommon vehicles from the default CARLA blueprint library
     (i.e., isetta, carlacola, cybertruck, t2).
@@ -127,7 +129,7 @@ def multi_class_vehicle_blueprint_filter(label, blueprint_library, bp_meta):
 
 class ScenarioManager:
     """
-    The manager that controls simulation construction, backgound traffic
+    The manager that controls simulation construction, background traffic
     generation and CAVs spawning.
 
     Parameters
@@ -168,7 +170,7 @@ class ScenarioManager:
 
     def __init__(self, scenario_params,
                  apply_ml,
-                 carla_version,
+                 carla_version=CARLA_VERSION,
                  xodr_path=None,
                  town=None,
                  cav_world=None):
@@ -182,9 +184,12 @@ class ScenarioManager:
             np.random.seed(simulation_config['seed'])
             random.seed(simulation_config['seed'])
 
+        host = simulation_config.get('host', 'localhost')
+        port = simulation_config.get('client_port', 2000)
+        timeout = simulation_config.get('timeout', 10.0)
         self.client = \
-            carla.Client('localhost', simulation_config['client_port'])
-        self.client.set_timeout(10.0)
+            carla.Client(host, port)
+        self.client.set_timeout(timeout)
 
         if xodr_path:
             self.world = load_customized_world(xodr_path, self.client)
@@ -204,11 +209,11 @@ class ScenarioManager:
 
         self.origin_settings = self.world.get_settings()
         new_settings = self.world.get_settings()
+        self.fixed_dt = simulation_config.get('fixed_delta_seconds', 0.1)
 
         if simulation_config['sync_mode']:
             new_settings.synchronous_mode = True
-            new_settings.fixed_delta_seconds = \
-                simulation_config['fixed_delta_seconds']
+            new_settings.fixed_delta_seconds = self.fixed_dt
         else:
             sys.exit(
                 'ERROR: Current version only supports sync simulation mode')
@@ -301,7 +306,8 @@ class ScenarioManager:
                 self.scenario_params['scenario']['single_cav_list']):
             # in case the cav wants to join a platoon later
             # it will be empty dictionary for single cav application
-            platoon_base = OmegaConf.create({'platoon': self.scenario_params.get('platoon_base',{})})
+            platoon_base = OmegaConf.create(
+                {'platoon': self.scenario_params.get('platoon_base', {})})
             cav_config = OmegaConf.merge(self.scenario_params['vehicle_base'],
                                          platoon_base,
                                          cav_config)
@@ -571,7 +577,7 @@ class ScenarioManager:
                     ego_vehicle_bp.set_attribute('color', color)
 
             vehicle = self.world.spawn_actor(ego_vehicle_bp, spawn_transform)
-            vehicle.set_autopilot(True, 8000)
+            vehicle.set_autopilot(True, tm.get_port())
 
             if 'vehicle_speed_perc' in vehicle_config:
                 tm.vehicle_percentage_speed_difference(
@@ -679,7 +685,7 @@ class ScenarioManager:
             if not vehicle:
                 continue
 
-            vehicle.set_autopilot(True, 8000)
+            vehicle.set_autopilot(True, tm.get_port())
             tm.auto_lane_change(vehicle, traffic_config['auto_lane_change'])
 
             if 'ignore_lights_percentage' in traffic_config:
@@ -711,7 +717,7 @@ class ScenarioManager:
         """
         print('Spawning CARLA traffic flow.')
         traffic_config = self.scenario_params['carla_traffic_manager']
-        tm = self.client.get_trafficmanager()
+        tm = self.client.get_trafficmanager(8000)
 
         tm.set_global_distance_to_leading_vehicle(
             traffic_config['global_distance'])

@@ -149,3 +149,7 @@ docs/tmp.py
 video_dumping
 *data_dumping*
 ready*
+
+!/recordings/*.json
+/checkpoints/*/*episode_*.*
+/checkpoints/*/latest_checkpoint.*

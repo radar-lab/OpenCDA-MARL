@@ -1,5 +1,7 @@
 <!--
-Thank you for contributing to OpenCDA! 
+MODIFIED FROM OPENCDA PR TEMPLATE
+
+Thank you for contributing to OpenCDA-MARL! 
 
 Please make sure you keep the title of your pull request short and informative,
 and that you fill in the following template accurately (don't forget to remove

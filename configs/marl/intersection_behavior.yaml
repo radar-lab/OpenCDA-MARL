@@ -1,0 +1,57 @@
+# Extend fields - only these fields will extend instead of replace
+_extend_fields:
+  - "world.seed" # Add to base seed for variation
+
+description: |-
+  MARL configuration for 4-way intersection with HIGH traffic density.
+  This scenario focuses on intersection navigation under heavy congestion.
+
+# Demonstrate seed extension - adds variation to base seed
+world:
+  seed: 5 # This will be ADDED to default.yaml seed (11) = 16 total
+
+spectator:
+  preset: "intersection_bird_eye"
+
+meta:
+  # available scenario types: intersection
+  scenario_type: "intersection"
+  town: "intersection_12_lane_fixed"
+  # custom xodr path for this scenario
+  # xodr_path: "opencda_marl/assets/maps/intersection.xodr"
+
+# minimal scenario configuration
+scenario:
+  simulation:
+    max_steps: 2400 # 2 minute = 20fps * 60s * 2
+    max_episodes: 100
+  traffic:
+    # Traffic mode: 'record', 'replay', or 'live'
+    mode: "replay"
+    replay_file: "recordings/lite_2minL.json"
+    #replay_file: "recordings/quick_test.json"
+    base_speed: 45.0 # km/h base speed for vehicles
+    active_junctions: [4]
+
+    planner:
+      distance: 5.0 # base spacing (m)
+      spawn_offset: 7 # multiples of safe_distance upstream
+      dest_offset: 7 # multiples of safe_distance downstream
+      spawn_z_lift: 0.3 # small lift to avoid ground collision
+      wp_step: 1.0 # stepping granularity along lanes (m)
+      allow_uturn: false
+      visualize:
+        entry_wp: false
+        exit_wp: false
+        spawn_wp: false
+        dest_wp: false
+        route_line: false
+        junction_center: true
+        bbox: false
+        extent_box: true
+        text: true
+        life_time: 10.0
+
+agents:
+  debug: false
+  agent_type: "behavior"

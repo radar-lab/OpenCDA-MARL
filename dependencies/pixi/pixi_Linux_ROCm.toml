@@ -1,0 +1,78 @@
+[workspace]
+authors = ["AXIBA <leolihao@arizona.edu>"]
+channels = ["conda-forge", "pytorch", "nvidia"]
+name = "OpenCDA"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[system-requirements]
+cuda = "12.8"
+
+[tasks]
+start = "python opencda.py"
+
+# MARL tests
+marl-intersection-build = "python test/marl/test_intersection_build.py"
+
+# MARL integrated with opencda.py
+marl-quick-test = "python opencda.py -t intersection --marl"
+marl-quick-test-gui = "python opencda.py -t intersection --marl --gui"
+marl-eval-agents = "python opencda_marl/envs/cross_agent_evaluator.py"
+
+
+# openCDA quick test
+cda-quick-test = "python opencda.py -t single_2lanefree_carla"
+cda-platoon-2lanefree = "python opencda.py -t platoon_joining_2lanefree_carla --apply_ml"
+cda-single-town06 = "python opencda.py -t single_town06_carla --apply_ml"
+cda-platoon-town06 = "python opencda.py -t platoon_town06_carla --apply_ml"
+
+[feature.docs.dependencies]
+mkdocs = ">=1.6.0,<2"
+mkdocs-material = ">=9.5.0,<10"
+
+[feature.docs.pypi-dependencies]
+mkdocs-mermaid2-plugin = ">=1.2.1, <2"
+mkdocs-git-revision-date-localized-plugin = ">=1.4.7, <2"
+pymdown-extensions = ">=10.12.0,<11"
+
+[feature.docs.tasks]
+docs-serve = "mkdocs serve"
+docs-build = "mkdocs build"
+docs-deploy = "mkdocs gh-deploy"
+
+[environments]
+default = { solve-group = "default" }
+docs = { features = ["docs"], solve-group = "default" }
+
+[dependencies]
+pip = ">=25.2,<26"
+python = "3.10.*"
+matplotlib = ">=3.10.5,<4"
+networkx = ">=3.4.2,<4"
+numpy = ">=2.2.6,<3"
+pillow = ">=11.3.0,<12"
+pyparsing = ">=3.2.3,<4"
+six = ">=1.17.0,<2"
+open3d = ">=0.19.0,<0.20"
+opencv = ">=4.12.0,<5"
+pandas = ">=2.3.2,<3"
+pygame = ">=2.6.1,<3"
+scikit-learn = ">=1.7.1,<2"
+scipy = ">=1.15.2,<2"
+seaborn = ">=0.13.2,<0.14"
+lxml = ">=6.0.0,<7"
+shapely = ">=2.1.1,<3"
+omegaconf = ">=2.3.0,<3"
+ultralytics = ">=8.3.176,<9"
+gitpython = ">=3.1.30,<4"
+loguru = ">=0.7.3,<0.8"
+pyyaml = ">=6.0.2,<7"
+h5py = ">=3.14.0,<4"
+pyside6 = ">=6.9.1,<7"
+
+[pypi-dependencies]
+torch = { index = "https://download.pytorch.org/whl/rocm6.4" }
+torchvision = { index = "https://download.pytorch.org/whl/rocm6.4" }
+carla = { path = "./dependencies/whl/carla-0.9.15-cp310-cp310-manylinux_2_27_x86_64.whl" }
+gitpython = ">=3.1.30"
+sumolib = ">=1.24.0, <2"

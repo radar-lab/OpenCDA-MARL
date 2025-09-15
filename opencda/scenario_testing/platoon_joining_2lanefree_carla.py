@@ -29,7 +29,6 @@ def run_scenario(opt, scenario_params):
         # create scenario manager
         scenario_manager = sim_api.ScenarioManager(scenario_params,
                                                    opt.apply_ml,
-                                                   opt.version,
                                                    xodr_path=xodr_path)
         if opt.record:
             scenario_manager.client. \
@@ -59,6 +58,10 @@ def run_scenario(opt, scenario_params):
         spectator = scenario_manager.world.get_spectator()
         spectator_vehicle = platoon_list[0].vehicle_manager_list[1].vehicle
 
+        # Keep track of all vehicles for cleanup
+        all_platoons = list(platoon_list)
+        all_single_cavs = list(single_cav_list)
+
         # run steps
         while True:
             scenario_manager.tick()
@@ -71,18 +74,37 @@ def run_scenario(opt, scenario_params):
                     carla.Rotation(
                         pitch=-
                         90)))
-            for platoon in platoon_list:
-                platoon.update_information()
-                platoon.run_step()
+            # Process platoons in reverse to safely remove completed ones
+            for i in range(len(platoon_list) - 1, -1, -1):
+                platoon = platoon_list[i]
+                try:
+                    platoon.update_information()
+                    platoon.run_step()
+                except StopIteration:
+                    # Platoon reached destination, remove from list
+                    print(f"Platoon {i} reached destination, removing from simulation")
+                    platoon_list.pop(i)
 
-            for i, single_cav in enumerate(single_cav_list):
+            # Process single CAVs in reverse to safely remove completed ones
+            for i in range(len(single_cav_list) - 1, -1, -1):
+                single_cav = single_cav_list[i]
                 # this function should be added in wrapper
                 if single_cav.v2x_manager.in_platoon():
                     single_cav_list.pop(i)
                 else:
                     single_cav.update_info()
-                    control = single_cav.run_step()
-                    single_cav.vehicle.apply_control(control)
+                    try:
+                        control = single_cav.run_step()
+                        single_cav.vehicle.apply_control(control)
+                    except StopIteration:
+                        # Vehicle reached destination, remove from list and continue
+                        print(f"Vehicle {i} reached destination, removing from simulation")
+                        single_cav_list.pop(i)
+            
+            # Check if all single vehicles and platoons are done
+            if not single_cav_list and not platoon_list:
+                print("All vehicles completed their routes. Ending simulation.")
+                break
 
     finally:
         eval_manager.evaluate()
@@ -92,9 +114,17 @@ def run_scenario(opt, scenario_params):
 
         scenario_manager.close()
 
-        for platoon in platoon_list:
-            platoon.destroy()
-        for cav in single_cav_list:
-            cav.destroy()
+        # Clean up all vehicles, including completed ones
+        for platoon in all_platoons:
+            try:
+                platoon.destroy()
+            except Exception as e:
+                print(f"Warning: Failed to destroy platoon: {e}")
+                
+        for cav in all_single_cavs:
+            try:
+                cav.destroy()
+            except Exception as e:
+                print(f"Warning: Failed to destroy single CAV: {e}")
         for v in bg_veh_list:
             v.destroy()

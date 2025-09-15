@@ -37,7 +37,6 @@ def run_scenario(opt, scenario_params):
         scenario_manager = \
             sim_api.CoScenarioManager(scenario_params,
                                       opt.apply_ml,
-                                      opt.version,
                                       xodr_path=xodr_path,
                                       cav_world=cav_world,
                                       sumo_file_parent_path=sumo_cfg)

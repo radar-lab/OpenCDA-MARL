@@ -62,6 +62,17 @@ class CavWorld(object):
         for rsu_manager in self._rsu_manager_dict.values():
             rsu_manager.destory()
 
+    def remove_vehicle_manager(self, vehicle_manager):
+        """
+        Remove vehicle manager from the world.
+        """
+        vid = getattr(vehicle_manager, 'vid', None)
+        if vid in self._vehicle_manager_dict:
+            self._vehicle_manager_dict.pop(vid, None)
+        veh = getattr(vehicle_manager, 'vehicle', None)
+        if getattr(veh, 'id', None) is not None:
+            self.vehicle_id_set.discard(veh.id)
+
     def update_vehicle_manager(self, vehicle_manager):
         """
         Update created CAV manager to the world.

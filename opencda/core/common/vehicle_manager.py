@@ -2,11 +2,12 @@
 """
 Basic class of CAV
 """
-# Author: Runsheng Xu <rxx3386@ucla.edu>
+# Author:   Lihao Guo   <leolihao@arizona.edu>
+#           Runsheng Xu <rxx3386@ucla.edu>
 # License: TDG-Attribution-NonCommercial-NoDistrib
 
 import uuid
-
+from loguru import logger
 from opencda.core.actuation.control_manager \
     import ControlManager
 from opencda.core.application.platooning.platoon_behavior_agent\
@@ -22,7 +23,6 @@ from opencda.core.plan.behavior_agent \
     import BehaviorAgent
 from opencda.core.map.map_manager import MapManager
 from opencda.core.common.data_dumper import DataDumper
-
 
 class VehicleManager(object):
     """
@@ -81,7 +81,8 @@ class VehicleManager(object):
             carla_map,
             cav_world,
             current_time='',
-            data_dumping=False):
+            data_dumping=False,
+            agent=None):
 
         # an unique uuid for this vehicle
         self.vid = str(uuid.uuid1())
@@ -114,7 +115,17 @@ class VehicleManager(object):
                                             params=config_yaml['safety_manager'])
         # behavior agent
         self.agent = None
-        if 'platooning' in application:
+
+        # <OpenCDA-MARL> 
+        # logger.info(f"Using agent class: {type(agent)}")
+        # we will use the agent passed by vehicle adapter
+        # otherwise, create the agent based on the application type for openCDA compatibility
+        if agent is not None:
+            # Use custom agent class (takes precedence)
+            logger.debug(f"Using custom agent class: {agent}")
+            self.agent = agent
+        elif 'platoon' in application:
+            # OpenCDA platoon agent
             platoon_config = config_yaml['platoon']
             self.agent = PlatooningBehaviorAgent(
                 vehicle,
@@ -124,6 +135,7 @@ class VehicleManager(object):
                 platoon_config,
                 carla_map)
         else:
+            # OpenCDA default behavior agent
             self.agent = BehaviorAgent(vehicle, carla_map, behavior_config)
 
         # Control module
@@ -164,7 +176,6 @@ class VehicleManager(object):
         Returns
         -------
         """
-
         self.agent.set_destination(
             start_location, end_location, clean, end_reset)
 
@@ -213,7 +224,6 @@ class VehicleManager(object):
         self.map_manager.run_step()
         target_speed, target_pos = self.agent.run_step(target_speed)
         control = self.controller.run_step(target_speed, target_pos)
-
         # dump data
         if self.data_dumper:
             self.data_dumper.run_step(self.perception_manager,
@@ -228,5 +238,6 @@ class VehicleManager(object):
         """
         self.perception_manager.destroy()
         self.localizer.destroy()
+        self.safety_manager.destroy()
         self.vehicle.destroy()
         self.map_manager.destroy()

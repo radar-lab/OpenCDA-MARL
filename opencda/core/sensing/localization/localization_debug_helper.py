@@ -232,24 +232,14 @@ class LocDebugHelper(object):
 
         figure.suptitle('localization plotting of actor id %d' % self.actor_id)
 
-        x_error_mean = np.mean(
-            np.abs(
-                np.array(
-                    self.gt_x) -
-                np.array(
-                    self.gnss_x)))
-        y_error_mean = np.mean(
-            np.abs(
-                np.array(
-                    self.gt_y) -
-                np.array(
-                    self.gnss_y)))
-        yaw_error_mean = np.mean(
-            np.abs(
-                np.array(
-                    self.gt_yaw) -
-                np.array(
-                    self.gnss_yaw)))
+        # Calculate means only if arrays are not empty
+        x_error_array = np.abs(np.array(self.gt_x) - np.array(self.gnss_x))
+        y_error_array = np.abs(np.array(self.gt_y) - np.array(self.gnss_y))
+        yaw_error_array = np.abs(np.array(self.gt_yaw) - np.array(self.gnss_yaw))
+        
+        x_error_mean = np.mean(x_error_array) if len(x_error_array) > 0 else 0.0
+        y_error_mean = np.mean(y_error_array) if len(y_error_array) > 0 else 0.0
+        yaw_error_mean = np.mean(yaw_error_array) if len(yaw_error_array) > 0 else 0.0
 
         perform_txt = 'mean error for GNSS raw data on x-axis: %f (meter), ' \
                       'mean error for GNSS raw data on y-axis: %f (meter),' \
@@ -258,24 +248,14 @@ class LocDebugHelper(object):
                          y_error_mean,
                          yaw_error_mean)
 
-        x_error_mean = np.mean(
-            np.abs(
-                np.array(
-                    self.gt_x) -
-                np.array(
-                    self.filter_x)))
-        y_error_mean = np.mean(
-            np.abs(
-                np.array(
-                    self.gt_y) -
-                np.array(
-                    self.filter_y)))
-        yaw_error_mean = np.mean(
-            np.abs(
-                np.array(
-                    self.gt_yaw) -
-                np.array(
-                    self.filter_yaw)))
+        # Calculate means only if arrays are not empty  
+        x_error_filter_array = np.abs(np.array(self.gt_x) - np.array(self.filter_x))
+        y_error_filter_array = np.abs(np.array(self.gt_y) - np.array(self.filter_y))
+        yaw_error_filter_array = np.abs(np.array(self.gt_yaw) - np.array(self.filter_yaw))
+        
+        x_error_mean = np.mean(x_error_filter_array) if len(x_error_filter_array) > 0 else 0.0
+        y_error_mean = np.mean(y_error_filter_array) if len(y_error_filter_array) > 0 else 0.0
+        yaw_error_mean = np.mean(yaw_error_filter_array) if len(yaw_error_filter_array) > 0 else 0.0
 
         perform_txt += 'mean error after data fusion on x-axis: %f (meter), ' \
                        'mean error after data fusion  on y-axis: %f (meter),' \

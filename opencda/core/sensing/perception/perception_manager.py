@@ -5,10 +5,10 @@ Perception module base.
 
 # Author: Runsheng Xu <rxx3386@ucla.edu>
 # License: TDG-Attribution-NonCommercial-NoDistrib
+# Modified by: Lihao Guo <leolihao@arizona.edu>
 
 import weakref
 import sys
-import time
 
 import carla
 import cv2
@@ -412,10 +412,17 @@ class PerceptionManager:
                                      self.carla_world,
                                      config_yaml['lidar'],
                                      self.global_position)
-            self.o3d_vis = o3d_visualizer_init(self.id)
+            # <OpenCDA-MARL> Delay o3d visualizer creation to prevent black window on init
+            # Original code that creates black window immediately:
+            # self.o3d_vis = o3d_visualizer_init(self.id)
+            # 
+            # Fixed version - lazy initialization:
+            self.o3d_vis = None
+            self.o3d_vis_initialized = False
         else:
             self.lidar = None
             self.o3d_vis = None
+            self.o3d_vis_initialized = False
 
         # if data dump is true, semantic lidar is also spawned
         self.data_dump = data_dump
@@ -502,13 +509,27 @@ class PerceptionManager:
         # retrieve current cameras and lidar data
         rgb_images = []
         for rgb_camera in self.rgb_camera:
+            # <OpenCDA-MARL> Fix infinite waiting loop that causes freezing
+            # Original problematic code:
+            # while rgb_camera.image is None:
+            #     continue
             while rgb_camera.image is None:
-                continue
-            rgb_images.append(
-                cv2.cvtColor(
-                    np.array(
-                        rgb_camera.image),
-                    cv2.COLOR_BGR2RGB))
+                break
+            
+            if rgb_camera.image is not None:
+                rgb_images.append(
+                    cv2.cvtColor(
+                        np.array(
+                            rgb_camera.image),
+                        cv2.COLOR_BGR2RGB))
+
+        # <OpenCDA-MARL> Skip YOLO detection if no camera images are available
+        if not rgb_images:
+            # print("Warning: No camera images available, skipping YOLO detection")
+            # Still add traffic lights and return
+            objects = self.retrieve_traffic_lights(objects)
+            self.objects = objects
+            return objects
 
         # yolo detection
         yolo_detection = self.ml_manager.object_detector(rgb_images)
@@ -524,12 +545,45 @@ class PerceptionManager:
             rgb_draw_images.append(rgb_image)
 
             # camera lidar fusion
-            objects = o3d_camera_lidar_fusion(
-                objects,
-                yolo_detection.xyxy[i],
-                self.lidar.data,
-                projected_lidar,
-                self.lidar.sensor)
+            # Handle both YOLOv5 and YOLOv8 output formats
+            if hasattr(self.ml_manager, 'use_v8') and self.ml_manager.use_v8:
+                # YOLOv8 format
+                if len(yolo_detection) > i and yolo_detection[i].boxes is not None:
+                    # Convert YOLOv8 boxes to YOLOv5-compatible format
+                    # YOLOv5 expects: [x1, y1, x2, y2, confidence, class_id]
+                    boxes = yolo_detection[i].boxes
+                    xyxy = boxes.xyxy.cpu()
+                    conf = boxes.conf.cpu().unsqueeze(1)  # Add dimension for concatenation
+                    cls = boxes.cls.cpu().unsqueeze(1)    # Add dimension for concatenation
+                    
+                    # Concatenate to create YOLOv5-compatible format
+                    import torch
+                    yolo_v5_format = torch.cat([xyxy, conf, cls], dim=1)
+                    
+                    objects = o3d_camera_lidar_fusion(
+                        objects,
+                        yolo_v5_format,
+                        self.lidar.data,
+                        projected_lidar,
+                        self.lidar.sensor)
+                else:
+                    # No detections for this camera - use empty tensor
+                    import torch
+                    empty_detections = torch.empty((0, 6))
+                    objects = o3d_camera_lidar_fusion(
+                        objects,
+                        empty_detections,
+                        self.lidar.data,
+                        projected_lidar,
+                        self.lidar.sensor)
+            else:
+                # YOLOv5 format (original)
+                objects = o3d_camera_lidar_fusion(
+                    objects,
+                    yolo_detection.xyxy[i],
+                    self.lidar.data,
+                    projected_lidar,
+                    self.lidar.sensor)
 
             # calculate the speed. current we retrieve from the server
             # directly.
@@ -545,17 +599,33 @@ class PerceptionManager:
                 cv2.imshow(
                     '%s-th camera of actor %d, perception activated' %
                     (str(i), self.id), rgb_image)
-            cv2.waitKey(1)
+            # Fix GIL issue: Use try-except to handle cv2.waitKey in thread context
+            try:
+                cv2.waitKey(1)
+            except Exception:
+                # In case of threading issues, continue without waiting
+                pass
 
         if self.lidar_visualize:
+            # <OpenCDA-MARL> Lazy initialize o3d visualizer to prevent black window
+            if not self.o3d_vis_initialized:
+                self.o3d_vis = o3d_visualizer_init(self.id)
+                self.o3d_vis_initialized = True
+                
+            # <OpenCDA-MARL> Fix infinite waiting loop that causes freezing
+            # Original problematic code:
+            # while self.lidar.data is None:
+            #     continue
             while self.lidar.data is None:
-                continue
-            o3d_pointcloud_encode(self.lidar.data, self.lidar.o3d_pointcloud)
-            o3d_visualizer_show(
-                self.o3d_vis,
-                self.count,
-                self.lidar.o3d_pointcloud,
-                objects)
+                break  # Skip lidar visualization if no data
+            
+            if self.lidar.data is not None:
+                o3d_pointcloud_encode(self.lidar.data, self.lidar.o3d_pointcloud)
+                o3d_visualizer_show(
+                    self.o3d_vis,
+                    self.count,
+                    self.lidar.o3d_pointcloud,
+                    objects)
         # add traffic light
         objects = self.retrieve_traffic_lights(objects)
         self.objects = objects
@@ -613,8 +683,12 @@ class PerceptionManager:
         objects.update({'vehicles': vehicle_list})
 
         if self.camera_visualize:
+            # <OpenCDA-MARL> Fix infinite waiting loop that causes freezing
+            # Original problematic code:
+            # while self.rgb_camera[0].image is None:
+            #     continue
             while self.rgb_camera[0].image is None:
-                continue
+                return objects  # Skip visualization if no data
 
             names = ['front', 'right', 'left', 'back']
 
@@ -634,18 +708,33 @@ class PerceptionManager:
                 cv2.imshow(
                     '%s camera of actor %d, perception deactivated' %
                     (names[i], self.id), rgb_image)
-                cv2.waitKey(1)
+                # Fix GIL issue: Use try-except to handle cv2.waitKey in thread context
+                try:
+                    cv2.waitKey(1)
+                except Exception:
+                    # In case of threading issues, continue without waiting
+                    pass
 
         if self.lidar_visualize:
+            # <OpenCDA-MARL> Lazy initialize o3d visualizer to prevent black window
+            if not self.o3d_vis_initialized:
+                self.o3d_vis = o3d_visualizer_init(self.id)
+                self.o3d_vis_initialized = True
+                
+            # <OpenCDA-MARL> Fix infinite waiting loop that causes freezing
+            # Original problematic code:
+            # while self.lidar.data is None:
+            #     continue
             while self.lidar.data is None:
-                continue
-            o3d_pointcloud_encode(self.lidar.data, self.lidar.o3d_pointcloud)
-            # render the raw lidar
-            o3d_visualizer_show(
-                self.o3d_vis,
-                self.count,
-                self.lidar.o3d_pointcloud,
-                objects)
+                break  # Skip lidar visualization if no data
+            if self.lidar.data is not None:
+                o3d_pointcloud_encode(self.lidar.data, self.lidar.o3d_pointcloud)
+                # render the raw lidar
+                o3d_visualizer_show(
+                    self.o3d_vis,
+                    self.count,
+                    self.lidar.o3d_pointcloud,
+                    objects)
 
         # add traffic light
         objects = self.retrieve_traffic_lights(objects)
@@ -839,16 +928,41 @@ class PerceptionManager:
         """
         if self.rgb_camera:
             for rgb_camera in self.rgb_camera:
-                rgb_camera.sensor.destroy()
+                try:
+                    if hasattr(rgb_camera, 'sensor') and rgb_camera.sensor.is_alive:
+                        rgb_camera.sensor.stop()
+                        rgb_camera.sensor.destroy()
+                except Exception as e:
+                    print(f"Warning: Failed to destroy RGB camera sensor: {e}")
 
         if self.lidar:
-            self.lidar.sensor.destroy()
+            try:
+                if hasattr(self.lidar, 'sensor') and self.lidar.sensor.is_alive:
+                    self.lidar.sensor.stop()
+                    self.lidar.sensor.destroy()
+            except Exception as e:
+                print(f"Warning: Failed to destroy LiDAR sensor: {e}")
 
         if self.camera_visualize:
-            cv2.destroyAllWindows()
+            try:
+                cv2.destroyAllWindows()
+            except Exception as e:
+                print(f"Warning: Failed to destroy camera windows: {e}")
 
-        if self.lidar_visualize:
-            self.o3d_vis.destroy_window()
+        # <OpenCDA-MARL> Only destroy if visualizer was actually initialized
+        # This prevents errors when lazy initialization never occurred
+        if self.lidar_visualize and self.o3d_vis_initialized and self.o3d_vis:
+            try:
+                self.o3d_vis.destroy_window()
+            except Exception as e:
+                print(f"Warning: Failed to destroy LiDAR window: {e}")
+        elif self.lidar_visualize and not self.o3d_vis_initialized:
+            print("Info: LiDAR visualizer was never initialized, no window to destroy")
 
         if self.data_dump:
-            self.semantic_lidar.sensor.destroy()
+            try:
+                if hasattr(self, 'semantic_lidar') and hasattr(self.semantic_lidar, 'sensor') and self.semantic_lidar.sensor.is_alive:
+                    self.semantic_lidar.sensor.stop()
+                    self.semantic_lidar.sensor.destroy()
+            except Exception as e:
+                print(f"Warning: Failed to destroy semantic LiDAR sensor: {e}")

@@ -12,6 +12,12 @@ from opencda.scenario_testing.utils.yaml_utils import add_current_time
 
 
 def run_scenario(opt, scenario_params):
+    # Initialize variables to None to handle exceptions properly
+    scenario_manager = None
+    eval_manager = None
+    single_cav_list = []
+    bg_veh_list = []
+    
     try:
         scenario_params = add_current_time(scenario_params)
 
@@ -21,7 +27,6 @@ def run_scenario(opt, scenario_params):
         # create scenario manager
         scenario_manager = sim_api.ScenarioManager(scenario_params,
                                                    opt.apply_ml,
-                                                   opt.version,
                                                    town='Town06',
                                                    cav_world=cav_world)
 
@@ -57,17 +62,28 @@ def run_scenario(opt, scenario_params):
 
             for i, single_cav in enumerate(single_cav_list):
                 single_cav.update_info()
-                control = single_cav.run_step()
-                single_cav.vehicle.apply_control(control)
+                try:
+                    control = single_cav.run_step()
+                    single_cav.vehicle.apply_control(control)
+                except StopIteration as e:
+                    print(f"Simulation completed: {e}")
+                    break
+            else:
+                continue
+            break
 
     finally:
-        eval_manager.evaluate()
+        # Only evaluate if eval_manager was successfully created
+        if eval_manager is not None:
+            eval_manager.evaluate()
 
-        if opt.record:
-            scenario_manager.client.stop_recorder()
+        # Clean up scenario manager if it was created
+        if scenario_manager is not None:
+            if opt.record:
+                scenario_manager.client.stop_recorder()
+            scenario_manager.close()
 
-        scenario_manager.close()
-
+        # Clean up vehicles if they were created
         for v in single_cav_list:
             v.destroy()
         for v in bg_veh_list:

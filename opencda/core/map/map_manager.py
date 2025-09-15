@@ -256,7 +256,9 @@ class MapManager(object):
         for tl_id, tl_content in self.traffic_light_info.items():
             trigger_poly = tl_content['corners']
             # use Path to do fast computation
-            trigger_path = Path(trigger_poly.boundary)
+            # Get coordinates from the polygon's exterior
+            trigger_coords = list(trigger_poly.exterior.coords)
+            trigger_path = Path(trigger_coords)
             # check if any point in the middle line inside the trigger area
             check_array = trigger_path.contains_points(mid_lane[:, :2])
 
@@ -274,8 +276,8 @@ class MapManager(object):
         crosswalks_ids = []
 
         # boundary of each lane for later filtering
-        lanes_bounds = np.empty((0, 2, 2), dtype=np.float)
-        crosswalks_bounds = np.empty((0, 2, 2), dtype=np.float)
+        lanes_bounds = np.empty((0, 2, 2), dtype=np.float64)
+        crosswalks_bounds = np.empty((0, 2, 2), dtype=np.float64)
 
         # loop all waypoints to get lane information
         for (i, waypoint) in enumerate(self.topology):

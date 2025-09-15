@@ -216,10 +216,14 @@ def o3d_camera_lidar_fusion(objects,
             continue
 
         # filter out the outlier
-        x_common = mode(np.array(np.abs(select_points[:, 0]),
-                                 dtype=np.int), axis=0)[0][0]
-        y_common = mode(np.array(np.abs(select_points[:, 1]),
-                                 dtype=np.int), axis=0)[0][0]
+        x_mode_result = mode(np.array(np.abs(select_points[:, 0]),
+                                     dtype=np.int32), axis=0)[0]
+        y_mode_result = mode(np.array(np.abs(select_points[:, 1]),
+                                     dtype=np.int32), axis=0)[0]
+        
+        # Handle both scalar and array results from mode
+        x_common = x_mode_result.item() if hasattr(x_mode_result, 'item') else x_mode_result
+        y_common = y_mode_result.item() if hasattr(y_mode_result, 'item') else y_mode_result
         points_inlier = (np.abs(select_points[:, 0]) > x_common - 3) & \
                         (np.abs(select_points[:, 0]) < x_common + 3) & \
                         (np.abs(select_points[:, 1]) > y_common - 3) & \
