@@ -79,8 +79,8 @@ We welcome contributions to OpenCDA-MARL! Please see our [Contributing Guide](do
 
 For quick reference:
 
-* Report bugs and improvements by submitting [issues](https://github.com/lgcyaxi/OpenCDA-MARL/issues)
-* Submit contributions via [pull requests](https://github.com/lgcyaxi/OpenCDA-MARL/pulls) using our [PR template](.github/PR_TEMPLATE.md)
+* Report bugs and improvements by submitting [issues](https://github.com/radar-lab/OpenCDA-MARL/issues)
+* Submit contributions via [pull requests](https://github.com/radar-lab/OpenCDA-MARL/pulls) using our [PR template](.github/PR_TEMPLATE.md)
 
 ## Citation
 
@@ -91,7 +91,7 @@ If you are using OpenCDA-MARL for your research, please cite both the MARL exten
   title={OpenCDA-MARL: A Unified Benchmarking Framework for Cooperative Autonomous Intersection Management with Multi-Agent Reinforcement Learning},
   author={Lihao Guo, Louis Liu, Jiahao Tang, Liu Bo, Siyang Cao},
   year={2025},
-  url={https://github.com/lgcyaxi/OpenCDA-MARL}
+  url={https://github.com/radar-lab/OpenCDA-MARL}
 }
 
 @inproceedings{xu2021opencda,
