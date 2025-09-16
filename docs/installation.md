@@ -50,6 +50,8 @@ pixi run marl-quick-test
    ```bash
    $env:CARLA_HOME = "D:\Applications\CARLA_0.9.15"
    ```
+4. [Optional] Download our customized pre-built maps package from [Here](https://drive.google.com/drive/folders/1igtXiaSJL73HWWxwP0dh_zvvGX9oBSBa?usp=sharing) and extract to the CARLA_0.9.15 folder.
+
 
 ## Step 5: Verify Installation
 

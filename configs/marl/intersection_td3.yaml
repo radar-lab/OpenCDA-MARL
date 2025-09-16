@@ -1,0 +1,130 @@
+# Extend fields - only these fields will extend instead of replace
+_extend_fields:
+  - "world.seed" # Add to base seed for variation
+
+description: |-
+  TD3 configuration for 4-way intersection with HIGH traffic density.
+  Twin Delayed DDPG with continuous action space for speed control.
+  This scenario focuses on intersection navigation under heavy congestion.
+
+# Demonstrate seed extension - adds variation to base seed
+world:
+  seed: 5 # This will be ADDED to default.yaml seed (11) = 16 total
+
+spectator:
+  preset: "intersection_bird_eye"
+
+meta:
+  # available scenario types: intersection
+  scenario_type: "intersection"
+  town: "intersection_12_lane_fixed"
+  # custom xodr path for this scenario
+  # xodr_path: "opencda_marl/assets/maps/intersection.xodr"
+
+# minimal scenario configuration
+scenario:
+  simulation:
+    max_steps: 2400 # 2 minute = 20fps * 60s * 2
+    max_episodes: 100
+  traffic:
+    # Traffic mode: 'record', 'replay', or 'live'
+    mode: "replay"
+    replay_file: "recordings/lite_2minL.json"
+    #replay_file: "recordings/quick_test.json"
+    base_speed: 45.0 # km/h base speed for vehicles
+    active_junctions: [4]
+
+    planner:
+      distance: 5.0 # base spacing (m)
+      spawn_offset: 7 # multiples of safe_distance upstream
+      dest_offset: 7 # multiples of safe_distance downstream
+      spawn_z_lift: 0.3 # small lift to avoid ground collision
+      wp_step: 1.0 # stepping granularity along lanes (m)
+      allow_uturn: false
+      visualize:
+        entry_wp: false
+        exit_wp: false
+        spawn_wp: false
+        dest_wp: false
+        route_line: false
+        junction_center: true
+        bbox: false
+        extent_box: true
+        text: true
+        life_time: 10.0
+
+agents:
+  debug: false
+  agent_type: "marl"
+
+  marl:
+    # Base VanillaAgent parameters
+    debug: false
+    max_speed: 65 # Maximum speed for the agent (km/h)
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: false # Keep trajectory clean for RL
+
+MARL:
+  # Algorithm selection: q_learning, td3, sac, ppo, dqn
+  algorithm: "td3"
+
+  state_dim: 9 # Auto-calculated from custom features (9D total)
+  action_dim: 1 # Continuous speed control
+
+  # TD3 Algorithm Configuration (Multi-Agent)
+  td3:
+    # Feature configuration (9D total)
+    features:
+      rel_x: 1                        # Relative X to intersection
+      rel_y: 1                        # Relative Y to intersection
+      position_x: 1                   # Absolute X position
+      position_y: 1                   # Absolute Y position
+      lane_position: 1                # Lane position (0=intersection, 1=left, 2=middle, 3=right)
+      heading_angle: 1                # Vehicle orientation (radians)
+      dist_to_intersection: 1         # Distance to intersection
+      dist_to_front_vehicle: 1        # Distance to front vehicle
+      waypoint_buffer: 1              # Waypoint count (0-50 range)
+
+    # LSTM conflict encoder (from ITS_Sim architecture)
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 9                   # From custom features (auto-calculated)
+      hidden_size: 256                # LSTM hidden dimension
+      num_layers: 1                   # LSTM layers
+
+    # Motion planner architecture (from AdvRAIM)
+    motion_planner:
+      num_layers: 5
+      input_dim: [265, 1024, 1024, 512, 256]    # First: 9 + 256 = 265
+      output_dim: [1024, 1024, 512, 256, 1]      # Final output: 1 (action)
+
+    # Learning rates - reduced for stable training
+    learning_rate_actor: 1e-3         # Actor learning rate (stable learning)
+    learning_rate_critic: 1e-3        # Critic learning rate (stable convergence)
+
+    # TD3 hyperparameters
+    tau: 0.01                         # Soft update parameter for target networks (2x faster updates)
+    discount: 0.99                    # Discount factor (gamma)
+    policy_noise: 0.2                 # Noise added to target policy during critic update
+    noise_clip: 0.3                   # Range to clip target policy noise
+    exploration_noise: 0.5            # Maximum noise for aggressive speed exploration (±21 km/h)
+    policy_freq: 2                    # Delayed policy updates (update actor every 2 critic updates)
+
+    # Training parameters
+    batch_size: 512                   # Training batch size (large for stable gradients)
+    memory_size: 300000               # Replay buffer size (large for diverse experience)
+    min_memory_size: 25000            # Minimum transitions before training starts
+    save_frequency: 1000              # Save model every N episodes
+    eval_frequency: 500               # Evaluate policy every N episodes
+
+  # Training configuration
+  training:
+    load_model: false                 # Load pre-trained model if available
+    model_dir: "models/td3/"          # Model save directory
+    enable_wandb: false               # Weights & Biases logging
+    wandb_project: "opencda_marl"     # WandB project name
