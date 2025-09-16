@@ -19,17 +19,19 @@ Dr. Liu Bo (Associate Professor @ UA):
 
 Lihao Guo (Ph.D. Student @ UA):
 
-- Project Lead and OpenCDA-MARL System Architect
+- Project Lead
+- OpenCDA-MARL System Architect
 - MARL Algorithm Development
 - [Homepage](https://www.lgcyaxi.net/)
 - [Linkedin](https://www.linkedin.com/in/lgcyaxi)
 
 Jiahao Tang (Ph.D. Student @ UA):
 
-- Maps
-- [Linkedin](https://www.linkedin.com/in/xu-han-12851a64/)
+- Rule-based Agent Configuration
+- [Linkedin](https://www.linkedin.com/in/jiahaotang1997/)
 
 Louis Liu (Volunteer Student @ University High School):
 
 - Map Development
-- SUMO Co-Simulation
+- Simulation Testing
+- [Linkedin](https://www.linkedin.com/in/louisliu2/)

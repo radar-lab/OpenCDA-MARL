@@ -5,13 +5,13 @@
 - **Windows 10/11** (64-bit)
 - **Python 3.10**
 - **CUDA 12.8** (for GPU acceleration)
-- **CARLA 0.9.15**
+- [**CARLA 0.9.15**](https://github.com/carla-simulator/carla/releases)
 - **Git**
 
 ## Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/opencda-marl.git
+git clone https://github.com/radar-lab/opencda-marl.git
 cd opencda-marl
 ```
 
@@ -22,16 +22,23 @@ If you don't have pixi installed:
 ```bash
 # Install pixi (Windows)
 powershell -c "irm https://pixi.sh/install.ps1 | iex"
+
+# Linux/macOS
+curl -fsSL https://pixi.sh/install.sh | sh
 ```
 
 ## Step 3: Setup Environment
 
 ```bash
+# Find compatible pixi.toml file from the dependencies folder
+# For example, if you are using AMD GPU, you should use the pixi.toml file 
+# in the dependencies/pixi/pixi_Linux_ROCm.toml
+
 # Install all dependencies
 pixi install
 
 # Test the installation
-pixi run quick-test
+pixi run marl-quick-test
 ```
 
 ## Step 4: Install CARLA
@@ -50,9 +57,10 @@ pixi run quick-test
 # Run CARLA server (in one terminal)
 cd $env:CARLA_HOME
 .\CarlaUE4.exe
+# Or manually start the server by clicking the CarlaUE4.exe file
 
 # Run OpenCDA test (in another terminal)
-pixi run quick-test
+pixi run marl-quick-test
 ```
 
 ## Development Environment
@@ -67,29 +75,8 @@ pixi shell -e docs
 pixi run -e docs docs-serve
 ```
 
-## Troubleshooting
-
-### Common Issues
-
-**CARLA Connection Error:**
-
-- Ensure CARLA server is running
-- Check firewall settings
-- Verify CARLA_HOME environment variable
-
-**GPU Issues:**
-
-- Install NVIDIA drivers
-- Verify CUDA 12.8 installation
-- Check GPU memory availability
-
-**Python Dependencies:**
-
-- Use `pixi clean` and `pixi install` to refresh dependencies
-- Ensure Python 3.10 is being used
-
-### Getting Help
+## Getting Help
 
 1. Check the [FAQ](faq.md)
-2. Search existing [Issues](https://github.com/lgcyaxi/opencda-marl/issues)
+2. Search existing [Issues](https://github.com/radar-lab/opencda-marl/issues)
 3. Create a new issue with detailed error information

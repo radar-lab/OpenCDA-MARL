@@ -2,15 +2,6 @@
 
 ## Installation Issues
 
-### Q: CARLA installation fails on Windows
-
-**A:** Make sure you have:
-
-- Windows 10/11 64-bit
-- Latest Visual C++ Redistributables
-- Sufficient disk space (>20GB)
-- Download CARLA 0.9.15 from official releases
-
 ### Q: Pixi environment issues
 
 **A:** Try these steps:
@@ -23,13 +14,36 @@ pixi clean
 pixi install --force-reinstall
 ```
 
+## Common Issues
+
+### Q: CARLA Connection Error
+
+**A:** Ensure CARLA server is running, check firewall settings, and verify CARLA_HOME environment variable.
+
 ### Q: CUDA compatibility issues
 
 **A:** Ensure you have:
 
-- CUDA 12.8 installed
-- Compatible GPU driver
+- Install NVIDIA drivers (if using NVIDIA GPU)
+- Verify CUDA 12.8 installation
+- Check GPU memory availability
 - PyTorch compiled with correct CUDA version
+
+## OpenCDA-MARL Integration
+
+### Q: How to add new MARL algorithms?
+
+**A:** Check the [MARL Framework](marl/overview.md) documentation and [API Reference](api/opencda-marl/overview.md).
+
+## OpenCDA Integration
+
+### Q: Perception module not working
+
+**A:** Check:
+
+- `activate: true` in perception config
+- PyTorch installation with `--apply_ml` flag
+- Camera/LiDAR sensor configuration
 
 ### Q: torch.cuda.amp deprecation warnings and boolean flag errors
 
@@ -48,79 +62,14 @@ pixi install --force-reinstall
 
 The fixed version uses the new `torch.amp.autocast` API with proper device type and enabled parameters.
 
-## MARL Training Issues
-
-### Q: Training runs but no learning occurs
-
-**A:** Check:
-
-- Learning rate (try 1e-4 to 1e-3)
-- Reward function implementation
-- Environment reset logic
-- Agent observation space
-
-### Q: Multi-agent coordination fails
-
-**A:** Verify:
-
-- Communication range settings
-- V2X manager configuration
-- Agent spawn positions
-- Scenario YAML configuration
-
-## OpenCDA Integration
-
-### Q: OpenCDA scenarios don't work with MARL
-
-**A:** Ensure:
-
-- Proper YAML configuration
-- Compatible OpenCDA version
-- CARLA server running
-- Correct scenario parameters
-
-### Q: Perception module not working
-
-**A:** Check:
-
-- `activate: true` in perception config
-- PyTorch installation with `--apply_ml` flag
-- Camera/LiDAR sensor configuration
-
-## Performance Issues
-
-### Q: Simulation runs slowly
-
-**A:** Try:
-
-- Reduce number of agents
-- Disable unnecessary visualizations
-- Use synchronous mode
-- Optimize CARLA settings
-
-### Q: Memory usage too high
-
-**A:** Consider:
-
-- Smaller replay buffer size
-- Batch processing
-- Reduce observation dimensions
-- Clean unused variables
-
-## Configuration Questions
-
 ### Q: How to create custom scenarios?
 
 **A:** See the [YAML Configuration Guide](opencda/yaml_define.md) for detailed instructions.
-
-### Q: How to add new MARL algorithms?
-
-**A:** Check the [MARL Framework](marl/overview.md) documentation and [API Reference](api/opencda-marl/overview.md).
 
 ## Getting Help
 
 Still having issues?
 
 - Check the [Original OpenCDA Documentation](https://opencda-documentation.readthedocs.io/en/latest/)
-- Open an issue on [GitHub](https://github.com/lgcyaxi/opencda-marl/issues)
+- Open an issue on [GitHub](https://github.com/radar-lab/opencda-marl/issues)
 - Review the [Contributing Guide](contributing.md)

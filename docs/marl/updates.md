@@ -83,4 +83,4 @@ When adding changelog entries:
 ```
 
 !!! tip "Stay Updated" 
-    Watch the [GitHub repository](https://github.com/lgcyaxi/OpenCDA-MARL) for the latest updates and releases.
+    Watch the [GitHub repository](https://github.com/radar-lab/OpenCDA-MARL) for the latest updates and releases.

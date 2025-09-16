@@ -10,18 +10,20 @@ This project extends the OpenCDA framework to support MARL algorithms for cooper
 - Evaluate multi-agent policies in realistic driving scenarios
 - Develop and test coordination strategies for autonomous vehicle fleets
 
+![simulation](images/MARL-rule-based-simulation.gif)
+
 ## 🚀 Quick Start
 
 ```bash
 # Clone and setup
-git clone https://github.com/lgcyaxi/opencda-marl.git
+git clone https://github.com/radar-lab/opencda-marl.git
 cd opencda-marl
 
 # Install dependencies with pixi
 pixi install
 
 # Run a quick test
-pixi run quick-test
+pixi run marl-quick-test
 ```
 
 Refer to [Quick Start](quick-start.md) for more details.
@@ -56,17 +58,7 @@ For comprehensive OpenCDA documentation, refer to [OpenCDA Documentation](https:
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TB
-    A[MARL Training Engine] --> B[OpenCDA Core]
-    B --> C[CARLA Simulator]
-    A --> D[Multi-Agent Algorithms]
-    B --> E[Vehicle Modules]
-    E --> F[Perception]
-    E --> G[Planning]
-    E --> H[Control]
-    E --> I[Communication]
-```
+![Architecture](images/OpenCDA_MARL_architecture.png)
 
 ## 📖 Documentation
 
@@ -90,5 +82,5 @@ This project is licensed under the same terms as OpenCDA. See [LICENSE](LICENSE)
 - Supported by the [Radar Lab](https://github.com/radar-lab) at University of Arizona.
 - Built upon the excellent [OpenCDA](https://github.com/ucla-mobility/OpenCDA) framework by UCLA Mobility Lab.
 - Carla simulator provided by [CARLA](https://carla.org/).
-- SUMO simulator provided by [SUMO](https://www.sumo.dlr.de/).
+- SUMO simulator provided by [SUMO](https://eclipse.dev/sumo/).
 - [Pixi](https://github.com/pixi-tools/pixi) is a powerful tool for managing Python dependencies.

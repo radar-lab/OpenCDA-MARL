@@ -15,7 +15,7 @@ Please make changes in your local repo and when the codes are ready to merge wit
 ## **Clone the repository and create your own branch**
 
 * Running the command `git clone https://github.com/your-username/OpenCDA-MARL`
-* Add the official OpenCDA-MARL repository as a remote to stay updated: `git remote add upstream https://github.com/lgcyaxi/OpenCDA-MARL`
+* Add the official OpenCDA-MARL repository as a remote to stay updated: `git remote add upstream https://github.com/radar-lab/OpenCDA-MARL`
 * Create your own branch `git checkout -b feature/short_summary_of_feature`
 * Make your changes, commit them, and push to your fork
 
@@ -32,7 +32,7 @@ git push origin feature/short_summary_of_feature
 * Set the base repository to "lgcyaxi/OpenCDA-MARL". Set the head repository to your own forked OpenCDA-MARL repo e.g., "your-name/OpenCDA-MARL" and set the compare to the branch you created e.g., "feature/short_summary_of_feature".
 * Provide a title and description for your pull request, explaining the changes you made.
 * Click "Create Pull Request."
-* Please use [this template](https://github.com/lgcyaxi/OpenCDA-MARL/blob/main/.github/PR_TEMPLATE.md) for your pull requests.
+* Please use [this template](https://github.com/radar-lab/OpenCDA-MARL/blob/main/.github/PR_TEMPLATE.md) for your pull requests.
 
 Project maintainers will review your changes, suggest modifications if needed, and discuss any concerns. Make necessary changes by pushing them to the same branch. The pull request will automatically update. Once your changes are approved, they will be merged into the main project.
 
