@@ -16,7 +16,7 @@
         <link rel="prev" href="../quick-start/">
       
       
-        <link rel="next" href="../marl/overview/">
+        <link rel="next" href="../marl/architecture/">
       
       
       <link rel="icon" href="../images/favicon.ico">
@@ -255,7 +255,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../marl/overview/" class="md-tabs__link">
+        <a href="../marl/architecture/" class="md-tabs__link">
           
   
   
@@ -313,26 +313,6 @@
     
   
 
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../architecture/" class="md-tabs__link">
-          
-  
-  
-  Development
-
-        </a>
-      </li>
     
   
 
@@ -640,18 +620,33 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#q-carla-installation-fails-on-windows" class="md-nav__link">
+  <a href="#q-pixi-environment-issues" class="md-nav__link">
     <span class="md-ellipsis">
-      Q: CARLA installation fails on Windows
+      Q: Pixi environment issues
     </span>
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#q-pixi-environment-issues" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-issues" class="md-nav__link">
     <span class="md-ellipsis">
-      Q: Pixi environment issues
+      Common Issues
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Issues">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#q-carla-connection-error" class="md-nav__link">
+    <span class="md-ellipsis">
+      Q: CARLA Connection Error
     </span>
   </a>
   
@@ -666,43 +661,25 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#q-torchcudaamp-deprecation-warnings-and-boolean-flag-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      Q: torch.cuda.amp deprecation warnings and boolean flag errors
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#marl-training-issues" class="md-nav__link">
+  <a href="#opencda-marl-integration" class="md-nav__link">
     <span class="md-ellipsis">
-      MARL Training Issues
+      OpenCDA-MARL Integration
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="MARL Training Issues">
+    <nav class="md-nav" aria-label="OpenCDA-MARL Integration">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#q-training-runs-but-no-learning-occurs" class="md-nav__link">
+  <a href="#q-how-to-add-new-marl-algorithms" class="md-nav__link">
     <span class="md-ellipsis">
-      Q: Training runs but no learning occurs
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#q-multi-agent-coordination-fails" class="md-nav__link">
-    <span class="md-ellipsis">
-      Q: Multi-agent coordination fails
+      Q: How to add new MARL algorithms?
     </span>
   </a>
   
@@ -724,15 +701,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#q-opencda-scenarios-dont-work-with-marl" class="md-nav__link">
-    <span class="md-ellipsis">
-      Q: OpenCDA scenarios don't work with MARL
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#q-perception-module-not-working" class="md-nav__link">
     <span class="md-ellipsis">
       Q: Perception module not working
@@ -741,67 +709,19 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#performance-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      Performance Issues
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Performance Issues">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#q-simulation-runs-slowly" class="md-nav__link">
+  <a href="#q-torchcudaamp-deprecation-warnings-and-boolean-flag-errors" class="md-nav__link">
     <span class="md-ellipsis">
-      Q: Simulation runs slowly
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#q-memory-usage-too-high" class="md-nav__link">
-    <span class="md-ellipsis">
-      Q: Memory usage too high
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration-questions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Configuration Questions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration Questions">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#q-how-to-create-custom-scenarios" class="md-nav__link">
-    <span class="md-ellipsis">
-      Q: How to create custom scenarios?
+      Q: torch.cuda.amp deprecation warnings and boolean flag errors
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#q-how-to-add-new-marl-algorithms" class="md-nav__link">
+  <a href="#q-how-to-create-custom-scenarios" class="md-nav__link">
     <span class="md-ellipsis">
-      Q: How to add new MARL algorithms?
+      Q: How to create custom scenarios?
     </span>
   </a>
   
@@ -897,58 +817,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../marl/overview/" class="md-nav__link">
+      <a href="../marl/architecture/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
-    Overview
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/algorithms/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Algorithms
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/training/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Training
+    Architecture
     
   </span>
   
@@ -1004,10 +878,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
             
   
   
@@ -1020,8 +894,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
             <span class="md-nav__icon md-icon"></span>
             Changelog-MARL
           </label>
@@ -2206,173 +2080,6 @@
   
   
   
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    Development
-    
-  </span>
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            Development
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Architecture
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/implementation/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Implementation Guide
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/dev/phase1_setup/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Phase 1
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/dev/phase2_baseline/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Phase 2
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/dev/phase3_marl/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Phase 3
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
     <li class="md-nav__item">
       <a href="../about/" class="md-nav__link">
         
@@ -2410,14 +2117,6 @@
 
 <h1 id="frequently-asked-questions">Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permanent link">&para;</a></h1>
 <h2 id="installation-issues">Installation Issues<a class="headerlink" href="#installation-issues" title="Permanent link">&para;</a></h2>
-<h3 id="q-carla-installation-fails-on-windows">Q: CARLA installation fails on Windows<a class="headerlink" href="#q-carla-installation-fails-on-windows" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Make sure you have:</p>
-<ul>
-<li>Windows 10/11 64-bit</li>
-<li>Latest Visual C++ Redistributables</li>
-<li>Sufficient disk space (&gt;20GB)</li>
-<li>Download CARLA 0.9.15 from official releases</li>
-</ul>
 <h3 id="q-pixi-environment-issues">Q: Pixi environment issues<a class="headerlink" href="#q-pixi-environment-issues" title="Permanent link">&para;</a></h3>
 <p><strong>A:</strong> Try these steps:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Clean pixi cache</span>
@@ -2426,12 +2125,27 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Reinstall environment</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>pixi<span class="w"> </span>install<span class="w"> </span>--force-reinstall
 </span></code></pre></div>
+<h2 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h2>
+<h3 id="q-carla-connection-error">Q: CARLA Connection Error<a class="headerlink" href="#q-carla-connection-error" title="Permanent link">&para;</a></h3>
+<p><strong>A:</strong> Ensure CARLA server is running, check firewall settings, and verify CARLA_HOME environment variable.</p>
 <h3 id="q-cuda-compatibility-issues">Q: CUDA compatibility issues<a class="headerlink" href="#q-cuda-compatibility-issues" title="Permanent link">&para;</a></h3>
 <p><strong>A:</strong> Ensure you have:</p>
 <ul>
-<li>CUDA 12.8 installed</li>
-<li>Compatible GPU driver</li>
+<li>Install NVIDIA drivers (if using NVIDIA GPU)</li>
+<li>Verify CUDA 12.8 installation</li>
+<li>Check GPU memory availability</li>
 <li>PyTorch compiled with correct CUDA version</li>
+</ul>
+<h2 id="opencda-marl-integration">OpenCDA-MARL Integration<a class="headerlink" href="#opencda-marl-integration" title="Permanent link">&para;</a></h2>
+<h3 id="q-how-to-add-new-marl-algorithms">Q: How to add new MARL algorithms?<a class="headerlink" href="#q-how-to-add-new-marl-algorithms" title="Permanent link">&para;</a></h3>
+<p><strong>A:</strong> Check the <a href="../marl/architecture/">MARL Framework</a> documentation and <a href="../api/opencda-marl/overview/">API Reference</a>.</p>
+<h2 id="opencda-integration">OpenCDA Integration<a class="headerlink" href="#opencda-integration" title="Permanent link">&para;</a></h2>
+<h3 id="q-perception-module-not-working">Q: Perception module not working<a class="headerlink" href="#q-perception-module-not-working" title="Permanent link">&para;</a></h3>
+<p><strong>A:</strong> Check:</p>
+<ul>
+<li><code>activate: true</code> in perception config</li>
+<li>PyTorch installation with <code>--apply_ml</code> flag</li>
+<li>Camera/LiDAR sensor configuration</li>
 </ul>
 <h3 id="q-torchcudaamp-deprecation-warnings-and-boolean-flag-errors">Q: torch.cuda.amp deprecation warnings and boolean flag errors<a class="headerlink" href="#q-torchcudaamp-deprecation-warnings-and-boolean-flag-errors" title="Permanent link">&para;</a></h3>
 <p><strong>A:</strong> If you see warnings about deprecated <code>torch.cuda.amp</code> or errors like <code>Expected 'device_type' of type 'str', got: '&lt;class 'bool'&gt;'</code>, this is due to PyTorch API changes.</p>
@@ -2446,66 +2160,13 @@
 <li>This fixes both the deprecated API warnings and the boolean flag error</li>
 </ol>
 <p>The fixed version uses the new <code>torch.amp.autocast</code> API with proper device type and enabled parameters.</p>
-<h2 id="marl-training-issues">MARL Training Issues<a class="headerlink" href="#marl-training-issues" title="Permanent link">&para;</a></h2>
-<h3 id="q-training-runs-but-no-learning-occurs">Q: Training runs but no learning occurs<a class="headerlink" href="#q-training-runs-but-no-learning-occurs" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Check:</p>
-<ul>
-<li>Learning rate (try 1e-4 to 1e-3)</li>
-<li>Reward function implementation</li>
-<li>Environment reset logic</li>
-<li>Agent observation space</li>
-</ul>
-<h3 id="q-multi-agent-coordination-fails">Q: Multi-agent coordination fails<a class="headerlink" href="#q-multi-agent-coordination-fails" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Verify:</p>
-<ul>
-<li>Communication range settings</li>
-<li>V2X manager configuration</li>
-<li>Agent spawn positions</li>
-<li>Scenario YAML configuration</li>
-</ul>
-<h2 id="opencda-integration">OpenCDA Integration<a class="headerlink" href="#opencda-integration" title="Permanent link">&para;</a></h2>
-<h3 id="q-opencda-scenarios-dont-work-with-marl">Q: OpenCDA scenarios don't work with MARL<a class="headerlink" href="#q-opencda-scenarios-dont-work-with-marl" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Ensure:</p>
-<ul>
-<li>Proper YAML configuration</li>
-<li>Compatible OpenCDA version</li>
-<li>CARLA server running</li>
-<li>Correct scenario parameters</li>
-</ul>
-<h3 id="q-perception-module-not-working">Q: Perception module not working<a class="headerlink" href="#q-perception-module-not-working" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Check:</p>
-<ul>
-<li><code>activate: true</code> in perception config</li>
-<li>PyTorch installation with <code>--apply_ml</code> flag</li>
-<li>Camera/LiDAR sensor configuration</li>
-</ul>
-<h2 id="performance-issues">Performance Issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h2>
-<h3 id="q-simulation-runs-slowly">Q: Simulation runs slowly<a class="headerlink" href="#q-simulation-runs-slowly" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Try:</p>
-<ul>
-<li>Reduce number of agents</li>
-<li>Disable unnecessary visualizations</li>
-<li>Use synchronous mode</li>
-<li>Optimize CARLA settings</li>
-</ul>
-<h3 id="q-memory-usage-too-high">Q: Memory usage too high<a class="headerlink" href="#q-memory-usage-too-high" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Consider:</p>
-<ul>
-<li>Smaller replay buffer size</li>
-<li>Batch processing</li>
-<li>Reduce observation dimensions</li>
-<li>Clean unused variables</li>
-</ul>
-<h2 id="configuration-questions">Configuration Questions<a class="headerlink" href="#configuration-questions" title="Permanent link">&para;</a></h2>
 <h3 id="q-how-to-create-custom-scenarios">Q: How to create custom scenarios?<a class="headerlink" href="#q-how-to-create-custom-scenarios" title="Permanent link">&para;</a></h3>
 <p><strong>A:</strong> See the <a href="../opencda/yaml_define/">YAML Configuration Guide</a> for detailed instructions.</p>
-<h3 id="q-how-to-add-new-marl-algorithms">Q: How to add new MARL algorithms?<a class="headerlink" href="#q-how-to-add-new-marl-algorithms" title="Permanent link">&para;</a></h3>
-<p><strong>A:</strong> Check the <a href="../marl/overview/">MARL Framework</a> documentation and <a href="../api/opencda-marl/overview/">API Reference</a>.</p>
 <h2 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h2>
 <p>Still having issues?</p>
 <ul>
 <li>Check the <a href="https://opencda-documentation.readthedocs.io/en/latest/">Original OpenCDA Documentation</a></li>
-<li>Open an issue on <a href="https://github.com/lgcyaxi/opencda-marl/issues">GitHub</a></li>
+<li>Open an issue on <a href="https://github.com/radar-lab/opencda-marl/issues">GitHub</a></li>
 <li>Review the <a href="../contributing/">Contributing Guide</a></li>
 </ul>
 
@@ -2528,7 +2189,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 15, 2025 20:42:04 UTC">September 15, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2025 04:34:55 UTC">September 16, 2025</span>
   </span>
 
     
