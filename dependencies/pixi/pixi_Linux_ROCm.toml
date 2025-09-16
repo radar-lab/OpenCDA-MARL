@@ -3,7 +3,7 @@ authors = ["AXIBA <leolihao@arizona.edu>"]
 channels = ["conda-forge", "pytorch", "nvidia"]
 name = "OpenCDA"
 platforms = ["linux-64"]
-version = "0.1.0"
+version = "0.1.0-alpha"
 
 [system-requirements]
 cuda = "12.8"

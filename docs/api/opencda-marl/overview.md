@@ -362,36 +362,3 @@ for vehicle in vehicles:
     # Interactive CLI mode
     python opencda.py -t intersection -v 0.9.15 --marl --interactive
     ```
-
-## Development Status
-
-=== "✅ Phase 1: Foundation (95% Complete)"
-
-    - **✅ Complete**: Core architecture, scenario system, environment interface, GUI
-    - **🔄 Remaining**: Vehicle adapter, enhanced configuration, testing framework
-
-=== "🔄 Phase 2: Agent Integration (Next)"
-
-    - **Priority**: Vehicle adapter implementation
-    - **Planned**: RL algorithm integration (PPO, MADDPG)
-    - **Goal**: End-to-end training pipeline
-
-=== "📋 Phase 3: Advanced MARL (Future)"
-
-    - Multi-agent algorithms with communication
-    - Distributed training infrastructure
-    - Advanced coordination mechanisms
-
-=== "📋 Phase 4: Research Extensions (Future)"
-
-    - Experiment management tools
-    - Benchmark scenarios and metrics
-    - Performance analysis and visualization
-
-**Related Documentation**
-
-- **[Coordinator API](coordinator.md)**: Central orchestration and execution modes
-- **[Scenario API](scenario.md)**: Template-based scenario generation and management  
-- **[Map Adapter API](adapters/map_adapter.md)**: OpenCDA-MARL map integration bridge
-- **[Implementation Guide](../../marl/implementation.md)**: Step-by-step development guide
-- **[Phase 1 Setup](../../marl/dev/phase1_setup.md)**: Current foundation status

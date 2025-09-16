@@ -50,7 +50,7 @@
     iwr -useb https://pixi.sh/install.ps1 | iex
 
     # 2. Clone and setup
-    git clone https://github.com/lgcyaxi/opencda-marl.git
+    git clone https://github.com/radar-lab/opencda-marl.git
     cd opencda-marl
     pixi install
     pixi shell

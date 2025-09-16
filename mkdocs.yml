@@ -105,9 +105,9 @@ nav:
           - Quick Start: quick-start.md
           - FAQ: faq.md
   - MARL Framework:
-      - Overview: marl/overview.md
-      - Algorithms: marl/algorithms.md
-      - Training: marl/training.md
+      - Architecture: marl/architecture.md
+      #- Algorithms: marl/algorithms.md
+      #- Training: marl/training.md
       - Updates: marl/updates.md
       - Changelog-MARL:
           - v0.1.0-alpha: marl/changelog/v0.1.0-alpha.md
@@ -123,9 +123,9 @@ nav:
           - Breaking Changes: opencda/changelog/breaking_changes.md
           - Migration & Docs: opencda/changelog/migration_and_docs.md
       - Integration:
-        - Scenario Testing: opencda/scenarios.md
-        - Traffic Generation: opencda/traffic_generation.md
-        - YAML Configuration: opencda/yaml_define.md
+          - Scenario Testing: opencda/scenarios.md
+          - Traffic Generation: opencda/traffic_generation.md
+          - YAML Configuration: opencda/yaml_define.md
   - API Reference:
       - OpenCDA Core:
           - Overview: api/opencda/overview.md
@@ -140,22 +140,16 @@ nav:
           - Overview: api/opencda-marl/overview.md
           - Coordinator: api/opencda-marl/coordinator.md
           - Scenario: api/opencda-marl/scenario.md
-          - Adapters: 
-            - Map Adapter: api/opencda-marl/adapters/map_adapter.md
-            - Vehicle Adapter: api/opencda-marl/adapters/vehicle_adapter.md
+          - Adapters:
+              - Map Adapter: api/opencda-marl/adapters/map_adapter.md
+              - Vehicle Adapter: api/opencda-marl/adapters/vehicle_adapter.md
           - Core Components:
-            - Agent Manager: api/opencda-marl/agent_manager.md
-            - Map Manager: api/opencda-marl/map_manager.md
+              - Agent Manager: api/opencda-marl/agent_manager.md
+              - Map Manager: api/opencda-marl/map_manager.md
           - Environment Interface: api/opencda-marl/environment.md
           - Traffic Configuration: api/opencda-marl/traffic_config.md
           - Benchmark System: api/opencda-marl/benchmark.md
           - Training Infrastructure: api/opencda-marl/training.md
-  - Development:
-      - Architecture: architecture.md
-      - Implementation Guide: marl/implementation.md
-      - Phase 1: marl/dev/phase1_setup.md
-      - Phase 2: marl/dev/phase2_baseline.md
-      - Phase 3: marl/dev/phase3_marl.md
   - About Us: about.md
 
 extra:
@@ -184,7 +178,7 @@ extra:
         - icon: material/emoticon-sad-outline
           name: This page could be improved
           data: 0
-          note: >- 
+          note: >-
             Thanks for your feedback! Help us improve this page by
             <a href="https://github.com/radar-lab/opencda-marl/issues/new/?title=[Feedback]+{title}+-+{url}" target="_blank" rel="noopener">telling us what you need</a>.
 

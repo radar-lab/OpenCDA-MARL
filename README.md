@@ -50,23 +50,21 @@ Check our [documentation](#) for detailed architecture and MARL integration.
 
 ## Get Started
 
- ![teaser](docs/images/platoon_joining_2lanefree_complete.gif)
+ ![teaser](docs/images/MARL-rule-based-simulation.gif)
 
 ### Users Guide
 
-* [Overview](#)
-* [Installation](#)
-* [Quick Start](#)
-* [Logic Flow](#)
-* [Traffic Generation](#)
+* [Overview](https://radar-lab.github.io/OpenCDA-MARL/)
+* [Installation](https://radar-lab.github.io/OpenCDA-MARL/installation/)
+* [Quick Start](https://radar-lab.github.io/OpenCDA-MARL/quick-start/)
 
 Note: We continuously improve the performance of OpenCDA-MARL. Currently, it is mainly tested in our customized maps. However, we <strong>DO NOT </strong> guarantee the same level of robustness in other maps. We will update the documentation and the maps in the future.
 
 ### Developer Guide
 
-* [Class Design](#)
+* [Class Design](https://radar-lab.github.io/OpenCDA-MARL/architecture/)
 * [Customize Your Algorithms](#)
-* [API Reference](#) <br>
+* [API Reference](https://radar-lab.github.io/OpenCDA-MARL/api/opencda-marl/overview/) <br>
 
 ### Contributing
 

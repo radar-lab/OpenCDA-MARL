@@ -3,7 +3,7 @@ authors = ["AXIBA <leolihao@arizona.edu>"]
 channels = ["conda-forge", "pytorch", "nvidia"]
 name = "OpenCDA"
 platforms = ["win-64"]
-version = "0.1.0"
+version = "0.1.0-alpha"
 
 [system-requirements]
 cuda = "12.8"
@@ -15,8 +15,9 @@ start = "python opencda.py"
 marl-intersection-build = "python test/marl/test_intersection_build.py"
 
 # MARL integrated with opencda.py
-marl-quick-test = "python opencda.py -t intersection --marl"
-marl-quick-test-gui = "python opencda.py -t intersection --marl --gui"
+marl-dev = "python opencda.py -t intersection --marl"
+marl-quick-test = "python opencda.py -t intersection_rule_based --marl"
+marl-quick-test-gui = "python opencda.py -t intersection_rule_based --marl --gui"
 marl-eval-agents = "python opencda_marl/envs/cross_agent_evaluator.py"
 
 

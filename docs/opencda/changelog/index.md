@@ -89,4 +89,4 @@ For users migrating from original OpenCDA, see:
 ---
 
 !!! tip "Staying Updated" Subscribe to our
-[GitHub releases](https://github.com/lgcyaxi/opencda-marl/releases) to get notified of new changes.
+[GitHub releases](https://github.com/radar-lab/opencda-marl/releases) to get notified of new changes.

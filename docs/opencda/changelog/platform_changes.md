@@ -151,7 +151,7 @@
     # 1. Install 
     Pixi curl -fsSL https://pixi.sh/install.sh | bash
     # 2. Clone repository
-    git clone https://github.com/lgcyaxi/opencda-marl.git
+    git clone https://github.com/radar-lab/opencda-marl.git
     cd opencda-marl
 
     # 3. Install dependencies
