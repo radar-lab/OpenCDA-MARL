@@ -153,3 +153,4 @@ ready*
 !/recordings/*.json
 /checkpoints/*/*episode_*.*
 /checkpoints/*/latest_checkpoint.*
+/archived_docs

@@ -105,7 +105,7 @@ nav:
           - Quick Start: quick-start.md
           - FAQ: faq.md
   - MARL Framework:
-      - Overview: marl/overview.md
+      - Architecture: marl/architecture.md
       - Algorithms: marl/algorithms.md
       - Training: marl/training.md
       - Updates: marl/updates.md
@@ -150,12 +150,6 @@ nav:
           - Traffic Configuration: api/opencda-marl/traffic_config.md
           - Benchmark System: api/opencda-marl/benchmark.md
           - Training Infrastructure: api/opencda-marl/training.md
-  - Development:
-      - Architecture: architecture.md
-      - Implementation Guide: marl/implementation.md
-      - Phase 1: marl/dev/phase1_setup.md
-      - Phase 2: marl/dev/phase2_baseline.md
-      - Phase 3: marl/dev/phase3_marl.md
   - About Us: about.md
 
 extra:

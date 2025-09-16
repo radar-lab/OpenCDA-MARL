@@ -337,24 +337,3 @@ OpenCDA-MARL extends the original `opencda.py` entry point with MARL capabilitie
         M --> Q[Policy Evaluation]
         N --> R[Manual Commands]
     ```
-
-
-
-## Development
-
-This section describes the development workflow for OpenCDA-MARL. The development is incremental, and the following steps are recommended:
-
-=== "Workflow"
-
-    1. **Read Architecture Doc** → Understand integration design
-    1. **Check Implementation Guide** → Follow step-by-step instructions
-    2. **Modify Incrementally** → Make small, testable changes
-    3. **Test Integration** → Verify MARL doesn't break OpenCDA
-    4. **Extend Functionality** → Add new MARL features
-
-=== "Next Steps"
-    After understanding this architecture:
-
-    1. Review [Implementation Guide](marl/implementation.md) for detailed steps
-    2. Start with [Phase 1 Setup](marl/dev/phase1_setup.md)
-    3. Follow the incremental development plan

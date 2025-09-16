@@ -465,9 +465,3 @@ The `MARLMapManager` extends OpenCDA's map management with MARL-specific feature
     - **Consistent**: Both use CARLA map data and OpenCDA utilities
     - **Flexible**: Can use MARL spawns with OpenCDA vehicles
     - **Scalable**: Junction-based approach works for any map size
-
-## Related Documentation
-
-- **[OpenCDA Map Manager](../opencda/overview.md)**: Core rasterization and perception utilities
-- **[MARL Overview](../../marl/overview.md)**: MARL framework documentation  
-- **[OpenCDA Integration](../../opencda/core.md)**: Integration patterns with OpenCDA

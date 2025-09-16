@@ -66,7 +66,7 @@ For comprehensive OpenCDA documentation, refer to [OpenCDA Documentation](https:
 
 1. **[Installation](installation.md)** - Set up your development environment
 2. **[Quick Start](quick-start.md)** - Run your first MARL experiment
-3. **[MARL Framework](marl/overview.md)** - Understand the MARL integration
+3. **[MARL Framework](marl/architecture.md)** - Understand the MARL integration
 4. **[API Reference](api/opencda-marl/overview.md)** - Detailed API documentation
 
 ## 🤝 Contributing

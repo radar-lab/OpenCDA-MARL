@@ -2,13 +2,6 @@
 
 Get started with OpenCDA for cooperative driving automation research and OpenCDA-MARL for multi-agent reinforcement learning scenarios.
 
-| Component         | Purpose                       | Requirements              |
-| ----------------- | ----------------------------- | ------------------------- |
-| **OpenCDA Core**  | Cooperative driving scenarios | CARLA 0.9.15, Python 3.10 |
-| **ML Features**   | YOLOv8/YOLOv5 detection       | PyTorch, CUDA (optional)  |
-| **Co-simulation** | Traffic flow generation       | SUMO (optional)           |
-| **OpenCDA-MARL**  | RL training environments      | Gym, Ray/RLlib (planned)  |
-
 ---
 
 ## OpenCDA Scenarios
@@ -16,12 +9,12 @@ Get started with OpenCDA for cooperative driving automation research and OpenCDA
 **What it provides**: Pre-configured benchmark scenarios for cooperative driving research
 
 ```bash
-pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
+pixi run start -t <scenario_name> [--apply_ml] [--record]
 ```
 
 **Parameters**:
 
-- `-t`: Scenario name (must have matching `.py` in `opencda/scenario_testing/` and `.yaml` in `config_yaml/`)
+- `-t`: Scenario name (must have matching `.py` in `configs/opencda/scenario_testing/` and `.yaml` in `configs/opencda/config_yaml/`)
 - `--apply_ml`: Enable ML models (requires PyTorch)
 - `--record`: Record simulation for replay
 
@@ -34,9 +27,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Highway Navigation"
     ```bash
     # Basic 2-lane highway test (no ML required)
-    pixi run python opencda.py -t single_2lanefree_carla
+    pixi run start -t single_2lanefree_carla
     ```
-    
+
     **Features**:
 
     - 100 km/h target speed
@@ -49,9 +42,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Urban with ML"
     ```bash
     # Town06 with YOLOv8/YOLOv5 detection
-    pixi run python opencda.py -t single_town06_carla --apply_ml
+    pixi run start -t single_town06_carla --apply_ml
     ```
-    
+
     **Features**:
 
     - Full perception pipeline with ML
@@ -64,9 +57,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "SUMO Co-simulation"
     ```bash
     # Town06 with SUMO traffic generation
-    pixi run python opencda.py -t single_town06_cosim --apply_ml
+    pixi run start -t single_town06_cosim --apply_ml
     ```
-    
+
     **Features**:
 
     - SUMO-generated traffic flow
@@ -85,9 +78,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Platoon Stability"
     ```bash
     # Test platoon stability under speed changes
-    pixi run python opencda.py -t platoon_stability_2lanefree_carla
+    pixi run start -t platoon_stability_2lanefree_carla
     ```
-    
+
     **Features**:
     - 4-vehicle platoon
     - Dynamic speed changes
@@ -97,9 +90,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Platoon Joining"
     ```bash
     # Cooperative merge and platoon joining
-    pixi run python opencda.py -t platoon_joining_2lanefree_carla
+    pixi run start -t platoon_joining_2lanefree_carla
     ```
-    
+
     **Features**:
     - Mainline platoon with traffic
     - Cooperative merging from ramp
@@ -111,9 +104,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Platoon Back-Join"
     ```bash
     # Join platoon from behind with ML
-    pixi run python opencda.py -t platoon_joining_town06_carla --apply_ml
+    pixi run start -t platoon_joining_town06_carla --apply_ml
     ```
-    
+
     **Features**:
     - Overtaking maneuvers
     - YOLOv8/YOLOv5 detection
@@ -125,9 +118,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "SUMO Platoon"
     ```bash
     # Platoon with SUMO co-simulation
-    pixi run python opencda.py -t platoon_joining_2lanefree_cosim
+    pixi run start -t platoon_joining_2lanefree_cosim
     ```
-    
+
     **Features**:
     - SUMO traffic integration
     - Realistic traffic patterns
@@ -142,9 +135,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Cooperative Perception"
     ```bash
     # V2X-enabled perception sharing
-    pixi run python opencda.py -t cooperception_cavs_town05 --apply_ml
+    pixi run start -t cooperception_cavs_town05 --apply_ml
     ```
-    
+
     **Features**:
     - Shared object detection via V2X
     - Extended perception range
@@ -154,9 +147,9 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 === "Intersection Management"
     ```bash
     # Cooperative intersection navigation
-    pixi run python opencda.py -t intersection_town05 --apply_ml
+    pixi run start -t intersection_town05 --apply_ml
     ```
-    
+
     **Features**:
     - Traffic light compliance
     - V2I communication
@@ -191,7 +184,7 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
     ```python
     # Add custom detection model
     from opencda.customize.ml_libs.ml_manager import MLManager
-    
+
     class CustomDetector(MLManager):
         def __init__(self):
             super().__init__()
@@ -205,7 +198,7 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
     ```python
     # Create new scenario
     from opencda.scenario_testing.scenario_manager import ScenarioManager
-    
+
     def custom_scenario():
         scenario_manager = ScenarioManager(config, apply_ml=True)
         
@@ -220,7 +213,7 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 
 **Tips**:
 
-- Check `opencda/scenario_testing/config_yaml/` for configuration examples
+- Check `configs/opencda/scenario_testing/config_yaml/` for configuration examples
 - Use `opencda/customize/` for custom implementations
 - See [YAML Configuration Guide](opencda/yaml_define.md) for all options
 
@@ -233,13 +226,13 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 **What it adds**: Multi-Agent Reinforcement Learning capabilities for training cooperative driving policies
 
 !!! info "Development Status"
-    OpenCDA-MARL is currently in Phase 1 development, refer to [Phase 1](api/opencda-marl/overview.md) for more details. The following sections show planned usage patterns.
+    OpenCDA-MARL is currently in Phase 1 development, refer to [Phase 1](marl/architecture.md) for more details. The following sections show planned usage patterns.
 
 === "Basic Environment"
     ```python
     # PLACEHOLDER: MARL environment initialization
     from opencda_marl import MARLEnvironment
-    
+
     # Create multi-agent environment
     env = MARLEnvironment(
         scenario="highway_merge",
@@ -262,7 +255,7 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
         scenario: platoon_formation
         num_agents: 6
         max_steps: 1000
-      
+
       training:
         algorithm: PPO
         batch_size: 4096
@@ -279,7 +272,7 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
     ```python
     # PLACEHOLDER: Custom MARL scenario
     from opencda_marl.scenarios import MARLScenario
-    
+
     class CustomCooperativeScenario(MARLScenario):
         def __init__(self, config):
             super().__init__(config)
@@ -316,7 +309,7 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
     # Content to be added
     ```
 
-**Note**: MARL features are under active development. Check the [MARL documentation](marl/overview.md) for updates.
+**Note**: MARL features are under active development. Check the [MARL documentation](marl/architecture.md) for updates.
 
 ---
 
@@ -336,8 +329,6 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 
 ---
 
-
-
 ## Troubleshooting
 
 | Issue                       | Solution                                           |
@@ -353,10 +344,10 @@ pixi run python opencda.py -t <scenario_name> [--apply_ml] [--record]
 ## More Information
 
 - **OpenCDA Users**: Explore [scenario testing](opencda/scenarios.md) and [API documentation](api/opencda/overview.md)
-- **MARL Researchers**: Check [MARL overview](marl/overview.md) and [training guide](marl/training.md)
-- **Contributors**: See [contributing guide](contributing.md) 
-- **Related Documentation**: 
-    - [Installation](installation.md) 
+- **MARL Researchers**: Check [MARL overview](marl/architecture.md) and [training guide](marl/training.md)
+- **Contributors**: See [contributing guide](contributing.md)
+- **Related Documentation**:
+    - [Installation](installation.md)
     - [OpenCDA](opencda/core.md)
     - [API Reference](api/opencda/overview.md)
     - [OpenCDA Official Documentation](https://opencda.readthedocs.io/en/latest/)

@@ -33,7 +33,7 @@ pixi install --force-reinstall
 
 ### Q: How to add new MARL algorithms?
 
-**A:** Check the [MARL Framework](marl/overview.md) documentation and [API Reference](api/opencda-marl/overview.md).
+**A:** Check the [MARL Framework](marl/architecture.md) documentation and [API Reference](api/opencda-marl/overview.md).
 
 ## OpenCDA Integration
 
