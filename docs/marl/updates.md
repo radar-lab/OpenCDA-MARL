@@ -3,7 +3,7 @@
 This page tracks the development progress of the OpenCDA-MARL extension, documenting all
 modifications, features, and improvements across versions.
 
-!!! info "Version Tracking" 
+!!! info "Version Tracking"
     The MARL extension follows semantic versioning (MAJOR.MINOR.PATCH)aligned with OpenCDA releases. Current version: **0.1.0-alpha** (Initial Development)
 
 ## Release Timeline
@@ -13,28 +13,27 @@ gantt
     title MARL Development Timeline
     dateFormat  YYYY-MM-DD
     section Framework
-    v0.1.0-alpha (Foundation)    :done, 2025-08-07, 7d
-    v0.2.0 (Gym Environment)     :active, 2025-08-14, 7d
-    v0.3.0 (Multi-Agent)         :2025-08-21, 7d
-    v1.0.0 (Production)          :2025-08-28, 7d
+    v0.1.0-alpha (Foundation)         :done, 2025-08-07, 35d
+    v0.1.0-beta (MARL Algorithms)     :active, 2025-09-15, 30d
 ```
 
-| Version     | Release Date | Status       | Highlights                                    |
-| ----------- | ------------ | ------------ | --------------------------------------------- |
-| 0.1.0-alpha | 2025-08-07   | ✅Current     | Initial framework, map manager, documentation |
-| 0.2.0       | 2025-08-14   | 🚧Development | Gym environment, basic RL algorithms          |
-| 0.3.0       | 2025-08-21   | 📋Planned     | Multi-agent scenarios, advanced training      |
-| 1.0.0       | 2025-08-28   | 📋Planned     | Production-ready, full documentation          |
+| Version     | Release Date | Status       | Highlights                 |
+| ----------- | ------------ | ------------ | -------------------------- |
+| 0.1.0-alpha | 2025-08-07   | ✅Current     | Foundation & Documentation |
+| 0.1.0-beta  | 2025-09-15   | 🚧Development | MARL algorithms            |
 
 ## Current Development
 
-!!! warning "No Breaking Changes" 
+!!! warning "No Breaking Changes"
     The MARL extension is designed to be non-invasive. All OpenCDA functionality remains unchanged.
 
+### v0.1.0-alpha (Foundation)
 
-### v0.1.0-alpha
+OpenCDA-MARL v0.1.0-alpha establishes the foundational Multi-Agent Reinforcement Learning framework with implementing a comprehensive 3-layer architecture. The system provides four distinct agent types including behavior, vanilla, rule-based, and MARL agents managed through a centralized agent factory pattern. Core RL algorithms are implemented with Q-Learning (discrete state/action spaces), DQN (deep neural network approximation), and TD3 (continuous control) providing diverse learning approaches for intersection scenarios.
 
-We migrated MARL map management to a registry‑first design. The previous on‑disk discovery in _discover_available_maps is replaced by verification of the `AVAILABLE_MAPS` registry on startup, with optional discovery behind config.map.auto_discover (default: False). Each map entry may now include explicit xodr_path/fbx_path so loaders don't recompute paths, while runtime validation annotates has_mesh and prunes missing assets. Custom maps are loaded via opencda.scenario_testing.utils.customized_map_api.load_customized_world (with a local fallback), avoiding wheel changes and acknowledging CARLA cannot dynamically load textures; FBX presence is advisory only. CARLA built‑in map loading remains unchanged. This yields predictable behavior, simpler external map registration, and no redundant path handling.
+The MARL environment system features custom CARLA integration with observation extraction, multi-objective reward calculation, and cross-agent evaluation capabilities. A Qt-based GUI dashboard enables real-time visualization, manual simulation control, and agent observation monitoring. Vehicle adapters serve as the critical bridge layer between OpenCDA's proven autonomous driving stack and MARL control systems, preserving all original OpenCDA functionality while enabling RL-based decision making.
+
+The implementation focuses on intersection scenarios with custom XODR maps and traffic replay patterns, establishing a solid foundation for multi-agent research in cooperative autonomous driving. Registry-based map management provides predictable loading behavior with support for custom intersection environments and automated spawn point generation based on junction analysis.
 
 ## Changelog Template
 
@@ -82,5 +81,5 @@ When adding changelog entries:
 [Migration instructions]
 ```
 
-!!! tip "Stay Updated" 
+!!! tip "Stay Updated"
     Watch the [GitHub repository](https://github.com/radar-lab/OpenCDA-MARL) for the latest updates and releases.
