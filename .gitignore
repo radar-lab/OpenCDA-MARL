@@ -154,3 +154,4 @@ ready*
 /checkpoints/*/*episode_*.*
 /checkpoints/*/latest_checkpoint.*
 /archived_docs
+/.spec-workflow

@@ -15,24 +15,15 @@ The key features of OpenCDA-MARL are:
 * <strong>Scalability</strong>: Distributed training infrastructure supporting large-scale multi-agent scenarios with hundreds of vehicles.
 * <strong>Mixed Autonomy</strong>: Support for mixed traffic with human-driven vehicles, rule-based AVs, and learning-based agents.
 
-Users can refer to our [documentation](#) for detailed guides on MARL integration, training procedures, and API references. For the original OpenCDA documentation, visit [OpenCDA documentation](https://opencda-documentation.readthedocs.io/en/latest/).
+Users can refer to our [documentation](https://radar-lab.github.io/OpenCDA-MARL/) for detailed guides on MARL integration, training procedures, and API references. For the original OpenCDA documentation, visit [OpenCDA documentation](https://opencda-documentation.readthedocs.io/en/latest/).
 
 ## What's New in OpenCDA-MARL
 
 ### August 2025
 
-* **MARL Framework Integration**: Full integration of Multi-Agent Reinforcement Learning capabilities with support for PPO, SAC, QMIX, and MADDPG algorithms.
-* **Distributed Training**: Scalable training infrastructure using Ray/RLlib for large-scale multi-agent scenarios.
-* **Mixed Autonomy Support**: Seamless integration of learning-based agents with rule-based vehicles and human-driven traffic.
-
-### Key Updates from Original OpenCDA
-
-* **Environment Changes**: Changed Conda environment to Pixi for easy installation.
-* **Enhanced Configuration System**: Clean YAML-based configuration with `default.yaml` template
-* **Docker Support**: Easy deployment and reproducibility
-* **Windows Compatibility**: Full support for Windows with Python 3.10.x and CUDA 12.8
-* **HD Map Manager**: Real-time rasterization maps for RL planning
-* **CARLA 0.9.15**: Latest CARLA version support with improved stability
+* **MARL Framework Integration**: Core Multi-Agent Reinforcement Learning framework with implemented algorithms including Q-learning, DQN, and TD3 for intersection management and cooperative driving tasks.
+* **Training Infrastructure**: Single-agent training capabilities with experience replay and checkpoint management, with distributed Ray/RLlib training planned for future releases.
+* **Mixed Autonomy Support**: Seamless integration of learning-based MARL agents with rule-based vehicles, vanilla behavior agents, and human-driven traffic.
 
 ## Major Components
 
@@ -40,13 +31,12 @@ Users can refer to our [documentation](#) for detailed guides on MARL integratio
 
 OpenCDA-MARL extends the original four components with MARL-specific modules:
 
-* <strong>MARL Training Framework</strong>: Distributed training infrastructure with multiple RL algorithms
-* <strong>Cooperative Driving System</strong>: Enhanced with learning-based decision making
-* <strong>Co-Simulation Tools</strong>: CARLA + SUMO integration with RL environment wrapper
+* <strong>MARL Training Framework</strong>: Core training infrastructure with Q-learning, DQN, and TD3 algorithms for single-agent and multi-agent scenarios
+* <strong>Cooperative Driving System</strong>: Enhanced with learning-based decision making for cooperative driving tasks
 * <strong>Data Manager and Repository</strong>: Training data collection and replay buffer management
 * <strong>Scenario Manager</strong>: MARL-specific training and evaluation scenarios
 
-Check our [documentation](#) for detailed architecture and MARL integration.
+Check our [documentation](https://radar-lab.github.io/OpenCDA-MARL/marl/architecture/) for detailed architecture and MARL integration.
 
 ## Get Started
 
@@ -62,8 +52,8 @@ Note: We continuously improve the performance of OpenCDA-MARL. Currently, it is 
 
 ### Developer Guide
 
-* [Class Design](https://radar-lab.github.io/OpenCDA-MARL/architecture/)
-* [Customize Your Algorithms](#)
+* [Class Design](https://radar-lab.github.io/OpenCDA-MARL/marl/architecture/)
+* [Customize Your Algorithms](https://radar-lab.github.io/OpenCDA-MARL/marl/algorithms/)
 * [API Reference](https://radar-lab.github.io/OpenCDA-MARL/api/opencda-marl/overview/) <br>
 
 ### Contributing
