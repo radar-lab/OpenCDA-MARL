@@ -1,0 +1,202 @@
+# CARLA Fine-tuning Configuration
+# Transfer learning from SUMO pre-trained policy
+
+description: |-
+  CARLA fine-tuning configuration for policies pre-trained in SUMO.
+  Uses same observation space as SUMO for smooth transfer learning.
+  Reduced exploration noise and learning rates for fine-tuning stability.
+
+# Extend base configuration
+_extend_fields:
+  - "world.seed"
+
+# Use same base seed as SUMO training
+world:
+  seed: 11
+
+spectator:
+  preset: "intersection_bird_eye"
+
+meta:
+  scenario_type: "intersection"  # Back to CARLA
+  town: "intersection_12_lane_fixed"
+
+scenario:
+  simulation:
+    max_steps: 2400  # Same as SUMO
+    max_episodes: 200  # Fewer episodes for fine-tuning (vs 1000 in SUMO)
+
+  traffic:
+    mode: "replay"  # Use consistent traffic patterns
+    replay_file: "recordings/lite_2minL.json"
+    base_speed: 45.0
+    active_junctions: [4]
+
+    planner:
+      distance: 5.0
+      spawn_offset: 7
+      dest_offset: 7
+      spawn_z_lift: 0.3
+      wp_step: 1.0
+      allow_uturn: false
+      visualize:
+        entry_wp: false
+        exit_wp: false
+        spawn_wp: false
+        dest_wp: false
+        route_line: false
+        junction_center: true
+        bbox: false
+        extent_box: true
+        text: true
+        life_time: 10.0
+
+    flows:
+      - name: "north"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "north"
+        speed_variation: 0.2
+        middle_peak:
+          intensity: 0.4
+          position: 0.5
+          width: 0.3
+
+      - name: "south"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "south"
+        speed_variation: 0.15
+        middle_peak:
+          intensity: 0.3
+          position: 0.4
+          width: 0.4
+
+      - name: "east"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "east"
+        speed_variation: 0.1
+        middle_peak:
+          intensity: 0.35
+          position: 0.6
+          width: 0.25
+
+      - name: "west"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "west"
+        speed_variation: 0.25
+        middle_peak:
+          intensity: 0.5
+          position: 0.45
+          width: 0.35
+
+agents:
+  debug: false
+  agent_type: "marl"
+
+  marl:
+    max_speed: 65
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: false
+
+MARL:
+  algorithm: "td3"
+
+  state_dim: 9  # Same as SUMO
+  action_dim: 1
+
+  # TD3 Configuration (must match SUMO for transfer)
+  td3:
+    # Same features as SUMO training
+    features:
+      rel_x: 1
+      rel_y: 1
+      position_x: 1
+      position_y: 1
+      lane_position: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      waypoint_buffer: 1
+
+    # Same architecture as SUMO
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 9
+      hidden_size: 256
+      num_layers: 1
+
+    motion_planner:
+      num_layers: 5
+      input_dim: [265, 1024, 1024, 512, 256]
+      output_dim: [1024, 1024, 512, 256, 1]
+
+    # REDUCED learning rates for fine-tuning
+    learning_rate_actor: 5e-4  # Was 1e-3 in SUMO
+    learning_rate_critic: 5e-4  # Was 1e-3 in SUMO
+
+    # TD3 hyperparameters
+    tau: 0.01  # Same as SUMO
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.3
+    exploration_noise: 0.2  # REDUCED from 0.5 (less exploration during fine-tuning)
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 256
+
+    # Smart replay buffer
+    memory_size: 25000
+    recency_ratio: 0.5
+
+    # Auto-clear configuration
+    clear_episodes: 1
+    clear_keep_ratio: 0.6
+
+    # PER configuration
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 0.001
+
+    # Action bounds (same as SUMO)
+    max_action: 65.0
+    min_action: 30.0
+    warmup_steps: 200  # REDUCED from 500 (policy already trained)
+
+  # Training configuration
+  training:
+    training_mode: true
+
+    # Checkpoint settings
+    checkpoint_dir: "checkpoints/carla_finetune_td3/"
+    save_freq: 5  # Save more frequently during fine-tuning
+    keep_checkpoints: 10
+
+    # CRITICAL: Load SUMO checkpoint for transfer learning
+    load_checkpoint: "checkpoints/sumo_td3/latest_checkpoint.pth"
+    # Alternative: load_checkpoint: "checkpoints/sumo_td3/episode_1000_checkpoint.pth"
+
+  # Same rewards as SUMO (consistency is important)
+  rewards:
+    collision: -500.0
+    success: 400.0
+    step_penalty: -1.5
+    speed_bonus: 0.5
+    speed_threshold: 45.0

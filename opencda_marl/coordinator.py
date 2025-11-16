@@ -11,7 +11,7 @@ from typing import Dict, List, Any, Callable
 import traceback
 
 from opencda.core.common.cav_world import CavWorld
-from opencda_marl.envs import CarlaMonitor, CarlaSpectator, MARLEnv, EvaluationManager
+from opencda_marl.envs import CarlaMonitor, CarlaSpectator, MARLEnv, SumoMARLEnv, EvaluationManager
 from opencda_marl.scenarios import ScenarioBuilder
 
 
@@ -55,49 +55,89 @@ class MARLCoordinator:
         2. Monitor the CARLA simulation?
 
         """
-        # 1. Create CAV world
-        self.cav_world = CavWorld(apply_ml=self.config.opt.apply_ml)
+        # Check if using SUMO-only mode
+        simulator = self.config.get('meta', {}).get('simulator', 'carla')
 
-        # 2. Create Scenario Manager
-        self.scenario_manager = ScenarioBuilder.build_from_config(
-            config=self.config,
-            cav_world=self.cav_world,
-        )
-        self.states = self.scenario_manager.states
-        self.carla_client = self.scenario_manager.client
-        self.carla_world = self.scenario_manager.world
+        if simulator == 'sumo':
+            # SUMO-only mode (no CARLA, no CAV world needed)
+            logger.info("Initializing SUMO-only MARL environment")
 
-        # 3. Create Spectator for GUI
-        spectator_config = self.config.get('spectator', {})
-        self.carla_spectator = CarlaSpectator(
-            self.carla_world, spectator_config)
+            # Create SUMO MARL environment directly
+            self.marl_env = SumoMARLEnv(config=self.config)
 
-        # 4. Create MARL environment
-        Marl_cfg = self.config.get('MARL', {})
-        self.marl_env = MARLEnv(self.scenario_manager,
-                                config=Marl_cfg)
+            # Set placeholders for CARLA components (not used in SUMO mode)
+            self.cav_world = None
+            self.scenario_manager = None
+            self.carla_client = None
+            self.carla_world = None
+            self.carla_spectator = None
+            self.carla_monitor = None
+            self.states = {}
 
-        # 5. Create CARLA monitor
-        marl_tm = self.scenario_manager.traffic_manager
-        self.carla_monitor = CarlaMonitor(self.carla_world,
-                                          marl_tm=marl_tm)
+            # Create Evaluation manager
+            scenario_type = self.config.get("meta", {}).get("scenario_type", None)
+            agent_name = self.config.get("agents", {}).get("agent_type", None)
+            eval_cfg = self.config.get('evaluation', {})
+            self.evaluation_manager = EvaluationManager(config=eval_cfg,
+                                                        scenario_name=scenario_type,
+                                                        agent_name=agent_name)
+        else:
+            # CARLA mode (standard)
+            logger.info("Initializing CARLA MARL environment")
 
-        # 6. Create Evaluation manager
-        scenario_type = self.config.get("meta", {}).get("scenario_type", None)
-        agent_name = self.config.get("agents", {}).get("agent_type", None)
-        eval_cfg = self.config.get('evaluation', {})
-        self.evaluation_manager = EvaluationManager(config=eval_cfg,
-                                                    scenario_name=scenario_type,
-                                                    agent_name=agent_name)
+            # 1. Create CAV world
+            self.cav_world = CavWorld(apply_ml=self.config.opt.apply_ml)
+
+            # 2. Create Scenario Manager
+            self.scenario_manager = ScenarioBuilder.build_from_config(
+                config=self.config,
+                cav_world=self.cav_world,
+            )
+            self.states = self.scenario_manager.states
+            self.carla_client = self.scenario_manager.client
+            self.carla_world = self.scenario_manager.world
+
+            # 3. Create Spectator for GUI
+            spectator_config = self.config.get('spectator', {})
+            self.carla_spectator = CarlaSpectator(
+                self.carla_world, spectator_config)
+
+            # 4. Create MARL environment
+            Marl_cfg = self.config.get('MARL', {})
+            self.marl_env = MARLEnv(self.scenario_manager,
+                                    config=Marl_cfg)
+
+            # 5. Create CARLA monitor
+            marl_tm = self.scenario_manager.traffic_manager
+            self.carla_monitor = CarlaMonitor(self.carla_world,
+                                              marl_tm=marl_tm)
+
+            # 6. Create Evaluation manager
+            scenario_type = self.config.get("meta", {}).get("scenario_type", None)
+            agent_name = self.config.get("agents", {}).get("agent_type", None)
+            eval_cfg = self.config.get('evaluation', {})
+            self.evaluation_manager = EvaluationManager(config=eval_cfg,
+                                                        scenario_name=scenario_type,
+                                                        agent_name=agent_name)
 
     # --------------------------------------------------------------------- #
     # main thread
     # --------------------------------------------------------------------- #
     def get_metrics(self):
-        metrics = self.states.copy()
-        if self.marl_env:
-            metrics.update(self.marl_env.get_episode_metrics())
-        return metrics
+        simulator = self.config.get('meta', {}).get('simulator', 'carla')
+
+        if simulator == 'sumo':
+            # SUMO mode: get metrics directly from environment
+            metrics = {}
+            if self.marl_env:
+                metrics.update(self.marl_env.get_episode_metrics())
+            return metrics
+        else:
+            # CARLA mode: combine scenario states and environment metrics
+            metrics = self.states.copy()
+            if self.marl_env:
+                metrics.update(self.marl_env.get_episode_metrics())
+            return metrics
 
     def step(self):
         # Call pre-step callbacks

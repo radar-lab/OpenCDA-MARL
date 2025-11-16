@@ -16,7 +16,8 @@ Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 from .carla_monitor import CarlaMonitor
 from .carla_spectator import CarlaSpectator
 from .marl_env import MARLEnv
+from .sumo_marl_env import SumoMARLEnv
 from .evaluation import EvaluationManager
 from .evaluation_plots import EvaluationPlotter
 
-__all__ = ['CarlaMonitor', 'CarlaSpectator', 'MARLEnv', 'EvaluationManager', 'EvaluationPlotter']
+__all__ = ['CarlaMonitor', 'CarlaSpectator', 'MARLEnv', 'SumoMARLEnv', 'EvaluationManager', 'EvaluationPlotter']
