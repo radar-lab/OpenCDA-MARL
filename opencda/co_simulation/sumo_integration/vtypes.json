@@ -5,7 +5,13 @@
     "DEFAULT_WHEELED_VEHICLE": {
         "vClass": "passenger"
     },
+    "DEFAULT_VEHTYPE": {
+        "vClass": "passenger"
+    },
     "carla_blueprints": {
+        "DEFAULT_VEHTYPE": {
+            "vClass": "passenger"
+        },
         "vehicle.audi.a2": {
             "vClass": "passenger"
         },

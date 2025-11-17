@@ -122,15 +122,26 @@ class BridgeHelper(object):
         blueprint_library = BridgeHelper.blueprint_library
         type_id = sumo_actor.type_id
 
+        # Known SUMO default types that are expected to be mapped
+        SUMO_DEFAULT_TYPES = {'DEFAULT_VEHTYPE', 'DEFAULT_BIKETYPE', 'DEFAULT_PEDTYPE',
+                              'DEFAULT_WHEELED_VEHICLE', 'DEFAULT_2_WHEELED_VEHICLE'}
+
         if type_id in [bp.id for bp in blueprint_library]:
             blueprint = blueprint_library.filter(type_id)[0]
             logging.debug('[BridgeHelper] sumo vtype %s found in carla blueprints', type_id)
         else:
             blueprint = BridgeHelper._get_recommended_carla_blueprint(sumo_actor)
             if blueprint is not None:
-                logging.warning(
-                    'sumo vtype %s not found in carla. The following blueprint will be used: %s',
-                    type_id, blueprint.id)
+                # Only warn for non-default SUMO types (custom types that might be typos)
+                if type_id not in SUMO_DEFAULT_TYPES:
+                    logging.warning(
+                        'sumo vtype %s not found in carla. The following blueprint will be used: %s',
+                        type_id, blueprint.id)
+                else:
+                    # Debug-level logging for expected SUMO default types
+                    logging.debug(
+                        '[BridgeHelper] sumo default vtype %s mapped to carla blueprint: %s',
+                        type_id, blueprint.id)
             else:
                 logging.error('sumo vtype %s not supported. No vehicle will be spawned in carla',
                               type_id)
