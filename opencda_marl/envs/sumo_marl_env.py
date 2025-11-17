@@ -206,13 +206,14 @@ class SumoMARLEnv:
             self.intersection_center = (0.0, 0.0)
             return
 
-        # Find the main intersection (usually the first one or largest)
-        # For now, use the first junction
-        main_junction = junctions[0]
+        # Find junction 4 (main intersection in our network)
+        # This ensures coordinate consistency with CARLA
+        main_junction = '4' if '4' in junctions else junctions[0]
         pos = traci.junction.getPosition(main_junction)
         self.intersection_center = pos
 
-        logger.info(f"Intersection center set to: {self.intersection_center}")
+        logger.info(f"Intersection center set to: {self.intersection_center} (junction {main_junction})")
+        logger.debug(f"Available junctions: {junctions}")
 
     def _initialize_traffic_manager(self):
         """Initialize MARLTrafficManager with SUMO adapter."""

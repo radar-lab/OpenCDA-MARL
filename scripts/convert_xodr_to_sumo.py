@@ -39,13 +39,14 @@ def convert_xodr_to_sumo(xodr_path: str, output_dir: str):
         NETCONVERT,
         '--opendrive', xodr_path,
         '--output-file', net_file,
-        '--opendrive.curve-resolution', '1.0',  # Finer resolution
+        '--opendrive.curve-resolution', '1.0',  # Finer resolution for accurate coordinates
         '--junctions.corner-detail', '5',
         '--tls.discard-loaded', 'true',  # Remove ALL traffic lights (matching CARLA)
         '--ramps.guess', 'true',
         '--junctions.join', 'true',
         '--geometry.remove', 'true',
-        '--no-turnarounds.except-deadend', 'true',
+        '--no-turnarounds', 'true',  # DISABLE all U-turns (prevents infinite loops)
+        '--no-internal-links', 'false',  # Keep junction internals for realistic routing
     ]
 
     try:

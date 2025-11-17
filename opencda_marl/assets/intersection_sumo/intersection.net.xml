@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-11-17T15:15:29.486096-07:00 by Eclipse SUMO netconvert 1.25.0
+<!-- generated on 2025-11-17T16:18:51.287795-07:00 by Eclipse SUMO netconvert 1.25.0
 <netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
@@ -24,7 +24,8 @@
     </ramp_guessing>
 
     <junctions>
-        <no-turnarounds.except-deadend value="true"/>
+        <no-internal-links value="false"/>
+        <no-turnarounds value="true"/>
         <junctions.join value="true"/>
         <junctions.corner-detail value="5"/>
     </junctions>
@@ -42,18 +43,6 @@
 
     <type id="driving" priority="1" speed="13.89" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" width="3.65"/>
 
-    <edge id=":0.begin_0" function="internal">
-        <lane id=":0.begin_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="3.82" length="5.11" width="3.50" shape="101.55,200.00 100.67,201.31 99.80,201.75 98.92,201.31 98.05,200.00"/>
-    </edge>
-    <edge id=":1.end_0" function="internal">
-        <lane id=":1.end_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="3.82" length="5.11" width="3.50" shape="98.05,0.00 98.92,-1.31 99.80,-1.75 100.67,-1.31 101.55,0.00"/>
-    </edge>
-    <edge id=":2.begin_0" function="internal">
-        <lane id=":2.begin_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="3.82" length="5.11" width="3.50" shape="0.00,101.32 -1.31,100.44 -1.75,99.57 -1.31,98.69 0.00,97.82"/>
-    </edge>
-    <edge id=":3.end_0" function="internal">
-        <lane id=":3.end_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="3.82" length="5.11" width="3.50" shape="200.00,97.82 201.31,98.69 201.75,99.57 201.31,100.44 200.00,101.32"/>
-    </edge>
     <edge id=":4_0" function="internal">
         <lane id=":4_0_0" index="0" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="7.34" length="11.69" width="3.50" shape="91.05,115.57 90.60,112.40 89.24,110.13 86.97,108.77 83.80,108.32"/>
     </edge>
@@ -138,18 +127,10 @@
         <lane id="3_2" index="2" disallow="pedestrian tram rail_urban rail rail_electric rail_fast ship container cable_car subway aircraft wheelchair scooter drone" speed="17.88" length="84.20" width="3.50" shape="200.00,101.32 115.80,101.32" type="driving"/>
     </edge>
 
-    <junction id="0.begin" type="priority" x="99.80" y="200.00" incLanes="0_0 0_1 0_2" intLanes=":0.begin_0_0" shape="99.80,200.00 110.30,200.00 99.80,200.00">
-        <request index="0" response="0" foes="0" cont="0"/>
-    </junction>
-    <junction id="1.end" type="priority" x="99.80" y="0.00" incLanes="-1_0 -1_1 -1_2" intLanes=":1.end_0_0" shape="99.80,0.00 89.30,0.00 99.80,0.00">
-        <request index="0" response="0" foes="0" cont="0"/>
-    </junction>
-    <junction id="2.begin" type="priority" x="0.00" y="99.57" incLanes="2_0 2_1 2_2" intLanes=":2.begin_0_0" shape="0.00,99.57 0.00,110.07 0.00,99.57">
-        <request index="0" response="0" foes="0" cont="0"/>
-    </junction>
-    <junction id="3.end" type="priority" x="200.00" y="99.57" incLanes="-3_0 -3_1 -3_2" intLanes=":3.end_0_0" shape="200.00,99.57 200.00,89.07 200.00,99.57">
-        <request index="0" response="0" foes="0" cont="0"/>
-    </junction>
+    <junction id="0.begin" type="dead_end" x="99.80" y="200.00" incLanes="0_0 0_1 0_2" intLanes="" shape="99.80,200.00 110.30,200.00 99.80,200.00"/>
+    <junction id="1.end" type="dead_end" x="99.80" y="0.00" incLanes="-1_0 -1_1 -1_2" intLanes="" shape="99.80,0.00 89.30,0.00 99.80,0.00"/>
+    <junction id="2.begin" type="dead_end" x="0.00" y="99.57" incLanes="2_0 2_1 2_2" intLanes="" shape="0.00,99.57 0.00,110.07 0.00,99.57"/>
+    <junction id="3.end" type="dead_end" x="200.00" y="99.57" incLanes="-3_0 -3_1 -3_2" intLanes="" shape="200.00,99.57 200.00,89.07 200.00,99.57"/>
     <junction id="4" type="priority" x="99.80" y="99.57" incLanes="-0_0 -0_1 -0_2 3_0 3_1 3_2 1_0 1_1 1_2 -2_0 -2_1 -2_2" intLanes=":4_0_0 :4_1_0 :4_12_0 :4_3_0 :4_4_0 :4_5_0 :4_6_0 :4_7_0 :4_13_0 :4_9_0 :4_10_0 :4_11_0" shape="89.30,115.57 110.30,115.57 110.91,112.51 111.67,111.44 112.74,110.68 114.12,110.22 115.80,110.07 115.80,89.07 112.74,88.46 111.67,87.69 110.91,86.63 110.45,85.25 110.30,83.57 89.30,83.57 88.69,86.63 87.92,87.69 86.86,88.46 85.48,88.92 83.80,89.07 83.80,110.07 86.86,110.68 87.92,111.44 88.69,112.51 89.15,113.89">
         <request index="0"  response="000000000000" foes="000000000000" cont="0"/>
         <request index="1"  response="000000000000" foes="110100010000" cont="0"/>
@@ -171,24 +152,16 @@
     <connection from="-0" to="2" fromLane="0" toLane="0" via=":4_0_0" dir="r" state="M"/>
     <connection from="-0" to="-1" fromLane="1" toLane="1" via=":4_1_0" dir="s" state="M"/>
     <connection from="-0" to="-3" fromLane="2" toLane="2" via=":4_2_0" dir="l" state="m"/>
-    <connection from="-1" to="1" fromLane="2" toLane="2" via=":1.end_0_0" dir="t" state="M"/>
     <connection from="-2" to="-1" fromLane="0" toLane="0" via=":4_9_0" dir="r" state="M"/>
     <connection from="-2" to="-3" fromLane="1" toLane="1" via=":4_10_0" dir="s" state="m"/>
     <connection from="-2" to="0" fromLane="2" toLane="2" via=":4_11_0" dir="l" state="m"/>
-    <connection from="-3" to="3" fromLane="2" toLane="2" via=":3.end_0_0" dir="t" state="M"/>
-    <connection from="0" to="-0" fromLane="2" toLane="2" via=":0.begin_0_0" dir="t" state="M"/>
     <connection from="1" to="-3" fromLane="0" toLane="0" via=":4_6_0" dir="r" state="M"/>
     <connection from="1" to="0" fromLane="1" toLane="1" via=":4_7_0" dir="s" state="M"/>
     <connection from="1" to="2" fromLane="2" toLane="2" via=":4_8_0" dir="l" state="m"/>
-    <connection from="2" to="-2" fromLane="2" toLane="2" via=":2.begin_0_0" dir="t" state="M"/>
     <connection from="3" to="0" fromLane="0" toLane="0" via=":4_3_0" dir="r" state="M"/>
     <connection from="3" to="2" fromLane="1" toLane="1" via=":4_4_0" dir="s" state="m"/>
     <connection from="3" to="-1" fromLane="2" toLane="2" via=":4_5_0" dir="l" state="m"/>
 
-    <connection from=":0.begin_0" to="-0" fromLane="0" toLane="2" dir="t" state="M"/>
-    <connection from=":1.end_0" to="1" fromLane="0" toLane="2" dir="t" state="M"/>
-    <connection from=":2.begin_0" to="-2" fromLane="0" toLane="2" dir="t" state="M"/>
-    <connection from=":3.end_0" to="3" fromLane="0" toLane="2" dir="t" state="M"/>
     <connection from=":4_0" to="2" fromLane="0" toLane="0" dir="r" state="M"/>
     <connection from=":4_1" to="-1" fromLane="0" toLane="1" dir="s" state="M"/>
     <connection from=":4_2" to="-3" fromLane="0" toLane="2" via=":4_12_0" dir="l" state="m"/>
