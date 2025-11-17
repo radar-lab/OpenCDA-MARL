@@ -6,11 +6,27 @@ Description  : Utility functions for traffic planning.
 Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 '''
 import carla
-from typing import List
+from typing import List, Union
 
 
-def with_z(t: carla.Transform, z: float) -> carla.Transform:
-    return carla.Transform(t.location + carla.Location(z=float(z)), t.rotation)
+def with_z(t: Union[carla.Transform, 'Transform'], z: float) -> Union[carla.Transform, 'Transform']:
+    """
+    Add z-offset to a transform.
+    Works with both CARLA Transform and SUMO mock Transform.
+    """
+    # Check if this is a SUMO mock Transform (has module 'sumo_adapter')
+    if hasattr(t, '__class__') and 'sumo_adapter' in t.__class__.__module__:
+        # SUMO mock object - use mock classes
+        from opencda_marl.core.traffic.sumo_adapter import Transform, Location
+        new_location = Location(
+            x=t.location.x,
+            y=t.location.y,
+            z=t.location.z + float(z)
+        )
+        return Transform(location=new_location, rotation=t.rotation)
+    else:
+        # Real CARLA object
+        return carla.Transform(t.location + carla.Location(z=float(z)), t.rotation)
 
 
 def choose_same_lane(cands: List[carla.Waypoint], cur: carla.Waypoint) -> carla.Waypoint:

@@ -4,20 +4,50 @@
     <!-- Vehicle type definitions -->
     <vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5.0" maxSpeed="70.0" guiShape="passenger"/>
 
-    <!-- Routes for MARL training -->
-    <!-- Note: Simple network, vehicles drive through single edges -->
-    <!-- MARL agents control vehicles via TraCI as they approach intersection -->
+    <!-- Routes for MARL training - Multi-edge routes matching CARLA behavior -->
+    <!-- Routes go through the intersection to different destinations -->
 
-    <route id="route_0" edges="0"/>
-    <route id="route_1" edges="1"/>
-    <route id="route_2" edges="2"/>
-    <route id="route_3" edges="3"/>
+    <!-- North entry routes (from -0) -->
+    <route id="north_south" edges="-0 -1"/>     <!-- Straight: North ¡ú South -->
+    <route id="north_east" edges="-0 -3"/>      <!-- Right turn: North ¡ú East -->
+    <route id="north_west" edges="-0 2"/>       <!-- Left turn: North ¡ú West -->
 
-    <!-- Traffic flows - vehicles spawn on edges and are controlled by MARL -->
-    <!-- Flow rate: 100 veh/hour = ~1.7 veh/min per direction -->
-    <flow id="flow_0" type="car" route="route_0" begin="0" end="3600" vehsPerHour="100"/>
-    <flow id="flow_1" type="car" route="route_1" begin="0" end="3600" vehsPerHour="100"/>
-    <flow id="flow_2" type="car" route="route_2" begin="0" end="3600" vehsPerHour="100"/>
-    <flow id="flow_3" type="car" route="route_3" begin="0" end="3600" vehsPerHour="100"/>
+    <!-- South entry routes (from 1) -->
+    <route id="south_north" edges="1 0"/>       <!-- Straight: South ¡ú North -->
+    <route id="south_west" edges="1 2"/>        <!-- Right turn: South ¡ú West -->
+    <route id="south_east" edges="1 -3"/>       <!-- Left turn: South ¡ú East -->
+
+    <!-- East entry routes (from 3) -->
+    <route id="east_west" edges="3 2"/>         <!-- Straight: East ¡ú West -->
+    <route id="east_south" edges="3 -1"/>       <!-- Right turn: East ¡ú South -->
+    <route id="east_north" edges="3 0"/>        <!-- Left turn: East ¡ú North -->
+
+    <!-- West entry routes (from -2) -->
+    <route id="west_east" edges="-2 -3"/>       <!-- Straight: West ¡ú East -->
+    <route id="west_north" edges="-2 0"/>       <!-- Right turn: West ¡ú North -->
+    <route id="west_south" edges="-2 -1"/>      <!-- Left turn: West ¡ú South -->
+
+    <!-- Traffic flows - vehicles spawn from all directions with varied routes -->
+    <!-- Distribution: 40% straight, 30% right, 30% left (matching typical traffic patterns) -->
+
+    <!-- North flows -->
+    <flow id="flow_north_straight" type="car" route="north_south" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_north_right" type="car" route="north_east" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_north_left" type="car" route="north_west" begin="0" end="3600" vehsPerHour="30"/>
+
+    <!-- South flows -->
+    <flow id="flow_south_straight" type="car" route="south_north" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_south_right" type="car" route="south_west" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_south_left" type="car" route="south_east" begin="0" end="3600" vehsPerHour="30"/>
+
+    <!-- East flows -->
+    <flow id="flow_east_straight" type="car" route="east_west" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_east_right" type="car" route="east_south" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_east_left" type="car" route="east_north" begin="0" end="3600" vehsPerHour="30"/>
+
+    <!-- West flows -->
+    <flow id="flow_west_straight" type="car" route="west_east" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_west_right" type="car" route="west_north" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_west_left" type="car" route="west_south" begin="0" end="3600" vehsPerHour="30"/>
 
 </routes>

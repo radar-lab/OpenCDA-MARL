@@ -29,8 +29,12 @@ scenario:
     max_episodes: 1000  # Fast training: 1000 episodes in SUMO
 
   traffic:
-    mode: "live"  # Generate traffic dynamically
+    mode: "replay"  # Generate traffic dynamically
+    replay_file: "recordings/lite_2minL.json"
+
     base_speed: 45.0  # km/h base speed
+    # Junction to use for MARL training
+    active_junctions: [4]
 
     flows:
       - name: "north"

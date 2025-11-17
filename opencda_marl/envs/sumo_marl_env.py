@@ -25,6 +25,9 @@ from opencda_marl.core.events import StepEvent
 from opencda_marl.core.marl import MARLManager
 from opencda_marl.core.marl.metrics import TrainingMetrics as Metrics
 from opencda_marl.core.marl.checkpoint import CheckpointManager
+from opencda_marl.core.traffic.sumo_adapter import SumoWorld, SumoMARLPlanner
+from opencda_marl.core.traffic.traffic_manager import MARLTrafficManager
+from opencda_marl.core.traffic.sumo_spawner import SumoVehicleSpawner
 
 
 class SumoMARLEnv:
@@ -83,6 +86,11 @@ class SumoMARLEnv:
         # Intersection center (will be calculated from network)
         self.intersection_center = None
 
+        # Traffic Manager (will be initialized after SUMO starts)
+        self.traffic_manager = None
+        self.vehicle_spawner = None
+        self.use_traffic_manager = self.scenario_config.get('traffic', {}).get('mode') in ['live', 'record', 'replay']
+
         # MARL Manager
         algorithm = self.marl_config.get('algorithm', 'td3')
         self.marl_manager = MARLManager(self.marl_config, algorithm)
@@ -133,13 +141,23 @@ class SumoMARLEnv:
         # Start TraCI
         sumo_cmd = [
             sumo_binary,
-            '--configuration-file', self.sumo_cfg,
             '--step-length', str(self.step_length),
             '--collision.action', 'warn',  # Log collisions
             '--collision.check-junctions', 'true',
             '--no-warnings', 'false',
             '--quit-on-end', 'false',  # Don't auto-quit
         ]
+
+        # If using traffic manager, only load network file (no routes)
+        if self.use_traffic_manager:
+            # Extract network file from sumocfg
+            net_file = self._get_network_file_from_config()
+            sumo_cmd.extend(['--net-file', net_file])
+            logger.info("Using MARLTrafficManager - loading network only (no route file)")
+        else:
+            # Use full config (includes routes)
+            sumo_cmd.extend(['--configuration-file', self.sumo_cfg])
+            logger.info("Using static route file from sumocfg")
 
         # Add auto-start flag for GUI to prevent manual start button
         if self.use_gui:
@@ -150,7 +168,33 @@ class SumoMARLEnv:
         # Calculate intersection center from network
         self._calculate_intersection_center()
 
+        # Initialize traffic manager if using dynamic traffic
+        if self.use_traffic_manager:
+            self._initialize_traffic_manager()
+
         logger.info("SUMO started successfully")
+
+    def _get_network_file_from_config(self) -> str:
+        """Extract network file path from SUMO configuration file."""
+        import xml.etree.ElementTree as ET
+        from pathlib import Path
+
+        # Parse sumocfg file
+        tree = ET.parse(self.sumo_cfg)
+        root = tree.getroot()
+
+        # Find net-file element
+        net_elem = root.find('.//net-file')
+        if net_elem is None:
+            raise ValueError(f"No net-file found in {self.sumo_cfg}")
+
+        net_file = net_elem.get('value')
+
+        # Resolve relative path
+        cfg_dir = Path(self.sumo_cfg).parent
+        net_path = cfg_dir / net_file
+
+        return str(net_path)
 
     def _calculate_intersection_center(self):
         """Calculate the center of the intersection from SUMO network."""
@@ -170,6 +214,47 @@ class SumoMARLEnv:
 
         logger.info(f"Intersection center set to: {self.intersection_center}")
 
+    def _initialize_traffic_manager(self):
+        """Initialize MARLTrafficManager with SUMO adapter."""
+        logger.info("Initializing MARL Traffic Manager for SUMO")
+
+        try:
+            # Create SUMO world adapter
+            sumo_world = SumoWorld()
+            logger.debug("SUMO world adapter created")
+
+            # Get traffic configuration
+            traffic_config = self.scenario_config.get('traffic', {})
+            logger.debug(f"Traffic config: {traffic_config}")
+
+            # Create state dict for traffic manager
+            state = {
+                'step': 0,
+                'episode': 0
+            }
+
+            # Initialize traffic manager with SUMO world
+            logger.debug("Creating MARLTrafficManager...")
+            self.traffic_manager = MARLTrafficManager(
+                world=sumo_world,
+                config=traffic_config,
+                state=state,
+                fix_dlt=self.step_length
+            )
+            logger.debug("MARLTrafficManager created")
+
+            # Initialize vehicle spawner
+            self.vehicle_spawner = SumoVehicleSpawner()
+            logger.debug("Vehicle spawner created")
+
+            logger.success(f"Traffic Manager initialized with {self.traffic_manager.total_events} spawn events")
+
+        except Exception as e:
+            logger.error(f"Failed to initialize traffic manager: {e}")
+            import traceback
+            traceback.print_exc()
+            raise
+
     def _default_reward_params(self) -> Dict:
         """Default reward parameters matching CARLA MARLEnv."""
         return {
@@ -187,11 +272,17 @@ class SumoMARLEnv:
         Returns:
             Dict containing rewards and metrics
         """
+        # Spawn vehicles from traffic manager
+        if self.use_traffic_manager and self.traffic_manager:
+            spawn_events = self.traffic_manager.update(self.current_step)
+            if spawn_events:
+                self.vehicle_spawner.spawn_vehicles(spawn_events)
+
         # Get current observations
         observations = self._get_observations()
 
         if not observations:
-            # No active vehicles
+            # No active vehicles yet - step simulation
             traci.simulationStep()
             self.current_step += 1
             self.total_steps += 1

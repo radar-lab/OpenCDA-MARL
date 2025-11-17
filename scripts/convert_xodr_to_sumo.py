@@ -41,11 +41,11 @@ def convert_xodr_to_sumo(xodr_path: str, output_dir: str):
         '--output-file', net_file,
         '--opendrive.curve-resolution', '1.0',  # Finer resolution
         '--junctions.corner-detail', '5',
-        '--tls.discard-simple',  # Remove simple traffic lights
-        '--tls.guess', 'true',  # Guess traffic light positions
+        '--tls.discard-loaded', 'true',  # Remove ALL traffic lights (matching CARLA)
         '--ramps.guess', 'true',
         '--junctions.join', 'true',
         '--geometry.remove', 'true',
+        '--no-turnarounds.except-deadend', 'true',
     ]
 
     try:
@@ -72,28 +72,58 @@ def create_route_file(output_dir: str, net_file: str):
     """
     route_file = os.path.join(output_dir, 'intersection.rou.xml')
 
-    # Simple route file template
+    # CARLA-compatible route file template with varied routes
     route_xml = '''<?xml version="1.0" encoding="UTF-8"?>
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
 
     <!-- Vehicle type definitions -->
     <vType id="car" accel="2.6" decel="4.5" sigma="0.5" length="5.0" maxSpeed="70.0" guiShape="passenger"/>
 
-    <!-- Routes will be defined by MARL traffic manager -->
-    <!-- This is a placeholder for manual testing -->
-    <!-- Valid edges: -0, -1, -2, -3, 0, 1, 2, 3 -->
+    <!-- Routes for MARL training - Multi-edge routes matching CARLA behavior -->
+    <!-- Routes go through the intersection to different destinations -->
 
-    <route id="north_to_south" edges="-0 2"/>
-    <route id="south_to_north" edges="-2 0"/>
-    <route id="east_to_west" edges="-1 3"/>
-    <route id="west_to_east" edges="-3 1"/>
+    <!-- North entry routes (from -0) -->
+    <route id="north_south" edges="-0 -1"/>     <!-- Straight: North → South -->
+    <route id="north_east" edges="-0 -3"/>      <!-- Right turn: North → East -->
+    <route id="north_west" edges="-0 2"/>       <!-- Left turn: North → West -->
 
-    <!-- Traffic flows for MARL training -->
-    <!-- Vehicles are spawned automatically and controlled by MARL agents via TraCI -->
-    <flow id="flow_north" type="car" route="north_to_south" begin="0" end="3600" vehsPerHour="100"/>
-    <flow id="flow_south" type="car" route="south_to_north" begin="0" end="3600" vehsPerHour="100"/>
-    <flow id="flow_east" type="car" route="east_to_west" begin="0" end="3600" vehsPerHour="100"/>
-    <flow id="flow_west" type="car" route="west_to_east" begin="0" end="3600" vehsPerHour="100"/>
+    <!-- South entry routes (from 1) -->
+    <route id="south_north" edges="1 0"/>       <!-- Straight: South → North -->
+    <route id="south_west" edges="1 2"/>        <!-- Right turn: South → West -->
+    <route id="south_east" edges="1 -3"/>       <!-- Left turn: South → East -->
+
+    <!-- East entry routes (from 3) -->
+    <route id="east_west" edges="3 2"/>         <!-- Straight: East → West -->
+    <route id="east_south" edges="3 -1"/>       <!-- Right turn: East → South -->
+    <route id="east_north" edges="3 0"/>        <!-- Left turn: East → North -->
+
+    <!-- West entry routes (from -2) -->
+    <route id="west_east" edges="-2 -3"/>       <!-- Straight: West → East -->
+    <route id="west_north" edges="-2 0"/>       <!-- Right turn: West → North -->
+    <route id="west_south" edges="-2 -1"/>      <!-- Left turn: West → South -->
+
+    <!-- Traffic flows - vehicles spawn from all directions with varied routes -->
+    <!-- Distribution: 40% straight, 30% right, 30% left (matching typical traffic patterns) -->
+
+    <!-- North flows -->
+    <flow id="flow_north_straight" type="car" route="north_south" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_north_right" type="car" route="north_east" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_north_left" type="car" route="north_west" begin="0" end="3600" vehsPerHour="30"/>
+
+    <!-- South flows -->
+    <flow id="flow_south_straight" type="car" route="south_north" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_south_right" type="car" route="south_west" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_south_left" type="car" route="south_east" begin="0" end="3600" vehsPerHour="30"/>
+
+    <!-- East flows -->
+    <flow id="flow_east_straight" type="car" route="east_west" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_east_right" type="car" route="east_south" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_east_left" type="car" route="east_north" begin="0" end="3600" vehsPerHour="30"/>
+
+    <!-- West flows -->
+    <flow id="flow_west_straight" type="car" route="west_east" begin="0" end="3600" vehsPerHour="40"/>
+    <flow id="flow_west_right" type="car" route="west_north" begin="0" end="3600" vehsPerHour="30"/>
+    <flow id="flow_west_left" type="car" route="west_south" begin="0" end="3600" vehsPerHour="30"/>
 
 </routes>
 '''
