@@ -416,6 +416,7 @@ class TD3Algorithm(BaseAlgorithm):
 
         self.training = True
         self.training_step = 0  # Required for delayed policy updates
+        self._pretrained = False  # Flag to indicate if loaded from pretrained checkpoint
 
         logger.info(
             f"TD3 initialized with {state_dim}D states, LSTM hidden: {self.lstm_hidden_size}, device: {self.device}")

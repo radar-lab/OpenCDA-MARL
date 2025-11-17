@@ -16,6 +16,8 @@ class TrainingMetrics:
         self.current_length = 0
         self.current_total_reward = 0.0
         self.agent_rewards = {}
+        self.collisions = 0
+        self.successes = 0
     # --------------------------------------------------------------------- #
     # Main steps for updating metrics
     # --------------------------------------------------------------------- #

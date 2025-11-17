@@ -196,8 +196,9 @@ class MARLCoordinator:
                 episode_metrics = self.marl_env.reset_episode()
                 logger.info(f"Episode metrics: {episode_metrics}")
 
-            # Reset scenario manager
-            self.scenario_manager.reset_episode()
+            # Reset scenario manager (only in CARLA mode)
+            if self.scenario_manager is not None:
+                self.scenario_manager.reset_episode()
 
             # Call episode callbacks
             for callback in self.episode_callbacks:

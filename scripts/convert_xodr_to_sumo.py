@@ -88,13 +88,12 @@ def create_route_file(output_dir: str, net_file: str):
     <route id="east_to_west" edges="-1 3"/>
     <route id="west_to_east" edges="-3 1"/>
 
-    <!-- Example flows (can be commented out when using MARL) -->
-    <!--
-    <flow id="flow_north" type="car" route="north_to_south" begin="0" end="3600" vehsPerHour="200"/>
-    <flow id="flow_south" type="car" route="south_to_north" begin="0" end="3600" vehsPerHour="200"/>
-    <flow id="flow_east" type="car" route="east_to_west" begin="0" end="3600" vehsPerHour="200"/>
-    <flow id="flow_west" type="car" route="west_to_east" begin="0" end="3600" vehsPerHour="200"/>
-    -->
+    <!-- Traffic flows for MARL training -->
+    <!-- Vehicles are spawned automatically and controlled by MARL agents via TraCI -->
+    <flow id="flow_north" type="car" route="north_to_south" begin="0" end="3600" vehsPerHour="100"/>
+    <flow id="flow_south" type="car" route="south_to_north" begin="0" end="3600" vehsPerHour="100"/>
+    <flow id="flow_east" type="car" route="east_to_west" begin="0" end="3600" vehsPerHour="100"/>
+    <flow id="flow_west" type="car" route="west_to_east" begin="0" end="3600" vehsPerHour="100"/>
 
 </routes>
 '''

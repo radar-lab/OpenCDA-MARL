@@ -141,6 +141,10 @@ class SumoMARLEnv:
             '--quit-on-end', 'false',  # Don't auto-quit
         ]
 
+        # Add auto-start flag for GUI to prevent manual start button
+        if self.use_gui:
+            sumo_cmd.append('--start')
+
         traci.start(sumo_cmd, port=self.sumo_port)
 
         # Calculate intersection center from network
@@ -215,12 +219,9 @@ class SumoMARLEnv:
         # Update MARL algorithm
         if self.is_training_mode and self.previous_observations:
             self.marl_manager.update(
-                self.previous_observations,
-                observations,  # Current becomes 'state'
-                rewards,
-                next_observations,
-                {agent_id: agent_id in self.terminal_agents
-                 for agent_id in observations.keys()}
+                rewards=rewards,
+                observations=self.previous_observations,
+                next_observations=next_observations
             )
 
         # Store for next iteration
@@ -350,9 +351,9 @@ class SumoMARLEnv:
                 self.terminal_agents.add(veh_id)
                 events.append(StepEvent(
                     step=self.current_step,
-                    agent_id=veh_id,
-                    event_type='success',
-                    details={'reason': 'arrived_at_destination'}
+                    event_id=f'success_{veh_id}_{self.current_step}',
+                    vehicle_id=veh_id,
+                    event_type='success'
                 ))
 
         # Check for collisions
@@ -368,9 +369,9 @@ class SumoMARLEnv:
                     self.terminal_agents.add(veh_id)
                     events.append(StepEvent(
                         step=self.current_step,
-                        agent_id=veh_id,
-                        event_type='collision',
-                        details={'collision_type': collision.type}
+                        event_id=f'collision_{veh_id}_{self.current_step}',
+                        vehicle_id=veh_id,
+                        event_type='collision'
                     ))
 
         return events
@@ -385,7 +386,7 @@ class SumoMARLEnv:
 
         # Process terminal events first
         for event in events:
-            agent_id = event.agent_id
+            agent_id = event.vehicle_id
 
             if event.event_type == 'collision':
                 rewards[agent_id] = self.reward_params['collision']
@@ -410,9 +411,8 @@ class SumoMARLEnv:
 
     def _update_metrics(self, rewards: Dict, events: List[StepEvent]):
         """Update training metrics."""
-        # Accumulate episode rewards
-        for agent_id, reward in rewards.items():
-            self.metrics.accumulate_reward(reward)
+        # Update step metrics with all agent rewards
+        self.metrics.update_step(rewards)
 
         # Track events
         for event in events:
@@ -441,9 +441,9 @@ class SumoMARLEnv:
         self.previous_observations.clear()
         self.episode_events.clear()
 
-        # Finalize episode metrics
+        # Log episode metrics before reset
         if self.current_episode > 0:
-            episode_metrics = self.metrics.finalize_episode()
+            episode_metrics = self.metrics.get_current_metrics()
             logger.info(f"Episode {self.current_episode} metrics: {episode_metrics}")
 
             # Save checkpoint periodically

@@ -107,30 +107,30 @@ class MARLManager:
             # Handle TD3 differently due to multi-agent structure
             if isinstance(self.algorithm, TD3Algorithm):
                 for agent_id_str, multi_agent_data in states.items():
-                    # Convert string agent_id to int for consistent key types
-                    agent_id_int = int(agent_id_str) if isinstance(agent_id_str, str) else agent_id_str
-                    
+                    # Keep agent_id as-is (can be string in SUMO or int in CARLA)
+                    agent_id = agent_id_str
+
                     # Extract all agent states for TD3
                     all_agent_states = multi_agent_data['all_states']
-                    action = self.algorithm.select_action(all_agent_states, agent_id_str, training=training)
-                    speed = self._compute_td3_action(action, agent_id_int)
+                    action = self.algorithm.select_action(all_agent_states, agent_id, training=training)
+                    speed = self._compute_td3_action(action, agent_id)
                     
                     # If speed is None (warmup phase), skip this agent to use vanilla agent
                     if speed is None:
-                        logger.debug(f"TD3: Agent {agent_id_int} in warmup phase, using vanilla agent")
+                        logger.debug(f"TD3: Agent {agent_id} in warmup phase, using vanilla agent")
                         # Track vanilla agent's current speed for memory storage
-                        if agent_id_int in observations:
-                            vanilla_speed = observations[agent_id_int].get('speed', 45.0)
-                            self.last_actions[agent_id_int] = vanilla_speed  # Track for TD3 learning
+                        if agent_id in observations:
+                            vanilla_speed = observations[agent_id].get('speed', 45.0)
+                            self.last_actions[agent_id] = vanilla_speed  # Track for TD3 learning
                         continue  # Don't add to target_speeds, let vanilla agent handle it
-                    
+
                     # Clamp speed to TD3 action bounds
                     max_action = self.algorithm.max_action
                     clamped_speed = max(0.0, min(max_action, speed))
-                    target_speeds[agent_id_int] = clamped_speed
-                    
+                    target_speeds[agent_id] = clamped_speed
+
                     # Log the target speed assignment
-                    logger.debug(f"TD3: Agent {agent_id_int} target speed set to {clamped_speed:.2f} km/h")
+                    logger.debug(f"TD3: Agent {agent_id} target speed set to {clamped_speed:.2f} km/h")
             else:
                 # Handle single-agent algorithms (Q-learning, DQN)
                 for agent_id, state in states.items():
@@ -302,24 +302,24 @@ class MARLManager:
         
         # Store transitions for each agent
         for agent_id_str in states.keys():
-            # Convert string agent_id back to int for rewards/actions lookup
-            agent_id = int(agent_id_str)
-            
-            if (agent_id in rewards and 
-                agent_id_str in next_states and 
+            # Use agent_id_str directly (can be string in SUMO or int in CARLA)
+            agent_id = agent_id_str
+
+            if (agent_id in rewards and
+                agent_id in next_states and
                 agent_id in self.last_actions):
-                
+
                 # Get multi-agent observations for TD3
-                multi_agent_obs = states[agent_id_str]['all_states']
-                next_multi_agent_obs = next_states[agent_id_str]['all_states']
-                
+                multi_agent_obs = states[agent_id]['all_states']
+                next_multi_agent_obs = next_states[agent_id]['all_states']
+
                 action = self.last_actions[agent_id]
                 reward = rewards[agent_id]
-                done = agent_id_str not in next_states
-                
-                # Store multi-agent transition (use string agent_id for TD3)
+                done = agent_id not in next_states
+
+                # Store multi-agent transition
                 self.algorithm.store_transition(
-                    multi_agent_obs, agent_id_str, action, reward, 
+                    multi_agent_obs, agent_id, action, reward,
                     next_multi_agent_obs, done
                 )
         
