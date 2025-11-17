@@ -72,7 +72,13 @@ class MARLCoordinator:
             self.carla_world = None
             self.carla_spectator = None
             self.carla_monitor = None
-            self.states = {}
+
+            # Populate states from config for SUMO mode
+            simulation_cfg = self.config.get('scenario', {}).get('simulation', {})
+            self.states = {
+                'max_steps': simulation_cfg.get('max_steps', 2400),
+                'max_episodes': simulation_cfg.get('max_episodes', 1000)
+            }
 
             # Create Evaluation manager
             scenario_type = self.config.get("meta", {}).get("scenario_type", None)

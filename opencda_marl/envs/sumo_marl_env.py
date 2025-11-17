@@ -468,7 +468,23 @@ class SumoMARLEnv:
 
     def get_episode_metrics(self) -> Dict:
         """Get current episode metrics."""
-        return self.metrics.get_current_metrics()
+        metrics = self.metrics.get_current_metrics()
+        # Add fixed_dt for evaluation manager
+        metrics['fixed_dt'] = self.step_length
+        return metrics
+
+    def get_current_step_rewards(self) -> Dict[int, float]:
+        """Get rewards from the current step for evaluation."""
+        return self.current_step_rewards.copy()
+
+    def reset_episode(self) -> Dict:
+        """
+        Reset episode and return metrics (alias for coordinator compatibility).
+        Returns episode metrics before resetting.
+        """
+        metrics = self.get_episode_metrics()
+        self.reset()
+        return metrics
 
     def _save_checkpoint(self):
         """Save training checkpoint."""

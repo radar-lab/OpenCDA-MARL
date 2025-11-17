@@ -9,14 +9,19 @@ description: |-
 meta:
   scenario_type: "intersection_sumo"  # New scenario type for SUMO-only
   simulator: "sumo"  # Flag to use SUMO instead of CARLA
-  sumo_cfg: "opencda/assets/intersection_sumo/intersection.sumocfg"
+  sumo_cfg: "opencda_marl/assets/intersection_sumo/intersection.sumocfg"
 
 world:
   sync_mode: true
   fixed_delta_seconds: 0.05
   seed: 11
   sumo_port: 8873
-  sumo_gui: false  # Set to true for visual debugging
+
+  # SUMO GUI Visualization
+  # Set to true to see traffic simulation in SUMO GUI window
+  # GUI will auto-start (non-blocking) - no manual "Play" button needed
+  # Useful for debugging vehicle behaviors and traffic patterns
+  sumo_gui: true
 
 scenario:
   simulation:

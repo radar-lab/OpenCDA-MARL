@@ -81,11 +81,12 @@ def create_route_file(output_dir: str, net_file: str):
 
     <!-- Routes will be defined by MARL traffic manager -->
     <!-- This is a placeholder for manual testing -->
+    <!-- Valid edges: -0, -1, -2, -3, 0, 1, 2, 3 -->
 
-    <route id="north_to_south" edges="0 8"/>
-    <route id="south_to_north" edges="2 10"/>
-    <route id="east_to_west" edges="1 9"/>
-    <route id="west_to_east" edges="3 11"/>
+    <route id="north_to_south" edges="-0 2"/>
+    <route id="south_to_north" edges="-2 0"/>
+    <route id="east_to_west" edges="-1 3"/>
+    <route id="west_to_east" edges="-3 1"/>
 
     <!-- Example flows (can be commented out when using MARL) -->
     <!--
@@ -201,10 +202,10 @@ def main():
     # Paths
     project_root = Path(__file__).parent.parent
     xodr_file = project_root / 'opencda_marl' / 'assets' / 'maps' / 'intersection.xodr'
-    output_dir = project_root / 'opencda' / 'assets' / 'intersection_sumo'
+    output_dir = project_root / 'opencda_marl' / 'assets' / 'intersection_sumo'  # MARL-specific location
 
     print("=" * 60)
-    print("XODR to SUMO Conversion Script")
+    print("XODR to SUMO Conversion Script (for MARL)")
     print("=" * 60)
     print(f"Input XODR: {xodr_file}")
     print(f"Output directory: {output_dir}")
