@@ -36,6 +36,14 @@ scenario:
     # Junction to use for MARL training
     active_junctions: [4]
 
+    planner:
+      distance: 5.0 # base spacing (m)
+      spawn_offset: 7 # multiples of safe_distance upstream
+      dest_offset: 7 # multiples of safe_distance downstream
+      spawn_z_lift: 0.3 # small lift to avoid ground collision
+      wp_step: 1.0 # stepping granularity along lanes (m)
+      allow_uturn: false
+
     flows:
       - name: "north"
         rate_vph: 200
