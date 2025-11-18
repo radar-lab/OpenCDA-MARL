@@ -25,6 +25,13 @@ class SumoVehicleSpawner:
         self.spawned_vehicles = {}  # {vehicle_id: event}
         self.spawn_counter = 0
         self.failed_spawns = []
+
+        # Get SUMO network offset for coordinate transformation
+        # SUMO applies netOffset during conversion: sumo_coord = carla_coord + offset
+        net_boundary = traci.simulation.getNetBoundary()
+        self.net_offset = self._get_network_offset()
+        logger.info(f"SUMO network offset: {self.net_offset}")
+
         self._ensure_vehicle_types()
 
     def spawn_vehicle(self, event: SpawnEvent) -> Optional[str]:
@@ -45,21 +52,25 @@ class SumoVehicleSpawner:
         vehicle_id = f"{event.flow_name}_{entry_dir}_{lane_idx}_{self.spawn_counter}"
         self.spawn_counter += 1
 
-        # Extract spawn and destination from event
+        # Extract spawn and destination from event (CARLA coordinates)
         spawn_loc = event.transform.location
         dest_loc = event.destination.location
 
+        # Transform CARLA coordinates to SUMO coordinates
+        spawn_x_sumo, spawn_y_sumo = self._carla_to_sumo(spawn_loc.x, spawn_loc.y)
+        dest_x_sumo, dest_y_sumo = self._carla_to_sumo(dest_loc.x, dest_loc.y)
+
         # Find closest SUMO edge to spawn location
-        spawn_edge = self._find_closest_edge(spawn_loc.x, spawn_loc.y)
+        spawn_edge = self._find_closest_edge(spawn_x_sumo, spawn_y_sumo)
         if not spawn_edge:
-            logger.warning(f"Could not find spawn edge for {vehicle_id} at ({spawn_loc.x:.1f}, {spawn_loc.y:.1f})")
+            logger.warning(f"Could not find spawn edge for {vehicle_id} at CARLA ({spawn_loc.x:.1f}, {spawn_loc.y:.1f}) → SUMO ({spawn_x_sumo:.1f}, {spawn_y_sumo:.1f})")
             self.failed_spawns.append(event)
             return None
 
         # Find closest SUMO edge to destination
-        dest_edge = self._find_closest_edge(dest_loc.x, dest_loc.y)
+        dest_edge = self._find_closest_edge(dest_x_sumo, dest_y_sumo)
         if not dest_edge:
-            logger.warning(f"Could not find destination edge for {vehicle_id}")
+            logger.warning(f"Could not find destination edge for {vehicle_id} at CARLA ({dest_loc.x:.1f}, {dest_loc.y:.1f}) → SUMO ({dest_x_sumo:.1f}, {dest_y_sumo:.1f})")
             self.failed_spawns.append(event)
             return None
 
@@ -237,6 +248,54 @@ class SumoVehicleSpawner:
             return True
         except:
             return False
+
+    def _get_network_offset(self) -> tuple:
+        """
+        Get the network offset from SUMO network.
+
+        SUMO applies netOffset during conversion: sumo_coord = carla_coord + offset
+        The offset is stored in the network file's <location> tag.
+
+        Returns:
+            (offset_x, offset_y) tuple
+        """
+        # For the intersection network, the offset is (99.80, 100.00)
+        # This can be read from network boundary or hardcoded
+        # Since CARLA junction 4 is at (99.80, 99.57) and SUMO junction 4 is also at (99.80, 99.57),
+        # but SUMO uses positive coordinates (0-200 range), the offset must be applied to spawn points
+
+        # The netOffset from intersection.net.xml is (99.80, 100.00)
+        return (99.80, 100.00)
+
+    def _carla_to_sumo(self, x: float, y: float) -> tuple:
+        """
+        Transform CARLA coordinates to SUMO coordinates.
+
+        Args:
+            x: CARLA X coordinate
+            y: CARLA Y coordinate
+
+        Returns:
+            (sumo_x, sumo_y) tuple
+        """
+        sumo_x = x + self.net_offset[0]
+        sumo_y = y + self.net_offset[1]
+        return (sumo_x, sumo_y)
+
+    def _sumo_to_carla(self, x: float, y: float) -> tuple:
+        """
+        Transform SUMO coordinates to CARLA coordinates.
+
+        Args:
+            x: SUMO X coordinate
+            y: SUMO Y coordinate
+
+        Returns:
+            (carla_x, carla_y) tuple
+        """
+        carla_x = x - self.net_offset[0]
+        carla_y = y - self.net_offset[1]
+        return (carla_x, carla_y)
 
     def cleanup(self):
         """Cleanup spawner resources."""

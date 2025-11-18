@@ -209,10 +209,18 @@ class SumoMARLEnv:
         # Find junction 4 (main intersection in our network)
         # This ensures coordinate consistency with CARLA
         main_junction = '4' if '4' in junctions else junctions[0]
-        pos = traci.junction.getPosition(main_junction)
-        self.intersection_center = pos
+        pos_sumo = traci.junction.getPosition(main_junction)
 
-        logger.info(f"Intersection center set to: {self.intersection_center} (junction {main_junction})")
+        # IMPORTANT: Convert SUMO coordinates back to CARLA coordinates
+        # SUMO applies netOffset (99.80, 100.00) during conversion
+        # To get CARLA coordinates: carla_coord = sumo_coord - offset
+        net_offset = (99.80, 100.00)
+        pos_carla = (pos_sumo[0] - net_offset[0], pos_sumo[1] - net_offset[1])
+
+        # Store in CARLA coordinate system for consistency with state features
+        self.intersection_center = pos_carla
+
+        logger.info(f"Intersection center (CARLA coords): {self.intersection_center} from SUMO junction {main_junction} at {pos_sumo}")
         logger.debug(f"Available junctions: {junctions}")
 
     def _initialize_traffic_manager(self):
@@ -580,19 +588,16 @@ class SumoMARLEnv:
 
     def _save_checkpoint(self):
         """Save training checkpoint."""
-        checkpoint_data = self.marl_manager.get_checkpoint_data()
-        checkpoint_data.update({
-            'episode': self.current_episode,
-            'total_steps': self.total_steps,
-            'metrics': self.metrics.get_history(),
-        })
+        # Use MARLManager's built-in checkpoint saving
+        checkpoint_dir = self.config.get('meta', {}).get('checkpoint_dir', 'checkpoints')
+        scenario_type = self.config.get('meta', {}).get('scenario_type', 'intersection_sumo')
+        checkpoint_path = f"{checkpoint_dir}/{scenario_type}/td3_episode_{self.current_episode}.pth"
 
-        self.checkpoint_manager.save(
-            checkpoint_data,
-            self.current_episode,
-            metrics=self.metrics.get_current_metrics()
-        )
-        logger.info(f"Checkpoint saved at episode {self.current_episode}")
+        import os
+        os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
+
+        self.marl_manager.save_checkpoint(checkpoint_path)
+        logger.info(f"Checkpoint saved at episode {self.current_episode}: {checkpoint_path}")
 
     def _load_checkpoint_from_config(self, checkpoint_path: str):
         """Load checkpoint from file."""

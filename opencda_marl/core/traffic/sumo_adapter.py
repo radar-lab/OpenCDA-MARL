@@ -103,13 +103,25 @@ class SumoWaypoint:
     """
     CARLA-like waypoint wrapper for SUMO edges/lanes.
     Provides same interface as carla.Waypoint for MARLPlanner compatibility.
+
+    IMPORTANT: All positions are stored in CARLA coordinate system for consistency.
+    SUMO coordinates are converted to CARLA coordinates using netOffset (99.8, 100.0).
     """
+
+    # Network offset for coordinate conversion (SUMO applies this during OpenDRIVE conversion)
+    NET_OFFSET = (99.80, 100.00)
 
     def __init__(self, edge_id: str, lane_index: int, position: Tuple[float, float],
                  road_id: int, lane_id: int, is_junction: bool = False, junction_id: str = None):
         self.edge_id = edge_id
         self.lane_index = lane_index
-        self.position = position  # (x, y)
+
+        # Convert SUMO coordinates to CARLA coordinates
+        # CARLA coords = SUMO coords - offset
+        carla_x = position[0] - self.NET_OFFSET[0]
+        carla_y = position[1] - self.NET_OFFSET[1]
+
+        self.position = (carla_x, carla_y)  # Store in CARLA coords!
         self.road_id = road_id  # Use edge_id hash for compatibility
         self.lane_id = lane_id  # SUMO lane index
         self.is_junction = is_junction
@@ -120,23 +132,47 @@ class SumoWaypoint:
         self.s = 0.0  # Distance along road (used for _is_same_lane_group)
         self.section_id = 0  # SUMO doesn't have sections, use 0 for all
 
-        # Create transform using proper mock classes
+        # Create transform using CARLA coordinates
         self.transform = Transform(
-            location=Location(x=position[0], y=position[1], z=0.0),
+            location=Location(x=carla_x, y=carla_y, z=0.0),
             rotation=Rotation(pitch=0.0, yaw=0.0, roll=0.0)
         )
 
     def get_left_lane(self):
         """Get left lane if exists."""
         # In SUMO, lane 0 is rightmost, increasing index goes left
-        edge_lanes = traci.edge.getLaneNumber(self.edge_id)
+        try:
+            edge_lanes = traci.edge.getLaneNumber(self.edge_id)
+        except:
+            return None
+
         if self.lane_index < edge_lanes - 1:
             new_lane_id = f"{self.edge_id}_{self.lane_index + 1}"
-            shape = traci.lane.getShape(new_lane_id)
-            if shape:
-                mid_point = shape[len(shape) // 2]
+            try:
+                shape = traci.lane.getShape(new_lane_id)
+            except:
+                return None
+
+            if shape and len(shape) >= 2:
+                # IMPORTANT: Use same position index as current waypoint
+                # If current waypoint is at end (-1), use end of adjacent lane too
+                # This ensures all lanes have coordinates at the same longitudinal position
+                position = self.position  # Current waypoint position in CARLA coords
+
+                # Convert to SUMO coords to match the longitudinal position
+                current_sumo_y = position[1] + self.NET_OFFSET[1]
+
+                # Find point in adjacent lane shape closest to current Y position
+                # For simplicity, use end point if current is near end, else mid point
+                if abs(current_sumo_y - shape[-1][1]) < 1.0:
+                    # Current waypoint is at end, use end of adjacent lane
+                    lane_point = shape[-1]
+                else:
+                    # Current waypoint is at mid, use mid of adjacent lane
+                    lane_point = shape[len(shape) // 2]
+
                 return SumoWaypoint(
-                    self.edge_id, self.lane_index + 1, mid_point,
+                    self.edge_id, self.lane_index + 1, lane_point,
                     self.road_id, self.lane_id + 1, self.is_junction, self.junction_id
                 )
         return None
@@ -145,11 +181,28 @@ class SumoWaypoint:
         """Get right lane if exists."""
         if self.lane_index > 0:
             new_lane_id = f"{self.edge_id}_{self.lane_index - 1}"
-            shape = traci.lane.getShape(new_lane_id)
-            if shape:
-                mid_point = shape[len(shape) // 2]
+            try:
+                shape = traci.lane.getShape(new_lane_id)
+            except:
+                return None
+
+            if shape and len(shape) >= 2:
+                # IMPORTANT: Use same position index as current waypoint
+                position = self.position  # Current waypoint position in CARLA coords
+
+                # Convert to SUMO coords to match the longitudinal position
+                current_sumo_y = position[1] + self.NET_OFFSET[1]
+
+                # Find point in adjacent lane shape closest to current Y position
+                if abs(current_sumo_y - shape[-1][1]) < 1.0:
+                    # Current waypoint is at end, use end of adjacent lane
+                    lane_point = shape[-1]
+                else:
+                    # Current waypoint is at mid, use mid of adjacent lane
+                    lane_point = shape[len(shape) // 2]
+
                 return SumoWaypoint(
-                    self.edge_id, self.lane_index - 1, mid_point,
+                    self.edge_id, self.lane_index - 1, lane_point,
                     self.road_id, self.lane_id - 1, self.is_junction, self.junction_id
                 )
         return None
@@ -243,6 +296,9 @@ class SumoWaypoint:
         """
         Get waypoints behind this waypoint along the lane.
 
+        IMPORTANT: This method now interpolates along the SAME lane shape
+        to provide proper spawn point distribution across lanes.
+
         Args:
             distance: Distance in meters to move backwards along the lane
 
@@ -257,50 +313,89 @@ class SumoWaypoint:
             if not shape or len(shape) < 2:
                 return []
 
-            # Current position is middle of lane, compute new position
-            # For simplicity, return waypoint at start of edge (where previous edge connects)
-            start_point = shape[0]
+            # Calculate total lane length
+            lane_length = traci.lane.getLength(lane_id)
 
-            # Check if there's a previous edge connected
-            from_junction_id = traci.edge.getFromJunction(self.edge_id)
-            if not from_junction_id:
-                return []
+            # Current position in CARLA coords - convert to SUMO to match shape
+            current_sumo_x = self.position[0] + self.NET_OFFSET[0]
+            current_sumo_y = self.position[1] + self.NET_OFFSET[1]
 
-            # Get edges entering this junction
-            all_edges = traci.edge.getIDList()
-            prev_waypoints = []
+            # Find current position along the lane shape
+            # For simplicity, if we're near the end, assume we're at the end
+            # Otherwise, assume we're at the start
+            current_distance_from_start = 0.0
+            if len(shape) == 2:
+                # Simple 2-point lane - calculate distance from start
+                start_x, start_y = shape[0]
+                end_x, end_y = shape[-1]
+                total_dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
+                current_dist = math.sqrt((current_sumo_x - start_x)**2 + (current_sumo_y - start_y)**2)
+                current_distance_from_start = current_dist
+            else:
+                # Multi-point lane - find closest segment
+                for i in range(len(shape) - 1):
+                    x1, y1 = shape[i]
+                    x2, y2 = shape[i + 1]
+                    # Simple check: if we're close to end point, we're at the end
+                    if abs(current_sumo_x - x2) < 1.0 and abs(current_sumo_y - y2) < 1.0:
+                        # Sum distances up to this segment
+                        for j in range(i + 1):
+                            x_a, y_a = shape[j]
+                            x_b, y_b = shape[j + 1]
+                            current_distance_from_start += math.sqrt((x_b - x_a)**2 + (y_b - y_a)**2)
+                        break
 
-            for edge_id in all_edges:
-                if edge_id.startswith(':'):
-                    continue
+            # Calculate target distance from start (moving backwards)
+            target_distance_from_start = current_distance_from_start - distance
 
-                to_junction = traci.edge.getToJunction(edge_id)
-                if to_junction == from_junction_id and edge_id != self.edge_id:
-                    # This edge enters our junction
-                    num_lanes = traci.edge.getLaneNumber(edge_id)
+            # Clamp to valid range
+            target_distance_from_start = max(0.0, min(lane_length, target_distance_from_start))
 
-                    # Create waypoint for same lane index if exists
-                    lane_idx = min(self.lane_index, num_lanes - 1)
-                    prev_lane_id = f"{edge_id}_{lane_idx}"
-                    prev_shape = traci.lane.getShape(prev_lane_id)
+            # Interpolate position along lane shape
+            if len(shape) == 2:
+                # Simple linear interpolation for 2-point lanes
+                start_x, start_y = shape[0]
+                end_x, end_y = shape[-1]
+                total_dist = math.sqrt((end_x - start_x)**2 + (end_y - start_y)**2)
+                if total_dist > 0:
+                    ratio = target_distance_from_start / total_dist
+                    new_x = start_x + ratio * (end_x - start_x)
+                    new_y = start_y + ratio * (end_y - start_y)
+                else:
+                    new_x, new_y = start_x, start_y
+            else:
+                # Multi-point interpolation
+                accumulated_dist = 0.0
+                new_x, new_y = shape[0]  # Default to start
+                for i in range(len(shape) - 1):
+                    x1, y1 = shape[i]
+                    x2, y2 = shape[i + 1]
+                    segment_length = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
-                    if prev_shape and len(prev_shape) >= 2:
-                        # Waypoint at end of previous edge
-                        end_point = prev_shape[-1]
-                        prev_from_junction = traci.edge.getFromJunction(edge_id)
+                    if accumulated_dist + segment_length >= target_distance_from_start:
+                        # Target is in this segment
+                        remaining = target_distance_from_start - accumulated_dist
+                        if segment_length > 0:
+                            ratio = remaining / segment_length
+                            new_x = x1 + ratio * (x2 - x1)
+                            new_y = y1 + ratio * (y2 - y1)
+                        else:
+                            new_x, new_y = x1, y1
+                        break
 
-                        wp = SumoWaypoint(
-                            edge_id, lane_idx, end_point,
-                            hash(edge_id) % 10000, -lane_idx - 1,
-                            is_junction=(to_junction is not None and to_junction != ''),
-                            junction_id=to_junction if to_junction else None
-                        )
-                        prev_waypoints.append(wp)
+                    accumulated_dist += segment_length
 
-            return prev_waypoints
+            # Create new waypoint at interpolated position
+            new_position_sumo = (new_x, new_y)
+            wp = SumoWaypoint(
+                self.edge_id, self.lane_index, new_position_sumo,
+                self.road_id, self.lane_id, self.is_junction, self.junction_id
+            )
+            return [wp]  # Return as list for CARLA compatibility
 
         except Exception as e:
-            logger.debug(f"Failed to get previous waypoint for {self.edge_id}_{self.lane_index}: {e}")
+            logger.debug(f"Failed to interpolate previous waypoint for {self.edge_id}_{self.lane_index}: {e}")
+            # Fallback: return empty to avoid breaking the planner
             return []
 
 
@@ -308,31 +403,40 @@ class SumoJunction:
     """
     CARLA-like junction wrapper for SUMO junctions.
     Provides same interface as carla.Junction for MARLPlanner compatibility.
+
+    IMPORTANT: Junction center is stored in CARLA coordinate system for consistency.
     """
+
+    # Network offset for coordinate conversion (same as SumoWaypoint)
+    NET_OFFSET = (99.80, 100.00)
 
     def __init__(self, junction_id: str):
         self.id = int(junction_id) if junction_id.isdigit() else hash(junction_id) % 10000
         self.junction_id = junction_id
 
-        # Get junction position and shape
+        # Get junction position and shape (in SUMO coordinates)
         pos = traci.junction.getPosition(junction_id)
         shape = traci.junction.getShape(junction_id)
 
-        # Calculate bounding box
+        # Calculate bounding box in SUMO coordinates first
         if shape:
             xs = [p[0] for p in shape]
             ys = [p[1] for p in shape]
-            center_x = sum(xs) / len(xs)
-            center_y = sum(ys) / len(ys)
+            center_x_sumo = sum(xs) / len(xs)
+            center_y_sumo = sum(ys) / len(ys)
             extent_x = (max(xs) - min(xs)) / 2
             extent_y = (max(ys) - min(ys)) / 2
         else:
-            center_x, center_y = pos
+            center_x_sumo, center_y_sumo = pos
             extent_x, extent_y = 10.0, 10.0  # Default size
 
-        # Create CARLA-like bounding box using proper mock classes
+        # Convert junction center to CARLA coordinates
+        center_x_carla = center_x_sumo - self.NET_OFFSET[0]
+        center_y_carla = center_y_sumo - self.NET_OFFSET[1]
+
+        # Create CARLA-like bounding box using CARLA coordinates
         self.bounding_box = BoundingBox(
-            location=Location(x=center_x, y=center_y, z=0.0),
+            location=Location(x=center_x_carla, y=center_y_carla, z=0.0),
             extent=Vector3D(x=extent_x, y=extent_y, z=1.0)
         )
 

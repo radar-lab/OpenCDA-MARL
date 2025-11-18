@@ -30,7 +30,7 @@ scenario:
 
   traffic:
     mode: "replay"  # Generate traffic dynamically
-    replay_file: "recordings/lite_2minL.json"
+    replay_file: "recordings/lite_2min_SUMO.json"
 
     base_speed: 45.0  # km/h base speed
     # Junction to use for MARL training
