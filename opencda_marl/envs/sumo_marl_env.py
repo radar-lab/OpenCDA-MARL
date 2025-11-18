@@ -541,6 +541,10 @@ class SumoMARLEnv:
         self.previous_observations.clear()
         self.episode_events.clear()
 
+        # Reset traffic manager for new episode
+        if self.use_traffic_manager and self.traffic_manager:
+            self.traffic_manager.reset()
+
         # Log episode metrics before reset
         if self.current_episode > 0:
             episode_metrics = self.metrics.get_current_metrics()
