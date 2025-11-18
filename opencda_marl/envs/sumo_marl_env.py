@@ -142,8 +142,9 @@ class SumoMARLEnv:
         sumo_cmd = [
             sumo_binary,
             '--step-length', str(self.step_length),
-            '--collision.action', 'warn',  # Log collisions
+            '--collision.action', 'teleport',  # Remove vehicles on collision (realistic for transfer learning)
             '--collision.check-junctions', 'true',
+            '--collision.mingap-factor', '1.0',  # Minimum gap for collision detection
             '--no-warnings', 'false',
             '--quit-on-end', 'false',  # Don't auto-quit
         ]
