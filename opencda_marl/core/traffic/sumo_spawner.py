@@ -32,7 +32,8 @@ class SumoVehicleSpawner:
         self.net_offset = self._get_network_offset()
         logger.info(f"SUMO network offset: {self.net_offset}")
 
-        self._ensure_vehicle_types()
+        # Note: We use SUMO's built-in 'DEFAULT_VEHTYPE' for all vehicles
+        # No need to create custom vehicle types
 
     def spawn_vehicle(self, event: SpawnEvent) -> Optional[str]:
         """
@@ -91,10 +92,9 @@ class SumoVehicleSpawner:
         num_lanes = traci.edge.getLaneNumber(spawn_edge)
         spawn_lane_idx = min(lane_idx, num_lanes - 1)
 
-        # Get vehicle type from event blueprint (default to 'car')
-        vtype_id = event.blueprint.id if event.blueprint else 'car'
-        if not self._vtype_exists(vtype_id):
-            vtype_id = 'car'  # Fallback to default
+        # Get vehicle type from event blueprint (convert CARLA blueprint to SUMO type)
+        carla_blueprint_id = event.blueprint.id if event.blueprint else 'vehicle.audi.a2'
+        vtype_id = self._carla_blueprint_to_sumo_type(carla_blueprint_id)
 
         try:
             # Add vehicle to simulation
@@ -172,24 +172,6 @@ class SumoVehicleSpawner:
     # Helper Methods
     # --------------------------------------------------------------------- #
 
-    def _ensure_vehicle_types(self):
-        """Ensure required vehicle types exist in SUMO simulation."""
-        try:
-            # Define standard car type if it doesn't exist
-            if not self._vtype_exists('car'):
-                logger.info("Creating 'car' vehicle type in SUMO")
-                traci.vehicletype.copy('DEFAULT_VEHTYPE', 'car')
-                traci.vehicletype.setLength('car', 5.0)
-                traci.vehicletype.setWidth('car', 2.0)
-                traci.vehicletype.setHeight('car', 1.5)
-                traci.vehicletype.setMaxSpeed('car', 70.0 / 3.6)  # 70 km/h in m/s
-                traci.vehicletype.setAccel('car', 2.6)
-                traci.vehicletype.setDecel('car', 4.5)
-                traci.vehicletype.setVehicleClass('car', 'passenger')
-                logger.success("Created 'car' vehicle type")
-        except Exception as e:
-            logger.warning(f"Failed to create vehicle type: {e}")
-
     def _find_closest_edge(self, x: float, y: float, max_distance: float = 50.0) -> Optional[str]:
         """
         Find the closest SUMO edge to given coordinates.
@@ -241,13 +223,24 @@ class SumoVehicleSpawner:
 
         return None
 
-    def _vtype_exists(self, vtype_id: str) -> bool:
-        """Check if vehicle type exists in SUMO."""
-        try:
-            traci.vehicletype.getLength(vtype_id)
-            return True
-        except:
-            return False
+    def _carla_blueprint_to_sumo_type(self, carla_blueprint_id: str) -> str:
+        """
+        Convert CARLA vehicle blueprint ID to SUMO vehicle type ID.
+
+        CARLA uses detailed blueprint IDs like 'vehicle.audi.a2', 'vehicle.bmw.grandtourer',
+        while SUMO uses generic type IDs.
+
+        For maximum compatibility, we use SUMO's built-in 'DEFAULT_VEHTYPE' which is
+        always available in any SUMO simulation.
+
+        Args:
+            carla_blueprint_id: CARLA blueprint ID (e.g., 'vehicle.audi.a2')
+
+        Returns:
+            SUMO vehicle type ID ('DEFAULT_VEHTYPE')
+        """
+        # Use SUMO's built-in default vehicle type - always available
+        return 'DEFAULT_VEHTYPE'
 
     def _get_network_offset(self) -> tuple:
         """
