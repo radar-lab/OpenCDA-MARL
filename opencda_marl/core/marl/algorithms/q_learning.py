@@ -166,12 +166,24 @@ class QLearningAlgorithm(BaseAlgorithm):
                 self.epsilon_min, self.epsilon * self.epsilon_decay)
 
             # Update metrics
+            q_mean = float(np.mean(self.q_table))
+            q_std = float(np.std(self.q_table))
+            nonzero_q = int(np.count_nonzero(self.q_table))
+
             self.training_metrics.update({
-                'q_values_mean': float(np.mean(self.q_table)),
-                'q_values_std': float(np.std(self.q_table)),
+                'q_values_mean': q_mean,
+                'q_values_std': q_std,
                 'epsilon': self.epsilon,
-                'nonzero_q_values': int(np.count_nonzero(self.q_table))
+                'nonzero_q_values': nonzero_q
             })
+
+            # TensorBoard logging (using base class methods)
+            self.log_scalar('Q_values/mean', q_mean, category='q_values')
+            self.log_scalar('Q_values/std', q_std, category='q_values')
+            self.log_scalar('Q_values/nonzero_count', nonzero_q, category='q_values')
+            self.log_scalar('Exploration/epsilon', self.epsilon, category='episode')
+            if self.use_experience_replay:
+                self.log_scalar('Buffer/size', len(self.memory), category='buffer')
 
             self.training_step += 1
 
