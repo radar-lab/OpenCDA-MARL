@@ -175,6 +175,23 @@ evaluation:
   # Memory management
   keep_last_n_files: 0  # Keep only last N episode files (0 = keep all)
   keep_summaries: 1000  # Number of episode summaries to retain in memory (lightweight mode)
-  
+
   # Visualization settings
   plot_interval: 5    # Generate plots every N episodes (full mode only)
+
+# TensorBoard Configuration
+# Shared across all MARL algorithms (TD3, DQN, Q-Learning, etc.)
+# View logs with: pixi run tensorboard
+tensorboard:
+  enabled: true           # Enable/disable TensorBoard logging
+  log_dir: "runs"         # Base directory for TensorBoard logs
+  # run_name: "custom"    # Optional: custom run name (default: timestamp)
+  log_frequency: 1        # Log every N training steps (1 = every step)
+
+  # Metrics to log (can be overridden per algorithm)
+  metrics:
+    losses: true          # Log actor/critic losses
+    q_values: true        # Log Q-value estimates
+    buffer: true          # Log replay buffer statistics
+    episode: true         # Log episode rewards/length/rates
+    rewards: true         # Log step-level rewards

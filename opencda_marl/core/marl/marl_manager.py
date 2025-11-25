@@ -26,12 +26,28 @@ class MARLManager:
         
         logger.success(f"MARLManager initialized with {algorithm}")
 
+    def _merge_shared_config(self, algo_config: Dict) -> Dict:
+        """Merge shared config (tensorboard, etc.) with algorithm-specific config."""
+        merged = algo_config.copy()
+
+        # Merge tensorboard config (algorithm can override)
+        tb_config = self.config.get('tensorboard', {})
+        if 'tensorboard' not in merged:
+            merged['tensorboard'] = tb_config
+        elif isinstance(merged['tensorboard'], dict):
+            # Algorithm-specific overrides shared config
+            base_tb = tb_config.copy() if isinstance(tb_config, dict) else {}
+            base_tb.update(merged['tensorboard'])
+            merged['tensorboard'] = base_tb
+
+        return merged
+
     def build_algorithm(self, algorithm: str):
         """Build algorithm instance based on configuration"""
 
         if algorithm == 'q_learning':
             # Get Q-learning specific config
-            q_config = self.config.get('q_learning', {})
+            q_config = self._merge_shared_config(self.config.get('q_learning', {}))
 
             # Calculate action_dim from speed actions (algorithm-specific)
             speed_actions = q_config.get('speed_actions', [0, 15, 30, 45, 60])
@@ -45,8 +61,8 @@ class MARLManager:
 
         elif algorithm == 'dqn':
             # Get DQN specific config
-            dqn_config = self.config.get('dqn', {})
-            
+            dqn_config = self._merge_shared_config(self.config.get('dqn', {}))
+
             # Calculate action_dim from speed actions (algorithm-specific)
             speed_actions = dqn_config.get('speed_actions', [0, 15, 30, 45, 60])
             action_dim = len(speed_actions)
@@ -57,9 +73,9 @@ class MARLManager:
             return DQNAlgorithm(dqn_config, state_dim, action_dim)
 
         elif algorithm == 'td3':
-            # Get TD3 specific config
-            td3_config = self.config.get('td3', {})
-            
+            # Get TD3 specific config with shared tensorboard config
+            td3_config = self._merge_shared_config(self.config.get('td3', {}))
+
             # TD3 uses continuous states
             state_dim = self.config.get('state_dim', 7)  # Use configured state dimension
             action_dim = self.config.get('action_dim', 1)
@@ -119,8 +135,16 @@ class MARLManager:
                     if speed is None:
                         logger.debug(f"TD3: Agent {agent_id} in warmup phase, using vanilla agent")
                         # Track vanilla agent's current speed for memory storage
-                        if agent_id in observations:
-                            vanilla_speed = observations[agent_id].get('speed', 45.0)
+                        # Handle key type mismatch: extractor uses str keys, but CARLA uses int keys
+                        obs_key = agent_id
+                        if agent_id not in observations:
+                            # Try integer key for CARLA compatibility
+                            try:
+                                obs_key = int(agent_id)
+                            except (ValueError, TypeError):
+                                pass
+                        if obs_key in observations:
+                            vanilla_speed = observations[obs_key].get('speed', 45.0)
                             self.last_actions[agent_id] = vanilla_speed  # Track for TD3 learning
                         continue  # Don't add to target_speeds, let vanilla agent handle it
 
@@ -310,13 +334,22 @@ class MARLManager:
 
         # Store transitions for each agent
         for agent_id_str in states.keys():
-            # Use agent_id_str directly (can be string in SUMO or int in CARLA)
+            # Use agent_id_str directly (extractor always uses string keys)
             agent_id = agent_id_str
 
-            # Check each condition and log failures
-            in_rewards = agent_id in rewards
-            in_next_states = agent_id in next_states
-            in_last_actions = agent_id in self.last_actions
+            # Handle key type mismatch: extractor uses str keys, but CARLA uses int keys
+            # Try to find the reward key (might be int or str)
+            reward_key = agent_id
+            if agent_id not in rewards:
+                try:
+                    reward_key = int(agent_id)
+                except (ValueError, TypeError):
+                    pass
+
+            # Check each condition
+            in_rewards = reward_key in rewards
+            in_next_states = agent_id in next_states  # next_states uses str keys from extractor
+            in_last_actions = agent_id in self.last_actions  # last_actions uses str keys
 
             if not (in_rewards and in_next_states and in_last_actions):
                 if self._update_count % 100 == 0:  # Log periodically
@@ -330,7 +363,7 @@ class MARLManager:
             next_multi_agent_obs = next_states[agent_id]['all_states']
 
             action = self.last_actions[agent_id]
-            reward = rewards[agent_id]
+            reward = rewards[reward_key]  # Use the correct key type for rewards
             done = agent_id not in next_states
 
             # Store multi-agent transition
@@ -350,7 +383,7 @@ class MARLManager:
     # --------------------------------------------------------------------- #
     # Algorithm interface methods (strict implementation required)
     # --------------------------------------------------------------------- #
-    def reset_episode(self):
+    def reset_episode(self, episode_metrics: Dict = None):
         """Reset algorithm for new episode."""
         if self.algorithm is None:
             logger.info("Episode reset skipped for baseline agent")
@@ -358,6 +391,15 @@ class MARLManager:
 
         # Clear last_actions to prevent stale data accumulation
         self.last_actions.clear()
+
+        # Log episode metrics to TensorBoard if available
+        if episode_metrics and hasattr(self.algorithm, 'log_episode_metrics'):
+            self.algorithm.log_episode_metrics(
+                episode_reward=episode_metrics.get('total_reward', 0.0),
+                episode_length=episode_metrics.get('steps', 0),
+                success_rate=episode_metrics.get('success_rate', 0.0),
+                collision_rate=episode_metrics.get('collision_rate', 0.0)
+            )
 
         self.algorithm.reset_episode()
         logger.info(f"Episode reset for {self.algorithm_name}")
@@ -367,6 +409,11 @@ class MARLManager:
         if self.algorithm is None:
             return {"algorithm_type": "none", "epsilon": "N/A", "training_mode": False}
         return self.algorithm.get_training_info()
+
+    def close(self):
+        """Close algorithm resources (e.g., TensorBoard writer)."""
+        if self.algorithm is not None and hasattr(self.algorithm, 'close'):
+            self.algorithm.close()
 
     def save_checkpoint(self, filepath: str):
         """Save model checkpoint."""

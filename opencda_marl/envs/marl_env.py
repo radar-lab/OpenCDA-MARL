@@ -357,8 +357,8 @@ class MARLEnv:
         if self.is_training_mode:
             self._handle_training_episode_end(episode_metrics, current_episode)
 
-        # Reset MARL algorithm
-        self.marl_manager.reset_episode()
+        # Reset MARL algorithm and log episode metrics to TensorBoard
+        self.marl_manager.reset_episode(episode_metrics=episode_metrics)
 
         # Reset environment state
         self.events = None

@@ -14,6 +14,10 @@ SUMO_HOME = "D:\\IDKs\\Eclipse\\Sumo"
 [tasks]
 start = "python opencda.py"
 
+# TensorBoard for training visualization
+tensorboard = "tensorboard --logdir=runs"
+tb = "tensorboard --logdir=runs"  # Short alias
+
 # MARL tests
 marl-intersection-build = "python test/marl/test_intersection_build.py"
 
@@ -73,6 +77,7 @@ loguru = ">=0.7.3,<0.8"
 pyyaml = ">=6.0.2,<7"
 h5py = ">=3.14.0,<4"
 pyside6 = ">=6.9.1,<7"
+tensorboard = ">=2.20.0,<3"
 
 [pypi-dependencies]
 torch = { index = "https://download.pytorch.org/whl/nightly/cu128" }

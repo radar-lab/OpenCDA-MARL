@@ -556,6 +556,9 @@ class SumoMARLEnv:
             episode_metrics = self.metrics.get_current_metrics()
             logger.info(f"Episode {self.current_episode} metrics: {episode_metrics}")
 
+            # Reset MARL algorithm and log episode metrics to TensorBoard
+            self.marl_manager.reset_episode(episode_metrics=episode_metrics)
+
             # Save checkpoint periodically
             if self.is_training_mode and self.checkpoint_manager:
                 save_freq = self.training_config.get('save_freq', 10)

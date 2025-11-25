@@ -419,6 +419,9 @@ class TD3Algorithm(BaseAlgorithm):
         self.training_step = 0  # Required for delayed policy updates
         self._pretrained = False  # Flag to indicate if loaded from pretrained checkpoint
 
+        # TensorBoard logging is handled by BaseAlgorithm
+        # Config options: tensorboard.enabled, tensorboard.log_dir, tensorboard.metrics
+
         logger.info(
             f"TD3 initialized with {state_dim}D states, LSTM hidden: {self.lstm_hidden_size}, device: {self.device}")
 
@@ -630,6 +633,16 @@ class TD3Algorithm(BaseAlgorithm):
                 'critic_loss': critic_loss,
                 'memory_size': len(self.memory)
             })
+
+            # TensorBoard logging (using base class methods)
+            self.log_scalar('Loss/critic', critic_loss, category='losses')
+            if self.training_step % self.policy_freq == 0:
+                self.log_scalar('Loss/actor', self.training_metrics.get('actor_loss', 0.0), category='losses')
+            self.log_scalar('Buffer/size', len(self.memory), category='buffer')
+            # Log Q-values if available
+            if 'q1_mean' in self.training_metrics:
+                self.log_scalar('Q_values/Q1_mean', self.training_metrics['q1_mean'], category='q_values')
+                self.log_scalar('Q_values/Q2_mean', self.training_metrics['q2_mean'], category='q_values')
 
             # Log training progress periodically (every 200 steps)
             if self.training_step % 200 == 0:
@@ -952,6 +965,17 @@ class TD3Algorithm(BaseAlgorithm):
             'device': str(self.device),
             'max_action': self.max_action
         }
+
+    def log_episode_metrics(self, episode_reward: float, episode_length: int,
+                           success_rate: float = 0.0, collision_rate: float = 0.0):
+        """Log episode-level metrics to TensorBoard (extends base class)"""
+        # Add TD3-specific metrics
+        additional = {'buffer_size': len(self.memory)}
+        # Call base class method
+        super().log_episode_metrics(
+            episode_reward, episode_length, success_rate, collision_rate,
+            additional_metrics=additional
+        )
 
     def save(self, path: str):
         """Save TD3 model"""
