@@ -11,6 +11,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 import random
+import gc
 from collections import deque
 from typing import Dict, Any, List, Tuple
 from loguru import logger
@@ -638,12 +639,28 @@ class TD3Algorithm(BaseAlgorithm):
                     f"TD3 Step {self.training_step}: critic_loss={critic_loss:.4f}, actor_loss={current_actor_loss:.4f}, policy_updates={target_updates}, memory={len(self.memory)}")
 
             self.training_step += 1
+
+            # Explicit cleanup to prevent memory leaks
+            del ego_states, multi_agent_contexts, actions, rewards
+            del next_ego_states, next_multi_agent_contexts, dones
+            del transitions
+            if self.use_per:
+                del importance_weights
+
+            # Periodic deep cleanup to prevent CUDA memory fragmentation
+            if self.training_step % 500 == 0 and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+
             return self.training_metrics.copy()
 
         except Exception as e:
             logger.error(f"Error in TD3 update (step {self.training_step}): {e}")
             import traceback
             logger.error(f"TD3 update traceback:\n{traceback.format_exc()}")
+            # Cleanup even on error
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            gc.collect()
             return self.training_metrics.copy()
 
     def _prepare_inputs(self, multi_agent_obs: Dict[str, np.ndarray], ego_agent_id: str) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -886,7 +903,7 @@ class TD3Algorithm(BaseAlgorithm):
     def reset_episode(self):
         """Reset for new episode"""
         self.episode_count += 1
-        
+
         # Auto-clear buffer every N episodes to prevent stale experiences
         if self.clear_episodes and self.episode_count > 0:
             if self.episode_count % self.clear_episodes == 0:
@@ -896,6 +913,22 @@ class TD3Algorithm(BaseAlgorithm):
                     new_size = len(self.memory)
                     logger.info(f"Episode {self.episode_count}: Cleared old experiences: "
                                f"{old_size} → {new_size} (kept {self.clear_keep_ratio*100:.0f}% newest)")
+
+        # GPU memory cleanup to prevent slowdown over episodes
+        if torch.cuda.is_available():
+            # Clear CUDA cache every episode to prevent memory fragmentation
+            torch.cuda.empty_cache()
+
+            # Log GPU memory usage periodically for debugging
+            if self.episode_count % 5 == 0:
+                allocated = torch.cuda.memory_allocated(self.device) / 1024**2  # MB
+                cached = torch.cuda.memory_reserved(self.device) / 1024**2  # MB
+                logger.debug(f"Episode {self.episode_count} GPU memory: "
+                           f"allocated={allocated:.1f}MB, cached={cached:.1f}MB")
+
+        # Force garbage collection every few episodes to prevent memory leaks
+        if self.episode_count % 3 == 0:
+            gc.collect()
 
     def get_training_info(self) -> Dict[str, Any]:
         """Get training information"""

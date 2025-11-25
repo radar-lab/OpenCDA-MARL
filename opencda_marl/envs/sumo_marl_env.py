@@ -311,21 +311,26 @@ class SumoMARLEnv:
         # Check for events (collisions, arrivals)
         events = self._check_events()
 
-        # Calculate rewards
+        # Calculate rewards for the current transition (state -> action -> next_state)
         rewards = self._calculate_rewards(events, observations)
 
         # Get next observations for learning
         next_observations = self._get_observations()
 
-        # Update MARL algorithm
-        if self.is_training_mode and self.previous_observations:
+        # Update MARL algorithm with CURRENT step's transition
+        # Transition: (observations, action, reward, next_observations)
+        # - observations: state before action (S_t)
+        # - action: stored in last_actions during compute_actions
+        # - reward: calculated for taking action from observations
+        # - next_observations: state after action (S_t+1)
+        if self.is_training_mode:
             self.marl_manager.update(
                 rewards=rewards,
-                observations=self.previous_observations,
+                observations=observations,  # Use current observations, not previous!
                 next_observations=next_observations
             )
 
-        # Store for next iteration
+        # Store for metrics/debugging only (not used for learning anymore)
         self.previous_observations = observations.copy()
         self.current_step_rewards = rewards
 

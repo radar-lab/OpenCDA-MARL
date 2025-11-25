@@ -299,30 +299,52 @@ class MARLManager:
         """TD3 specific update logic."""
         states = self.observation_extractor.extract(observations)
         next_states = self.observation_extractor.extract(next_observations)
-        
+
+        # Debug: Log key availability periodically
+        if hasattr(self, '_update_count'):
+            self._update_count += 1
+        else:
+            self._update_count = 0
+
+        transitions_stored = 0
+
         # Store transitions for each agent
         for agent_id_str in states.keys():
             # Use agent_id_str directly (can be string in SUMO or int in CARLA)
             agent_id = agent_id_str
 
-            if (agent_id in rewards and
-                agent_id in next_states and
-                agent_id in self.last_actions):
+            # Check each condition and log failures
+            in_rewards = agent_id in rewards
+            in_next_states = agent_id in next_states
+            in_last_actions = agent_id in self.last_actions
 
-                # Get multi-agent observations for TD3
-                multi_agent_obs = states[agent_id]['all_states']
-                next_multi_agent_obs = next_states[agent_id]['all_states']
+            if not (in_rewards and in_next_states and in_last_actions):
+                if self._update_count % 100 == 0:  # Log periodically
+                    logger.debug(f"TD3 Update: Agent {agent_id} skipped - "
+                               f"in_rewards={in_rewards}, in_next_states={in_next_states}, "
+                               f"in_last_actions={in_last_actions}")
+                continue
 
-                action = self.last_actions[agent_id]
-                reward = rewards[agent_id]
-                done = agent_id not in next_states
+            # Get multi-agent observations for TD3
+            multi_agent_obs = states[agent_id]['all_states']
+            next_multi_agent_obs = next_states[agent_id]['all_states']
 
-                # Store multi-agent transition
-                self.algorithm.store_transition(
-                    multi_agent_obs, agent_id, action, reward,
-                    next_multi_agent_obs, done
-                )
-        
+            action = self.last_actions[agent_id]
+            reward = rewards[agent_id]
+            done = agent_id not in next_states
+
+            # Store multi-agent transition
+            self.algorithm.store_transition(
+                multi_agent_obs, agent_id, action, reward,
+                next_multi_agent_obs, done
+            )
+            transitions_stored += 1
+
+        # Log transition storage progress periodically
+        if self._update_count % 100 == 0:
+            logger.debug(f"TD3 Update #{self._update_count}: Stored {transitions_stored} transitions, "
+                        f"buffer size={len(self.algorithm.memory)}")
+
         self.algorithm.update()
 
     # --------------------------------------------------------------------- #
@@ -333,6 +355,10 @@ class MARLManager:
         if self.algorithm is None:
             logger.info("Episode reset skipped for baseline agent")
             return
+
+        # Clear last_actions to prevent stale data accumulation
+        self.last_actions.clear()
+
         self.algorithm.reset_episode()
         logger.info(f"Episode reset for {self.algorithm_name}")
 

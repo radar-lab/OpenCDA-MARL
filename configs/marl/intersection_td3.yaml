@@ -29,7 +29,7 @@ scenario:
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
     mode: "replay"
-    replay_file: "recordings/lite_2minL.json"
+    replay_file: "recordings/lite_2min_SUMO.json"
     #replay_file: "recordings/quick_test.json"
     base_speed: 45.0 # km/h base speed for vehicles
     active_junctions: [4]
