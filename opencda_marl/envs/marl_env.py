@@ -265,6 +265,10 @@ class MARLEnv:
         speed_bonus = self.reward_params.get("speed_bonus", 0.0)
         speed_threshold = self.reward_params.get("speed_threshold", 40.0)  # km/h
 
+        # Get stop penalty parameters (Phase 3.1)
+        stop_threshold = self.reward_params.get("stop_threshold", 5.0)  # km/h
+        stop_penalty = self.reward_params.get("stop_penalty", -3.0)
+
         try:
             # Get current agents from scenario manager
             agents = self.sm.agents
@@ -274,19 +278,25 @@ class MARLEnv:
                 agent_id = agent.actor_id
                 base_reward = step_penalty
 
-                # Add speed bonus if agent is going fast enough
-                if speed_bonus > 0:
-                    try:
-                        # Get agent's current speed in km/h
-                        velocity = agent.vehicle.get_velocity()
-                        speed_kmh = 3.6 * math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
+                # Get agent's current speed in km/h
+                speed_kmh = 0.0
+                try:
+                    velocity = agent.vehicle.get_velocity()
+                    speed_kmh = 3.6 * math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
 
-                        if speed_kmh > speed_threshold:
-                            base_reward += speed_bonus
-                            logger.debug(f"Speed bonus applied to agent {agent_id}: {speed_kmh:.1f} km/h > {speed_threshold} km/h")
+                    # Add speed bonus if agent is going fast enough
+                    if speed_bonus > 0 and speed_kmh > speed_threshold:
+                        base_reward += speed_bonus
+                        logger.debug(f"Speed bonus applied to agent {agent_id}: {speed_kmh:.1f} km/h > {speed_threshold} km/h")
 
-                    except Exception as e:
-                        logger.debug(f"Could not get speed for agent {agent_id}: {e}")
+                    # Add stop penalty if agent has nearly stopped (Phase 3.1)
+                    # Encourages gradual deceleration over hard stops
+                    if speed_kmh < stop_threshold:
+                        base_reward += stop_penalty
+                        logger.debug(f"Stop penalty applied to agent {agent_id}: {speed_kmh:.1f} km/h < {stop_threshold} km/h")
+
+                except Exception as e:
+                    logger.debug(f"Could not get speed for agent {agent_id}: {e}")
 
                 # Phase 3: Add TTC-based safety reward
                 if observations and agent_id in observations:
@@ -361,7 +371,10 @@ class MARLEnv:
             "ttc_critical_penalty": -5.0,   # penalty in critical zone (< 1s)
             # Progress reward parameters (Phase 3)
             "progress_scale": 0.5,          # scale factor for progress reward
-            "junction_threshold": 5.0       # meters - threshold for "in junction"
+            "junction_threshold": 5.0,      # meters - threshold for "in junction"
+            # Stop penalty parameters (Phase 3.1)
+            "stop_threshold": 5.0,          # km/h - below this speed is considered "stopped"
+            "stop_penalty": -3.0            # penalty for stopping (encourages gradual deceleration)
         }
 
     # --------------------------------------------------------------------- #

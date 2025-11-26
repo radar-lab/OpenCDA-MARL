@@ -21,12 +21,14 @@ from opencda_marl.core.safety.marl_safety_manager import MARLSafetyManager
 from opencda_marl.core.agents import AgentFactory
 from opencda_marl.core.agents.vanilla_agent import VanillaAgent
 
-# Nearby vehicle detection constants for MARL state features
-NEARBY_DETECTION_RADIUS = 50.0  # meters - detection radius for nearby vehicles
-MAX_NEARBY_VEHICLES = 5  # Maximum number of nearby vehicles to track (K slots)
-FEATURES_PER_VEHICLE = 7  # Features per vehicle: rel_x, rel_y, rel_vx, rel_vy, heading_diff, distance, ttc
-MAX_RELATIVE_VELOCITY = 40.0  # m/s (~144 km/h) - for normalization
-MAX_TTC = 10.0  # seconds - TTC values clamped to this maximum
+# Default nearby vehicle detection constants (can be overridden by config)
+DEFAULT_NEARBY_DETECTION_RADIUS = 50.0  # meters - detection radius for nearby vehicles
+DEFAULT_MAX_NEARBY_VEHICLES = 5  # Maximum number of nearby vehicles to track (K slots)
+DEFAULT_FEATURES_PER_VEHICLE = 7  # Features per vehicle: rel_x, rel_y, rel_vx, rel_vy, heading_diff, distance, ttc
+DEFAULT_MAX_RELATIVE_VELOCITY = 40.0  # m/s (~144 km/h) - for normalization
+DEFAULT_MAX_TTC = 10.0  # seconds - TTC values clamped to this maximum
+
+
 class MARLVehicleAdapter:
 
     def __init__(self, config: Dict[str, Any],
@@ -45,13 +47,30 @@ class MARLVehicleAdapter:
         self.world = vehicle.get_world()
         self.dump_data = dump_data
         self.agent_type = agent_type
-        
+
         # Store target speed for monitoring
         self.target_speed = 0.0
-        
+
+        # Load nearby vehicle config from MARL config (or use defaults)
+        self._init_nearby_vehicle_config(config)
+
         self.vm = self.get_vm()
         if hasattr(self.vm, 'safety_manager'):
             self._use_marl_safety_manager()
+
+    def _init_nearby_vehicle_config(self, config: Dict[str, Any]):
+        """Initialize nearby vehicle detection parameters from config."""
+        # Try to get config from MARL.td3.nearby_vehicle_config
+        marl_config = config.get('MARL', {})
+        td3_config = marl_config.get('td3', {})
+        nearby_config = td3_config.get('nearby_vehicle_config', {})
+
+        # Load values from config with defaults
+        self.nearby_detection_radius = nearby_config.get('detection_radius', DEFAULT_NEARBY_DETECTION_RADIUS)
+        self.max_nearby_vehicles = nearby_config.get('max_vehicles', DEFAULT_MAX_NEARBY_VEHICLES)
+        self.features_per_vehicle = nearby_config.get('features_per_vehicle', DEFAULT_FEATURES_PER_VEHICLE)
+        self.max_relative_velocity = nearby_config.get('max_relative_velocity', DEFAULT_MAX_RELATIVE_VELOCITY)
+        self.max_ttc = nearby_config.get('max_ttc', DEFAULT_MAX_TTC)
     # --------------------------------------------------------------------- #
     # Public control API
     # --------------------------------------------------------------------- #
@@ -516,17 +535,17 @@ class MARLVehicleAdapter:
                 other_loc = vehicle.get_location()
 
                 # Quick bounding box check (faster than full distance calculation)
-                if (abs(other_loc.x - current_location.x) > NEARBY_DETECTION_RADIUS or
-                    abs(other_loc.y - current_location.y) > NEARBY_DETECTION_RADIUS):
+                if (abs(other_loc.x - current_location.x) > self.nearby_detection_radius or
+                    abs(other_loc.y - current_location.y) > self.nearby_detection_radius):
                     continue
 
                 distance = current_location.distance(other_loc)
-                if distance <= NEARBY_DETECTION_RADIUS:
+                if distance <= self.nearby_detection_radius:
                     nearby.append((vehicle, distance))
 
             # Sort by distance and return top K
             nearby.sort(key=lambda x: x[1])
-            return nearby[:MAX_NEARBY_VEHICLES]
+            return nearby[:self.max_nearby_vehicles]
 
         except Exception as e:
             logger.debug(f"Error getting nearby vehicles for {self.actor_id}: {e}")
@@ -617,7 +636,7 @@ class MARLVehicleAdapter:
             features = []
             min_ttc = float('inf')
 
-            for i in range(MAX_NEARBY_VEHICLES):
+            for i in range(self.max_nearby_vehicles):
                 if i < len(nearby_vehicles):
                     vehicle, distance = nearby_vehicles[i]
                     other_loc = vehicle.get_location()
@@ -625,12 +644,12 @@ class MARLVehicleAdapter:
                     other_heading = np.radians(vehicle.get_transform().rotation.yaw)
 
                     # Relative position (normalized by detection radius)
-                    rel_x = (other_loc.x - ego_loc.x) / NEARBY_DETECTION_RADIUS
-                    rel_y = (other_loc.y - ego_loc.y) / NEARBY_DETECTION_RADIUS
+                    rel_x = (other_loc.x - ego_loc.x) / self.nearby_detection_radius
+                    rel_y = (other_loc.y - ego_loc.y) / self.nearby_detection_radius
 
                     # Relative velocity (normalized by max velocity)
-                    rel_vx = (other_vel.x - ego_vel.x) / MAX_RELATIVE_VELOCITY
-                    rel_vy = (other_vel.y - ego_vel.y) / MAX_RELATIVE_VELOCITY
+                    rel_vx = (other_vel.x - ego_vel.x) / self.max_relative_velocity
+                    rel_vy = (other_vel.y - ego_vel.y) / self.max_relative_velocity
 
                     # Heading difference (normalized by π)
                     heading_diff = other_heading - ego_heading
@@ -642,12 +661,12 @@ class MARLVehicleAdapter:
                     heading_diff_norm = heading_diff / np.pi
 
                     # Distance (normalized by detection radius)
-                    distance_norm = distance / NEARBY_DETECTION_RADIUS
+                    distance_norm = distance / self.nearby_detection_radius
 
                     # TTC (normalized by max TTC, clamped)
                     ttc = self._calculate_ttc_to_vehicle(vehicle)
                     min_ttc = min(min_ttc, ttc)
-                    ttc_norm = min(ttc, MAX_TTC) / MAX_TTC
+                    ttc_norm = min(ttc, self.max_ttc) / self.max_ttc
 
                     features.extend([
                         np.clip(rel_x, -1.0, 1.0),
@@ -666,9 +685,9 @@ class MARLVehicleAdapter:
 
         except Exception as e:
             logger.debug(f"Error computing nearby vehicle features: {e}")
-            # Return safe defaults: 5 slots × 7 features with safe values
+            # Return safe defaults: K slots × 7 features with safe values
             default_features = []
-            for _ in range(MAX_NEARBY_VEHICLES):
+            for _ in range(self.max_nearby_vehicles):
                 default_features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
             return default_features, float('inf')
 

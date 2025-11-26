@@ -62,6 +62,7 @@ class TrainingMetrics:
         self.step_speeds: List[float] = []  # All speeds at each step
         self.step_avg_speeds: List[float] = []  # Average speed per step
         self.agent_speeds: Dict[int, List[float]] = {}  # Speed history per agent
+        self.step_target_speeds: List[float] = []  # Target (commanded) speeds for comparison
     # --------------------------------------------------------------------- #
     # Main steps for updating metrics
     # --------------------------------------------------------------------- #
@@ -94,12 +95,15 @@ class TrainingMetrics:
             observations: Dictionary of agent observations
         """
         step_speeds_list = []
+        step_target_speeds_list = []
 
         for agent_id, obs in observations.items():
             # Extract speed (handle different observation formats)
             speed = None
+            target_speed = None
             if isinstance(obs, dict):
                 speed = obs.get('speed')
+                target_speed = obs.get('target_speed')  # Track commanded speed
             elif hasattr(obs, '__getitem__'):
                 # Numpy array or list - speed is typically index 2 in 7D features
                 try:
@@ -115,10 +119,17 @@ class TrainingMetrics:
                     self.agent_speeds[agent_id] = []
                 self.agent_speeds[agent_id].append(speed)
 
+            if target_speed is not None:
+                step_target_speeds_list.append(target_speed)
+
         # Store step-level speed data
         if step_speeds_list:
             self.step_speeds.extend(step_speeds_list)
             self.step_avg_speeds.append(np.mean(step_speeds_list))
+
+        # Store target speeds
+        if step_target_speeds_list:
+            self.step_target_speeds.extend(step_target_speeds_list)
 
     # --------------------------------------------------------------------- #
     # Public Methods
@@ -209,6 +220,16 @@ class TrainingMetrics:
             metrics['min_speed'] = 0.0
             metrics['max_speed'] = 0.0
 
+        # Target (commanded) speed metrics - for comparing RL output vs actual vehicle speed
+        if self.step_target_speeds:
+            metrics['target_speed_mean'] = float(np.mean(self.step_target_speeds))
+            metrics['target_speed_max'] = float(np.max(self.step_target_speeds))
+            metrics['target_speed_min'] = float(np.min(self.step_target_speeds))
+        else:
+            metrics['target_speed_mean'] = 0.0
+            metrics['target_speed_max'] = 0.0
+            metrics['target_speed_min'] = 0.0
+
         # Speed smoothness (variance of step-average speeds = how stable traffic flow is)
         if self.step_avg_speeds:
             metrics['speed_smoothness'] = float(np.var(self.step_avg_speeds))
@@ -237,6 +258,13 @@ class TrainingMetrics:
         """Finish current episode and compute metrics."""
         self._episode_counter += 1
 
+        # Update success/collision counters from episode states
+        # BUG FIX: These were never being updated from episode states
+        episode_successes = states.get('success', 0)
+        episode_collisions = states.get('collision', 0)
+        self.successes += episode_successes
+        self.collisions += episode_collisions
+
         # Compute traffic metrics first
         traffic_metrics = self._compute_traffic_metrics()
         avg_speed = traffic_metrics.get('avg_speed', 0.0)
@@ -253,8 +281,8 @@ class TrainingMetrics:
         self._full_history['avg_speeds'].append(avg_speed)
         self._full_history['speed_variances'].append(speed_variance)
         self._full_history['episode_lengths'].append(self.current_length)
-        self._full_history['success_counts'].append(states.get('success', 0))
-        self._full_history['collision_counts'].append(states.get('collision', 0))
+        self._full_history['success_counts'].append(episode_successes)
+        self._full_history['collision_counts'].append(episode_collisions)
 
         # Check if it's time to export
         if self.export_interval > 0 and self._episode_counter % self.export_interval == 0:

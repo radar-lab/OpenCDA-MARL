@@ -222,7 +222,7 @@ class BaseAlgorithm(ABC):
 
         # Traffic performance metrics (RA-L paper-ready)
         if traffic_metrics:
-            # Core traffic metrics
+            # Core traffic metrics (actual vehicle speeds)
             if 'avg_speed' in traffic_metrics:
                 self.writer.add_scalar('Traffic/avg_speed', traffic_metrics['avg_speed'], self.episode_count)
             if 'speed_std' in traffic_metrics:
@@ -233,6 +233,14 @@ class BaseAlgorithm(ABC):
                 self.writer.add_scalar('Traffic/min_speed', traffic_metrics['min_speed'], self.episode_count)
             if 'max_speed' in traffic_metrics:
                 self.writer.add_scalar('Traffic/max_speed', traffic_metrics['max_speed'], self.episode_count)
+
+            # Target (commanded) speed metrics - compare RL output vs actual
+            if 'target_speed_mean' in traffic_metrics:
+                self.writer.add_scalar('Traffic/target_speed_mean', traffic_metrics['target_speed_mean'], self.episode_count)
+            if 'target_speed_max' in traffic_metrics:
+                self.writer.add_scalar('Traffic/target_speed_max', traffic_metrics['target_speed_max'], self.episode_count)
+            if 'target_speed_min' in traffic_metrics:
+                self.writer.add_scalar('Traffic/target_speed_min', traffic_metrics['target_speed_min'], self.episode_count)
 
             # Traffic flow quality metrics
             if 'speed_smoothness' in traffic_metrics:
