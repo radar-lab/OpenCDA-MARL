@@ -211,7 +211,19 @@ class ObservationExtractor:
                         # Rough estimate: ~2m per waypoint
                         estimated_waypoints = min(50.0, max(0.0, dist_to_int / 2.0))
                         state_features.append(estimated_waypoints)
-                
+
+                elif feature_name == 'nearby_vehicles':
+                    # Nearby vehicle features: 35D = 5 vehicles × 7 features each
+                    # Features per vehicle: rel_x, rel_y, rel_vx, rel_vy, heading_diff, distance, ttc
+                    if 'nearby_vehicles' in obs:
+                        nearby_features = obs['nearby_vehicles']
+                        state_features.extend(nearby_features)
+                    else:
+                        # Default: 5 slots × 7 features with safe values
+                        # Empty slots have zeros except distance=1.0, ttc=1.0 (safe/far away)
+                        for _ in range(5):
+                            state_features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+
                 else:
                     logger.warning(f"Unknown custom feature: {feature_name}")
                     state_features.extend([0.0] * feature_dim)

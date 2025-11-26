@@ -90,12 +90,12 @@ class MARLEnv:
         # Execute scenario manager step with target speeds
         out = self.sm.step(target_speeds)
 
-        # Calculate rewards from events
-        self.events = out.get('event', [])
-        rewards = self._calculate_rewards(self.events)
-
-        # Get new observations for MARL learning
+        # Get new observations for reward calculation (includes min_ttc, distance_to_destination)
         next_observations = self.sm.get_observations()
+
+        # Calculate rewards from events AND observations (Phase 3: includes TTC and progress rewards)
+        self.events = out.get('event', [])
+        rewards = self._calculate_rewards(self.events, observations=next_observations)
 
         # Update MARL algorithm with CURRENT step's transition
         # Transition: (observations, action, reward, next_observations)
@@ -107,8 +107,8 @@ class MARLEnv:
             self.marl_manager.update(
                 rewards, observations, next_observations)  # Use current observations!
 
-        # Store for metrics/debugging only
-        self.previous_observations = observations.copy()
+        # Store current observations as previous for next step's progress calculation
+        self.previous_observations = next_observations.copy()
 
         # Store current step rewards for evaluation
         self.current_step_rewards = rewards.copy()
@@ -116,7 +116,7 @@ class MARLEnv:
         self.episode_events.extend(self.events)
 
         # Update training metrics with observations for traffic performance tracking
-        self.metrics.update_step(rewards, observations)
+        self.metrics.update_step(rewards, next_observations)
 
     # --------------------------------------------------------------------- #
     # Public Methods
@@ -240,12 +240,17 @@ class MARLEnv:
     # Private Methods
     # --------------------------------------------------------------------- #
 
-    def _calculate_rewards(self, events: List[StepEvent]) -> Dict[str, float]:
+    def _calculate_rewards(self, events: List[StepEvent], observations: Dict = None) -> Dict[str, float]:
         """
         Calculate rewards for all agents based on events and current state.
 
+        Includes Phase 3 enhancements:
+        - TTC-based safety reward (proactive penalty for dangerous proximity)
+        - Progress-toward-goal reward (dense feedback for movement toward destination)
+
         Args:
             events: List of event strings from scenario manager
+            observations: Current observations dict (optional, for TTC/progress rewards)
 
         Returns:
             Dict mapping agent_id to reward value
@@ -268,21 +273,39 @@ class MARLEnv:
             for agent in agents:
                 agent_id = agent.actor_id
                 base_reward = step_penalty
-                
+
                 # Add speed bonus if agent is going fast enough
                 if speed_bonus > 0:
                     try:
                         # Get agent's current speed in km/h
                         velocity = agent.vehicle.get_velocity()
                         speed_kmh = 3.6 * math.sqrt(velocity.x**2 + velocity.y**2 + velocity.z**2)
-                        
+
                         if speed_kmh > speed_threshold:
                             base_reward += speed_bonus
                             logger.debug(f"Speed bonus applied to agent {agent_id}: {speed_kmh:.1f} km/h > {speed_threshold} km/h")
-                            
+
                     except Exception as e:
                         logger.debug(f"Could not get speed for agent {agent_id}: {e}")
-                
+
+                # Phase 3: Add TTC-based safety reward
+                if observations and agent_id in observations:
+                    obs = observations[agent_id]
+                    min_ttc = obs.get('min_ttc', float('inf'))
+                    ttc_reward = self._calculate_ttc_reward(min_ttc)
+                    base_reward += ttc_reward
+
+                    # Phase 3: Add progress reward (requires previous observations)
+                    if agent_id in self.previous_observations:
+                        prev_obs = self.previous_observations[agent_id]
+                        progress_reward = self._calculate_progress_reward(
+                            current_dist_to_dest=obs.get('distance_to_destination', 999.0),
+                            prev_dist_to_dest=prev_obs.get('distance_to_destination', 999.0),
+                            current_dist_to_int=obs.get('distance_to_intersection', 100.0),
+                            prev_dist_to_int=prev_obs.get('distance_to_intersection', 100.0)
+                        )
+                        base_reward += progress_reward
+
                 rewards[agent_id] = base_reward
 
             # Process events for rewards (prevent duplicate terminal rewards)
@@ -304,7 +327,7 @@ class MARLEnv:
                         except Exception:
                             pass  # Use base reward if speed calculation fails
                     rewards[agent_id] = base_reward
-                    
+
                 if event.event_type == "collision" and agent_id not in self.terminal_agents:
                     rewards[agent_id] = collision_reward
                     self.terminal_agents.add(agent_id)
@@ -328,8 +351,84 @@ class MARLEnv:
             "success": 120.0,
             "step_penalty": -0.5,
             "speed_bonus": 0.0,      # Bonus for maintaining speed above threshold
-            "speed_threshold": 40.0   # km/h threshold for speed bonus
+            "speed_threshold": 40.0,  # km/h threshold for speed bonus
+            # TTC-based safety reward parameters (Phase 3)
+            "ttc_safe_threshold": 3.0,      # seconds - no penalty above this
+            "ttc_caution_threshold": 2.0,   # seconds - caution zone
+            "ttc_danger_threshold": 1.0,    # seconds - danger zone
+            "ttc_caution_penalty": -0.5,    # penalty in caution zone
+            "ttc_danger_penalty": -2.0,     # penalty in danger zone
+            "ttc_critical_penalty": -5.0,   # penalty in critical zone (< 1s)
+            # Progress reward parameters (Phase 3)
+            "progress_scale": 0.5,          # scale factor for progress reward
+            "junction_threshold": 5.0       # meters - threshold for "in junction"
         }
+
+    # --------------------------------------------------------------------- #
+    # TTC and Progress Reward Methods (Phase 3 Enhancement)
+    # --------------------------------------------------------------------- #
+
+    def _calculate_ttc_reward(self, min_ttc: float) -> float:
+        """
+        Calculate TTC-based safety reward.
+
+        Penalizes dangerous proximity to other vehicles before collision occurs.
+        This provides proactive safety feedback rather than reactive collision penalty.
+
+        Args:
+            min_ttc: Minimum time-to-collision across all nearby vehicles (seconds)
+
+        Returns:
+            float: TTC reward (0.0 for safe, negative for dangerous situations)
+        """
+        safe_threshold = self.reward_params.get('ttc_safe_threshold', 3.0)
+        caution_threshold = self.reward_params.get('ttc_caution_threshold', 2.0)
+        danger_threshold = self.reward_params.get('ttc_danger_threshold', 1.0)
+
+        if min_ttc > safe_threshold or min_ttc == float('inf'):
+            return 0.0  # Safe - no penalty
+        elif min_ttc > caution_threshold:
+            return self.reward_params.get('ttc_caution_penalty', -0.5)
+        elif min_ttc > danger_threshold:
+            return self.reward_params.get('ttc_danger_penalty', -2.0)
+        else:
+            return self.reward_params.get('ttc_critical_penalty', -5.0)
+
+    def _calculate_progress_reward(self, current_dist_to_dest: float, prev_dist_to_dest: float,
+                                    current_dist_to_int: float, prev_dist_to_int: float) -> float:
+        """
+        Calculate progress-toward-goal reward.
+
+        Two-phase approach:
+        1. Before intersection: reward reducing distance to intersection
+        2. In/past junction: reward reducing distance to destination
+
+        Args:
+            current_dist_to_dest: Current distance to destination (meters)
+            prev_dist_to_dest: Previous distance to destination (meters)
+            current_dist_to_int: Current distance to intersection (meters)
+            prev_dist_to_int: Previous distance to intersection (meters)
+
+        Returns:
+            float: Progress reward (positive for progress, negative for regression)
+        """
+        junction_threshold = self.reward_params.get('junction_threshold', 5.0)
+        in_junction = current_dist_to_int < junction_threshold
+
+        if not in_junction:
+            # Approaching intersection phase
+            progress = prev_dist_to_int - current_dist_to_int
+        else:
+            # In/past junction: use destination distance
+            progress = prev_dist_to_dest - current_dist_to_dest
+
+        # Normalize: typical step progress ~2-4m at 40-80 km/h
+        # Cap at ±5m of progress per step
+        import numpy as np
+        progress_reward = np.clip(progress / 5.0, -1.0, 1.0)
+        scale = self.reward_params.get('progress_scale', 0.5)
+
+        return progress_reward * scale
 
     # --------------------------------------------------------------------- #
     # Clean Up

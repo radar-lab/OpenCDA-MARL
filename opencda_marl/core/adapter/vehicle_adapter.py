@@ -14,12 +14,19 @@ import numpy as np
 from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl.core.adapter.vehicle_defaults import get_vehicle_manager_defaults
+
+
 from opencda_marl.core.adapter.exception import CollisionException
 from opencda_marl.core.safety.marl_safety_manager import MARLSafetyManager
 from opencda_marl.core.agents import AgentFactory
 from opencda_marl.core.agents.vanilla_agent import VanillaAgent
 
-
+# Nearby vehicle detection constants for MARL state features
+NEARBY_DETECTION_RADIUS = 50.0  # meters - detection radius for nearby vehicles
+MAX_NEARBY_VEHICLES = 5  # Maximum number of nearby vehicles to track (K slots)
+FEATURES_PER_VEHICLE = 7  # Features per vehicle: rel_x, rel_y, rel_vx, rel_vy, heading_diff, distance, ttc
+MAX_RELATIVE_VELOCITY = 40.0  # m/s (~144 km/h) - for normalization
+MAX_TTC = 10.0  # seconds - TTC values clamped to this maximum
 class MARLVehicleAdapter:
 
     def __init__(self, config: Dict[str, Any],
@@ -155,6 +162,12 @@ class MARLVehicleAdapter:
             obs['distance_to_intersection'] = self._calculate_distance_to_intersection()
             obs['distance_to_front_vehicle'] = self._calculate_distance_to_front_vehicle()
             obs['lane_position'] = self._classify_lane_position()
+
+            # Add nearby vehicle features for Phase 3 enhancement (35D)
+            nearby_features, min_ttc = self._compute_nearby_vehicle_features()
+            obs['nearby_vehicles'] = nearby_features  # 35D list (5 vehicles × 7 features)
+            obs['min_ttc'] = min_ttc  # For TTC-based reward calculation
+            obs['distance_to_destination'] = self._calculate_distance_to_destination()  # For progress reward
 
             # Add new enhanced DQN features (9D feature set)
             # 1. Relative position to intersection (replaces absolute position)
@@ -463,21 +476,220 @@ class MARLVehicleAdapter:
             # CARLA uses degrees, convert to radians and normalize to [-π, π]
             yaw_degrees = vehicle_transform.rotation.yaw
             yaw_radians = np.radians(yaw_degrees)
-            
+
             # Normalize to [-π, π]
             while yaw_radians > np.pi:
                 yaw_radians -= 2 * np.pi
             while yaw_radians < -np.pi:
                 yaw_radians += 2 * np.pi
-                
+
             return yaw_radians
-            
+
         except Exception as e:
             logger.debug(f"Error getting vehicle heading angle: {e}")
             return 0.0
 
+    # --------------------------------------------------------------------- #
+    # Nearby vehicle detection for MARL
+    # --------------------------------------------------------------------- #
 
+    def _get_nearby_vehicles(self) -> list:
+        """
+        Get nearby vehicles within detection radius, sorted by distance.
+        Uses bounding box pre-filter for efficiency.
 
+        Returns:
+            List of tuples: [(vehicle, distance), ...] sorted by distance, max K vehicles
+        """
+        try:
+            current_location = self.vehicle.get_location()
+            all_vehicles = self.world.get_actors().filter('vehicle.*')
+
+            nearby = []
+            for vehicle in all_vehicles:
+                if vehicle.id == self.vehicle.id:
+                    continue  # Skip self
+
+                if not vehicle.is_alive:
+                    continue
+
+                other_loc = vehicle.get_location()
+
+                # Quick bounding box check (faster than full distance calculation)
+                if (abs(other_loc.x - current_location.x) > NEARBY_DETECTION_RADIUS or
+                    abs(other_loc.y - current_location.y) > NEARBY_DETECTION_RADIUS):
+                    continue
+
+                distance = current_location.distance(other_loc)
+                if distance <= NEARBY_DETECTION_RADIUS:
+                    nearby.append((vehicle, distance))
+
+            # Sort by distance and return top K
+            nearby.sort(key=lambda x: x[1])
+            return nearby[:MAX_NEARBY_VEHICLES]
+
+        except Exception as e:
+            logger.debug(f"Error getting nearby vehicles for {self.actor_id}: {e}")
+            return []
+
+    def _calculate_ttc_to_vehicle(self, other_vehicle: carla.Actor) -> float:
+        """
+        Calculate Time-to-Collision (TTC) to another vehicle using constant velocity assumption.
+
+        Uses quadratic equation: |rel_pos + t*rel_vel|² = collision_radius²
+
+        Args:
+            other_vehicle: The other CARLA vehicle actor
+
+        Returns:
+            float: TTC in seconds (inf if no collision predicted within horizon)
+        """
+        try:
+            ego_loc = self.vehicle.get_location()
+            ego_vel = self.vehicle.get_velocity()
+            other_loc = other_vehicle.get_location()
+            other_vel = other_vehicle.get_velocity()
+
+            # Relative position and velocity
+            rel_x = other_loc.x - ego_loc.x
+            rel_y = other_loc.y - ego_loc.y
+            rel_vx = other_vel.x - ego_vel.x
+            rel_vy = other_vel.y - ego_vel.y
+
+            collision_radius = 4.0  # Combined vehicle radii (meters)
+
+            # Quadratic equation coefficients: at² + bt + c = 0
+            a = rel_vx**2 + rel_vy**2
+            b = 2 * (rel_x * rel_vx + rel_y * rel_vy)
+            c = rel_x**2 + rel_y**2 - collision_radius**2
+
+            # No relative motion - check if already colliding
+            if abs(a) < 1e-6:
+                return float('inf')
+
+            discriminant = b**2 - 4 * a * c
+
+            # No collision trajectory
+            if discriminant < 0:
+                return float('inf')
+
+            # Find smallest positive root
+            sqrt_disc = np.sqrt(discriminant)
+            t1 = (-b - sqrt_disc) / (2 * a)
+            t2 = (-b + sqrt_disc) / (2 * a)
+
+            if t1 > 0:
+                return t1
+            elif t2 > 0:
+                return t2
+            else:
+                return float('inf')  # Collision in past
+
+        except Exception as e:
+            logger.debug(f"Error calculating TTC: {e}")
+            return float('inf')
+
+    def _compute_nearby_vehicle_features(self) -> tuple:
+        """
+        Compute normalized features for nearby vehicles (35D total = 5 slots × 7 features).
+
+        Per-vehicle features (7D):
+        - rel_x: Relative X position (normalized to [-1, 1])
+        - rel_y: Relative Y position (normalized to [-1, 1])
+        - rel_vx: Relative velocity X (normalized to [-1, 1])
+        - rel_vy: Relative velocity Y (normalized to [-1, 1])
+        - heading_diff: Heading difference (normalized to [-1, 1])
+        - distance: Euclidean distance (normalized to [0, 1])
+        - ttc: Time-to-collision (normalized to [0, 1])
+
+        Empty slots are filled with safe defaults (distance=1.0, ttc=1.0).
+
+        Returns:
+            Tuple[List[float], float]: (35D feature vector, minimum TTC across all vehicles)
+        """
+        try:
+            nearby_vehicles = self._get_nearby_vehicles()
+
+            ego_loc = self.vehicle.get_location()
+            ego_vel = self.vehicle.get_velocity()
+            ego_heading = np.radians(self.vehicle.get_transform().rotation.yaw)
+
+            features = []
+            min_ttc = float('inf')
+
+            for i in range(MAX_NEARBY_VEHICLES):
+                if i < len(nearby_vehicles):
+                    vehicle, distance = nearby_vehicles[i]
+                    other_loc = vehicle.get_location()
+                    other_vel = vehicle.get_velocity()
+                    other_heading = np.radians(vehicle.get_transform().rotation.yaw)
+
+                    # Relative position (normalized by detection radius)
+                    rel_x = (other_loc.x - ego_loc.x) / NEARBY_DETECTION_RADIUS
+                    rel_y = (other_loc.y - ego_loc.y) / NEARBY_DETECTION_RADIUS
+
+                    # Relative velocity (normalized by max velocity)
+                    rel_vx = (other_vel.x - ego_vel.x) / MAX_RELATIVE_VELOCITY
+                    rel_vy = (other_vel.y - ego_vel.y) / MAX_RELATIVE_VELOCITY
+
+                    # Heading difference (normalized by π)
+                    heading_diff = other_heading - ego_heading
+                    # Wrap to [-π, π]
+                    while heading_diff > np.pi:
+                        heading_diff -= 2 * np.pi
+                    while heading_diff < -np.pi:
+                        heading_diff += 2 * np.pi
+                    heading_diff_norm = heading_diff / np.pi
+
+                    # Distance (normalized by detection radius)
+                    distance_norm = distance / NEARBY_DETECTION_RADIUS
+
+                    # TTC (normalized by max TTC, clamped)
+                    ttc = self._calculate_ttc_to_vehicle(vehicle)
+                    min_ttc = min(min_ttc, ttc)
+                    ttc_norm = min(ttc, MAX_TTC) / MAX_TTC
+
+                    features.extend([
+                        np.clip(rel_x, -1.0, 1.0),
+                        np.clip(rel_y, -1.0, 1.0),
+                        np.clip(rel_vx, -1.0, 1.0),
+                        np.clip(rel_vy, -1.0, 1.0),
+                        np.clip(heading_diff_norm, -1.0, 1.0),
+                        np.clip(distance_norm, 0.0, 1.0),
+                        np.clip(ttc_norm, 0.0, 1.0)
+                    ])
+                else:
+                    # Empty slot: zeros except distance and TTC = 1.0 (safe/far away)
+                    features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+
+            return features, min_ttc
+
+        except Exception as e:
+            logger.debug(f"Error computing nearby vehicle features: {e}")
+            # Return safe defaults: 5 slots × 7 features with safe values
+            default_features = []
+            for _ in range(MAX_NEARBY_VEHICLES):
+                default_features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+            return default_features, float('inf')
+
+    def _calculate_distance_to_destination(self) -> float:
+        """
+        Calculate distance to destination for progress reward calculation.
+
+        Returns:
+            float: Distance to destination in meters (999.0 if not available)
+        """
+        try:
+            if hasattr(self.vm, 'agent') and hasattr(self.vm.agent, '_local_planner'):
+                planner = self.vm.agent._local_planner
+                if hasattr(planner, '_destination') and planner._destination:
+                    current_loc = self.vehicle.get_location()
+                    dest_loc = planner._destination
+                    return current_loc.distance(dest_loc)
+            return 999.0
+        except Exception as e:
+            logger.debug(f"Error calculating distance to destination: {e}")
+            return 999.0
 
     # --------------------------------------------------------------------- #
     # Private functions
