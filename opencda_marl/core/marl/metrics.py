@@ -119,7 +119,8 @@ class TrainingMetrics:
                     self.agent_speeds[agent_id] = []
                 self.agent_speeds[agent_id].append(speed)
 
-            if target_speed is not None:
+            # Filter out 0.0 values (uninitialized or stopped vehicles)
+            if target_speed is not None and target_speed > 0:
                 step_target_speeds_list.append(target_speed)
 
         # Store step-level speed data
@@ -150,8 +151,10 @@ class TrainingMetrics:
         traffic_metrics = self._compute_traffic_metrics()
 
         # Compute success/collision rates from tracked counts
-        active_agents = len(self.agent_rewards)
-        total_vehicles = self.successes + self.collisions + active_agents
+        # Note: Don't add active_agents because successes+collisions already accounts
+        # for all completed agents. agent_rewards contains ALL agents ever rewarded
+        # (including those that succeeded/collided), causing double-counting.
+        total_vehicles = self.successes + self.collisions
         success_rate = (self.successes / total_vehicles * 100) if total_vehicles > 0 else 0.0
         collision_rate = (self.collisions / total_vehicles * 100) if total_vehicles > 0 else 0.0
 

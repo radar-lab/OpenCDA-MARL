@@ -80,7 +80,7 @@ class Actor(nn.Module):
     """Actor network for TD3 based on AdvRAIM architecture"""
 
     def __init__(self, state_dim: int, lstm_hidden_dim: int, action_dim: int,
-                 max_action: float = 1.0, min_action: float = 0.0, motion_planner_config: dict = None, 
+                 max_action: float = 1.0, min_action: float = 0.0, motion_planner_config: dict = None,
                  is_target: bool = False):
         super(Actor, self).__init__()
 
@@ -88,6 +88,7 @@ class Actor(nn.Module):
         self.min_action = min_action
         self.is_target = is_target
         self.forward_count = 0  # Counter for logging frequency
+        self.action_dim = action_dim  # Store for LayerNorm
 
         # Use configurable motion planner architecture
         if motion_planner_config is None:
@@ -113,20 +114,24 @@ class Actor(nn.Module):
                 # Config case - properly pair input_dim[i] -> output_dim[i]
                 in_dim = layer_dims[i]
                 out_dim = output_dims[i]
-            
+
             motion_planner_layers.append(nn.Linear(in_dim, out_dim))
             # Add ReLU for all layers except the last one
             if i < num_layers - 1:
                 motion_planner_layers.append(nn.ReLU())
-        
+
         self.motion_planner = nn.Sequential(*motion_planner_layers)
-        
+
         # Final output layer (if the last layer doesn't output action_dim directly)
         if output_dim != action_dim:
             self.output_layer = nn.Linear(output_dim, action_dim)
         else:
             # Motion planner already outputs the right dimension
             self.output_layer = None
+
+        # LayerNorm before tanh to prevent gradient vanishing from tanh saturation
+        # This normalizes pre-tanh values to prevent |x| >> 3 where tanh'(x) ≈ 0
+        self.pre_tanh_norm = nn.LayerNorm(action_dim)
 
         # Initialize weights properly (only log for non-target networks)
         self._initialize_weights()
@@ -147,22 +152,29 @@ class Actor(nn.Module):
 
         # Forward through motion planner
         x = self.motion_planner(combined_input)
-        
-        # Output layer with sigmoid activation (if separate output layer exists)
+
+        # Output layer (if separate output layer exists)
         if self.output_layer is not None:
             x = self.output_layer(x)
-        
-        # Apply tanh activation for better gradient flow and exploration
+
+        # CRITICAL FIX: Apply LayerNorm before tanh to prevent gradient vanishing
+        # Problem: When |x| > 3, tanh saturates at ±1 and gradient ≈ 0
+        # Solution: LayerNorm keeps pre-tanh values in [-2, 2] range where tanh has healthy gradients
+        x_normalized = self.pre_tanh_norm(x)
+
+        # Apply tanh activation for bounded output
         # tanh outputs in [-1, 1], then scale to [min_action, max_action]
-        tanh_out = torch.tanh(x)
+        tanh_out = torch.tanh(x_normalized)
         # Scale from [-1, 1] to [0, 1] then to [min_action, max_action]
         action = self.min_action + (self.max_action - self.min_action) * (tanh_out + 1) * 0.5
         self.forward_count = (self.forward_count + 1) % 100000
-        
+
         # Debug logging for network outputs (periodic)
         if not self.is_target and self.forward_count % 5000 == 0:
-            logger.info(f"Actor Debug (batch mean) - Pre-tanh: {x.mean().item():.3f}, Tanh: {tanh_out.mean().item():.3f}, Action: {action.mean().item():.1f} km/h")
-        
+            logger.info(f"Actor Debug (batch mean) - Pre-norm: {x.mean().item():.3f}, "
+                       f"Normalized: {x_normalized.mean().item():.3f}, "
+                       f"Tanh: {tanh_out.mean().item():.3f}, Action: {action.mean().item():.1f} km/h")
+
         return action
 
     def _initialize_weights(self):
@@ -338,9 +350,9 @@ class TD3Algorithm(BaseAlgorithm):
         # Legacy network architecture (for compatibility)
         critic_hidden_dims = config.get('critic_hidden_dims', [256, 256])
 
-        # Learning rates
-        self.actor_lr = config.get('learning_rate_actor', 1e-5)
-        self.critic_lr = config.get('learning_rate_critic', 1e-4)
+        # Learning rates (increased defaults for faster learning with LayerNorm fix)
+        self.actor_lr = config.get('learning_rate_actor', 1e-4)  # Was 1e-5, now 1e-4
+        self.critic_lr = config.get('learning_rate_critic', 1e-3)  # Was 1e-4, now 1e-3
 
         # Device configuration
         self.device = torch.device(
@@ -433,6 +445,8 @@ class TD3Algorithm(BaseAlgorithm):
 
         logger.info(
             f"TD3 initialized with {state_dim}D states, LSTM hidden: {self.lstm_hidden_size}, device: {self.device}")
+        logger.info(
+            f"TD3 Learning rates: actor_lr={self.actor_lr}, critic_lr={self.critic_lr}")
 
     def select_action(self, multi_agent_obs: Dict[str, np.ndarray], ego_agent_id: str, training: bool = True) -> float:
         """

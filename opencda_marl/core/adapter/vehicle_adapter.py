@@ -79,7 +79,16 @@ class MARLVehicleAdapter:
         # Store target speed for monitoring
         if target_speed is not None:
             self.target_speed = target_speed
-        
+        else:
+            # During warmup (target_speed=None): use current vehicle speed as "target"
+            # This reflects what vanilla agent is commanding, for TensorBoard tracking
+            try:
+                velocity = self.vm.vehicle.get_velocity()
+                current_speed = 3.6 * (velocity.x**2 + velocity.y**2 + velocity.z**2)**0.5
+                self.target_speed = current_speed
+            except Exception:
+                pass  # Keep previous value if velocity unavailable
+
         self.vm.update_info()
 
         if self.check_collision():
