@@ -289,8 +289,10 @@ class DQNAlgorithm(BaseAlgorithm):
             self.training_step += 1
 
             # Periodic deep cleanup to prevent CUDA memory fragmentation
-            if self.training_step % 500 == 0 and torch.cuda.is_available():
+            # More aggressive: every 50 steps instead of 500 to prevent slowdown
+            if self.training_step % 50 == 0 and torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                gc.collect()
 
             return self.training_metrics.copy()
 
@@ -324,6 +326,7 @@ class DQNAlgorithm(BaseAlgorithm):
     def _compute_grad_norm(self, parameters) -> float:
         """
         Compute the L2 norm of gradients for monitoring training stability.
+        Optimized: Single GPU-CPU sync instead of per-parameter sync.
 
         Args:
             parameters: Iterator of model parameters
@@ -331,12 +334,12 @@ class DQNAlgorithm(BaseAlgorithm):
         Returns:
             Total gradient norm (float)
         """
-        total_norm = 0.0
-        for p in parameters:
-            if p.grad is not None:
-                param_norm = p.grad.data.norm(2)
-                total_norm += param_norm.item() ** 2
-        return total_norm ** 0.5
+        # Collect all gradients - avoid multiple .item() calls
+        grads = [p.grad.flatten() for p in parameters if p.grad is not None]
+        if not grads:
+            return 0.0
+        # Single concatenation and norm computation on GPU, then one .item()
+        return torch.cat(grads).norm(2).item()
 
     def get_training_info(self) -> Dict[str, Any]:
         """Get training information"""

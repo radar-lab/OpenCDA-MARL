@@ -1,18 +1,51 @@
 from typing import Dict, Any, Optional, List
 from collections import deque
 import numpy as np
+import pickle
+import os
+from loguru import logger
 
 
 class TrainingMetrics:
-    """Track and compute training metrics including traffic performance."""
+    """Track and compute training metrics including traffic performance.
 
-    def __init__(self):
-        self.episode_rewards = []
-        self.episode_states = []
+    Uses rolling windows for real-time stats and periodic file export for full history.
+    """
 
-        # Traffic performance history (for multi-episode analysis)
-        self.episode_avg_speeds = []
-        self.episode_speed_variances = []
+    def __init__(self, export_interval: int = 100, export_dir: str = "metrics_history"):
+        """
+        Initialize metrics tracker.
+
+        Args:
+            export_interval: Export history to file every N episodes (0 = disabled)
+            export_dir: Directory to save history files
+        """
+        # Rolling windows for real-time stats (bounded memory)
+        self.episode_rewards: deque = deque(maxlen=100)
+        self.episode_states: deque = deque(maxlen=100)
+
+        # Traffic performance history (bounded)
+        self.episode_avg_speeds: deque = deque(maxlen=100)
+        self.episode_speed_variances: deque = deque(maxlen=100)
+
+        # Full history for file export (cleared after export)
+        self._full_history = {
+            'rewards': [],
+            'avg_speeds': [],
+            'speed_variances': [],
+            'episode_lengths': [],
+            'success_counts': [],
+            'collision_counts': []
+        }
+
+        # Export configuration
+        self.export_interval = export_interval
+        self.export_dir = export_dir
+        self._episode_counter = 0
+
+        # Create export directory if needed
+        if export_interval > 0:
+            os.makedirs(export_dir, exist_ok=True)
 
         self.reset()
 
@@ -115,9 +148,10 @@ class TrainingMetrics:
             metrics.update(traffic_metrics)
             return metrics
 
-        # Compute running averages
-        window_size = min(10, len(self.episode_rewards))
-        recent_rewards = self.episode_rewards[-window_size:]
+        # Compute running averages (convert deque to list for slicing)
+        rewards_list = list(self.episode_rewards)
+        window_size = min(10, len(rewards_list))
+        recent_rewards = rewards_list[-window_size:]
 
         metrics = {
             'step_reward': self.current_reward,
@@ -126,8 +160,8 @@ class TrainingMetrics:
             'avg_reward': avg_reward,
             f'mean_reward_episode_{window_size}': float(np.mean(recent_rewards)),
             f'std_reward_episode_{window_size}': float(np.std(recent_rewards)),
-            'max_reward_episode': max(self.episode_rewards),
-            'total_episodes': len(self.episode_rewards),
+            'max_reward_episode': max(rewards_list),
+            'total_episodes': len(rewards_list),
         }
         metrics.update(traffic_metrics)
 
@@ -187,13 +221,30 @@ class TrainingMetrics:
 
     def finish_episode(self, states: Dict[str, Any]):
         """Finish current episode and compute metrics."""
+        self._episode_counter += 1
+
+        # Compute traffic metrics first
+        traffic_metrics = self._compute_traffic_metrics()
+        avg_speed = traffic_metrics.get('avg_speed', 0.0)
+        speed_variance = traffic_metrics.get('speed_variance', 0.0)
+
+        # Add to rolling windows (bounded memory)
         self.episode_rewards.append(self.current_total_reward)
         self.episode_states.append(states)
+        self.episode_avg_speeds.append(avg_speed)
+        self.episode_speed_variances.append(speed_variance)
 
-        # Save traffic performance for multi-episode analysis
-        traffic_metrics = self._compute_traffic_metrics()
-        self.episode_avg_speeds.append(traffic_metrics.get('avg_speed', 0.0))
-        self.episode_speed_variances.append(traffic_metrics.get('speed_variance', 0.0))
+        # Add to full history for export
+        self._full_history['rewards'].append(self.current_total_reward)
+        self._full_history['avg_speeds'].append(avg_speed)
+        self._full_history['speed_variances'].append(speed_variance)
+        self._full_history['episode_lengths'].append(self.current_length)
+        self._full_history['success_counts'].append(states.get('success', 0))
+        self._full_history['collision_counts'].append(states.get('collision', 0))
+
+        # Check if it's time to export
+        if self.export_interval > 0 and self._episode_counter % self.export_interval == 0:
+            self.export_history()
 
         metrics = self.get_current_metrics()
         metrics.update({
@@ -201,6 +252,42 @@ class TrainingMetrics:
         })
         self.reset()
         return metrics
+
+    def export_history(self, filepath: str = None):
+        """
+        Export full history to file and clear memory.
+
+        Args:
+            filepath: Optional custom filepath. If None, auto-generates based on episode count.
+        """
+        if not self._full_history['rewards']:
+            logger.debug("No history to export")
+            return
+
+        if filepath is None:
+            filepath = os.path.join(
+                self.export_dir,
+                f"metrics_history_ep{self._episode_counter}.pkl"
+            )
+
+        try:
+            with open(filepath, 'wb') as f:
+                pickle.dump(self._full_history, f)
+
+            exported_count = len(self._full_history['rewards'])
+            logger.info(f"Exported {exported_count} episodes to {filepath}")
+
+            # Clear full history to free memory
+            self._full_history = {
+                'rewards': [],
+                'avg_speeds': [],
+                'speed_variances': [],
+                'episode_lengths': [],
+                'success_counts': [],
+                'collision_counts': []
+            }
+        except Exception as e:
+            logger.error(f"Failed to export metrics history: {e}")
 
     def get_traffic_statistics(self) -> Dict[str, Any]:
         """

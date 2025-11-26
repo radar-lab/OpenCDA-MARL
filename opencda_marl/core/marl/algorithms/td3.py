@@ -582,23 +582,32 @@ class TD3Algorithm(BaseAlgorithm):
                 indices = None
                 importance_weights = None
 
-            # Unpack batch - squeeze the stored [1, dim] arrays to [dim]
-            # Create tensors with gradient tracking for critic learning
-            ego_states = torch.FloatTensor(
-                np.stack([t[0].squeeze(0) for t in transitions])).to(self.device).requires_grad_(True)
-            multi_agent_contexts = torch.FloatTensor(
-                np.stack([t[1].squeeze(0) for t in transitions])).to(self.device).requires_grad_(True)
-            # Actions: collect scalar actions and reshape to [batch_size, 1] for critic
-            actions = torch.FloatTensor(
-                np.array([t[2] for t in transitions])).unsqueeze(1).to(self.device).requires_grad_(False)
-            rewards = torch.FloatTensor(
-                np.array([t[3] for t in transitions])).to(self.device)
-            next_ego_states = torch.FloatTensor(
-                np.stack([t[4].squeeze(0) for t in transitions])).to(self.device)
-            next_multi_agent_contexts = torch.FloatTensor(
-                np.stack([t[5].squeeze(0) for t in transitions])).to(self.device)
-            dones = torch.BoolTensor(
-                np.array([t[6] for t in transitions])).to(self.device)
+            # Unpack batch - optimized: stack first, then squeeze once (not per-element)
+            # Use torch.from_numpy for efficiency (avoids data copy)
+            batch_size = len(transitions)
+
+            # Stack arrays first (shape: [batch, 1, dim]), then squeeze to [batch, dim]
+            ego_states_np = np.stack([t[0] for t in transitions]).squeeze(1).astype(np.float32)
+            ego_states = torch.from_numpy(ego_states_np).to(self.device).requires_grad_(True)
+
+            multi_contexts_np = np.stack([t[1] for t in transitions]).squeeze(1).astype(np.float32)
+            multi_agent_contexts = torch.from_numpy(multi_contexts_np).to(self.device).requires_grad_(True)
+
+            # Actions: collect scalars and reshape to [batch_size, 1]
+            actions_np = np.array([t[2] for t in transitions], dtype=np.float32).reshape(-1, 1)
+            actions = torch.from_numpy(actions_np).to(self.device)
+
+            rewards_np = np.array([t[3] for t in transitions], dtype=np.float32)
+            rewards = torch.from_numpy(rewards_np).to(self.device)
+
+            next_ego_np = np.stack([t[4] for t in transitions]).squeeze(1).astype(np.float32)
+            next_ego_states = torch.from_numpy(next_ego_np).to(self.device)
+
+            next_contexts_np = np.stack([t[5] for t in transitions]).squeeze(1).astype(np.float32)
+            next_multi_agent_contexts = torch.from_numpy(next_contexts_np).to(self.device)
+
+            dones_np = np.array([t[6] for t in transitions], dtype=np.bool_)
+            dones = torch.from_numpy(dones_np).to(self.device)
             
             # Debug logging for tensor shapes (only every 1000 updates)
             if self.training_step % 1000 == 0:
@@ -656,13 +665,17 @@ class TD3Algorithm(BaseAlgorithm):
             # Explicit cleanup to prevent memory leaks
             del ego_states, multi_agent_contexts, actions, rewards
             del next_ego_states, next_multi_agent_contexts, dones
+            del ego_states_np, multi_contexts_np, actions_np, rewards_np
+            del next_ego_np, next_contexts_np, dones_np
             del transitions
             if self.use_per:
                 del importance_weights
 
             # Periodic deep cleanup to prevent CUDA memory fragmentation
-            if self.training_step % 500 == 0 and torch.cuda.is_available():
+            # More aggressive: every 50 steps instead of 500 to prevent slowdown
+            if self.training_step % 50 == 0 and torch.cuda.is_available():
                 torch.cuda.empty_cache()
+                gc.collect()
 
             return self.training_metrics.copy()
 
@@ -963,6 +976,7 @@ class TD3Algorithm(BaseAlgorithm):
     def _compute_grad_norm(self, parameters) -> float:
         """
         Compute the L2 norm of gradients for monitoring training stability.
+        Optimized: Single GPU-CPU sync instead of per-parameter sync.
 
         Args:
             parameters: Iterator of model parameters
@@ -970,12 +984,12 @@ class TD3Algorithm(BaseAlgorithm):
         Returns:
             Total gradient norm (float)
         """
-        total_norm = 0.0
-        for p in parameters:
-            if p.grad is not None:
-                param_norm = p.grad.data.norm(2)
-                total_norm += param_norm.item() ** 2
-        return total_norm ** 0.5
+        # Collect all gradients - avoid multiple .item() calls
+        grads = [p.grad.flatten() for p in parameters if p.grad is not None]
+        if not grads:
+            return 0.0
+        # Single concatenation and norm computation on GPU, then one .item()
+        return torch.cat(grads).norm(2).item()
 
     def reset_episode(self):
         """Reset for new episode"""
@@ -1031,14 +1045,18 @@ class TD3Algorithm(BaseAlgorithm):
         }
 
     def log_episode_metrics(self, episode_reward: float, episode_length: int,
-                           success_rate: float = 0.0, collision_rate: float = 0.0):
+                           success_rate: float = 0.0, collision_rate: float = 0.0,
+                           additional_metrics: Dict[str, float] = None,
+                           traffic_metrics: Dict[str, float] = None):
         """Log episode-level metrics to TensorBoard (extends base class)"""
         # Add TD3-specific metrics
-        additional = {'buffer_size': len(self.memory)}
+        td3_metrics = {'buffer_size': len(self.memory)}
+        if additional_metrics:
+            td3_metrics.update(additional_metrics)
         # Call base class method
         super().log_episode_metrics(
             episode_reward, episode_length, success_rate, collision_rate,
-            additional_metrics=additional
+            additional_metrics=td3_metrics, traffic_metrics=traffic_metrics
         )
 
     def save(self, path: str):

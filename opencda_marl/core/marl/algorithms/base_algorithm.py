@@ -239,8 +239,10 @@ class BaseAlgorithm(ABC):
             for name, value in additional_metrics.items():
                 self.writer.add_scalar(f'Episode/{name}', value, self.episode_count)
 
-        # Flush to ensure metrics are written
-        self.writer.flush()
+        # Flush periodically (every 10 episodes) instead of every episode
+        # Reduces I/O blocking during training
+        if self.episode_count % 10 == 0:
+            self.writer.flush()
 
     def flush_tensorboard(self):
         """Flush TensorBoard writer to ensure all metrics are written."""
