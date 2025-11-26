@@ -25,7 +25,7 @@ meta:
 scenario:
   simulation:
     max_steps: 2400 # 2 minute = 20fps * 60s * 2
-    max_episodes: 200
+    max_episodes: 10
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
     mode: "replay"

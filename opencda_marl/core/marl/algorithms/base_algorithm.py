@@ -222,33 +222,39 @@ class BaseAlgorithm(ABC):
 
         # Traffic performance metrics (RA-L paper-ready)
         if traffic_metrics:
-            # Core traffic metrics (actual vehicle speeds)
+            # ============ KEY METRICS (most important for monitoring) ============
+            # avg_speed: Actual average vehicle speed from CARLA (km/h)
             if 'avg_speed' in traffic_metrics:
                 self.writer.add_scalar('Traffic/avg_speed', traffic_metrics['avg_speed'], self.episode_count)
-            if 'speed_std' in traffic_metrics:
-                self.writer.add_scalar('Traffic/speed_std', traffic_metrics['speed_std'], self.episode_count)
-            if 'speed_variance' in traffic_metrics:
-                self.writer.add_scalar('Traffic/speed_variance', traffic_metrics['speed_variance'], self.episode_count)
-            if 'min_speed' in traffic_metrics:
-                self.writer.add_scalar('Traffic/min_speed', traffic_metrics['min_speed'], self.episode_count)
-            if 'max_speed' in traffic_metrics:
-                self.writer.add_scalar('Traffic/max_speed', traffic_metrics['max_speed'], self.episode_count)
 
-            # Target (commanded) speed metrics - compare RL output vs actual
+            # target_speed_mean: What RL algorithm commanded vehicles to do (km/h)
             if 'target_speed_mean' in traffic_metrics:
                 self.writer.add_scalar('Traffic/target_speed_mean', traffic_metrics['target_speed_mean'], self.episode_count)
+
+            # speed_gap: Difference between commanded and actual speed (target - actual)
+            # Positive = vehicles slower than commanded, Negative = vehicles faster
+            avg_speed = traffic_metrics.get('avg_speed', 0)
+            target_speed = traffic_metrics.get('target_speed_mean', 0)
+            if target_speed > 0 and avg_speed > 0:
+                speed_gap = target_speed - avg_speed
+                self.writer.add_scalar('Traffic/speed_gap', speed_gap, self.episode_count)
+
+            # ============ SECONDARY METRICS (for detailed analysis) ============
+            # max_speed: Fastest actual vehicle speed in episode (km/h)
+            if 'max_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/max_speed', traffic_metrics['max_speed'], self.episode_count)
+            # min_speed: Slowest actual vehicle speed in episode (km/h)
+            if 'min_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/min_speed', traffic_metrics['min_speed'], self.episode_count)
+            # speed_std: Standard deviation of actual speeds (lower = more uniform)
+            if 'speed_std' in traffic_metrics:
+                self.writer.add_scalar('Traffic/speed_std', traffic_metrics['speed_std'], self.episode_count)
+
+            # target_speed_max/min: Range of RL commanded speeds
             if 'target_speed_max' in traffic_metrics:
                 self.writer.add_scalar('Traffic/target_speed_max', traffic_metrics['target_speed_max'], self.episode_count)
             if 'target_speed_min' in traffic_metrics:
                 self.writer.add_scalar('Traffic/target_speed_min', traffic_metrics['target_speed_min'], self.episode_count)
-
-            # Traffic flow quality metrics
-            if 'speed_smoothness' in traffic_metrics:
-                self.writer.add_scalar('Traffic/speed_smoothness', traffic_metrics['speed_smoothness'], self.episode_count)
-            if 'avg_step_speed' in traffic_metrics:
-                self.writer.add_scalar('Traffic/avg_step_speed', traffic_metrics['avg_step_speed'], self.episode_count)
-            if 'avg_agent_speed_var' in traffic_metrics:
-                self.writer.add_scalar('Traffic/avg_agent_speed_var', traffic_metrics['avg_agent_speed_var'], self.episode_count)
 
         # Log additional custom metrics
         if additional_metrics:

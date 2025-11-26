@@ -115,8 +115,9 @@ class MARLEnv:
 
         self.episode_events.extend(self.events)
 
-        # Update training metrics with observations for traffic performance tracking
-        self.metrics.update_step(rewards, next_observations)
+        # Update training metrics with observations and RL-commanded target speeds
+        # Pass target_speeds directly so we track what RL commanded (not adapter cached values)
+        self.metrics.update_step(rewards, next_observations, target_speeds)
 
     # --------------------------------------------------------------------- #
     # Public Methods

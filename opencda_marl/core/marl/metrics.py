@@ -67,13 +67,15 @@ class TrainingMetrics:
     # Main steps for updating metrics
     # --------------------------------------------------------------------- #
 
-    def update_step(self, rewards: Dict[int, float], observations: Optional[Dict] = None):
+    def update_step(self, rewards: Dict[int, float], observations: Optional[Dict] = None,
+                    target_speeds: Optional[Dict[int, float]] = None):
         """
         Update metrics for current step.
 
         Args:
             rewards: Dictionary of agent_id -> reward
             observations: Optional dictionary of agent observations (containing speed data)
+            target_speeds: Optional dictionary of agent_id -> RL-commanded target speed (km/h)
         """
         self.current_reward = sum(rewards.values()) if rewards else 0.0
         self.current_total_reward += self.current_reward
@@ -86,6 +88,13 @@ class TrainingMetrics:
         # Track traffic performance metrics if observations provided
         if observations:
             self._update_traffic_metrics(observations)
+
+        # Track RL-commanded target speeds directly (more reliable than observations)
+        # This captures what the RL algorithm actually commanded, not adapter cached values
+        if target_speeds:
+            for agent_id, ts in target_speeds.items():
+                if ts is not None and ts > 0:
+                    self.step_target_speeds.append(ts)
 
     def _update_traffic_metrics(self, observations: Dict):
         """

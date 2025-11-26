@@ -14,7 +14,7 @@ import numpy as np
 from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl.core.adapter.vehicle_defaults import get_vehicle_manager_defaults
-
+from opencda_marl.core.actuation.marl_control_manager import MARLControlManager
 
 from opencda_marl.core.adapter.exception import CollisionException
 from opencda_marl.core.safety.marl_safety_manager import MARLSafetyManager
@@ -788,7 +788,7 @@ class MARLVehicleAdapter:
             agent = AgentFactory.get_agent(self.agent_type,
                                            self.vehicle, self.carla_map,
                                            self.config)
-            return VehicleManager(
+            vm = VehicleManager(
                 vehicle=self.vehicle,
                 config_yaml=self.vm_cfg,
                 application=['single'],
@@ -796,6 +796,15 @@ class MARLVehicleAdapter:
                 cav_world=self.cav_world,
                 agent=agent
             )
+
+            # MARL-specific: Replace the default controller with MARL controller
+            # This fixes the PID bug where longitudinal control uses wrong gains
+            # while keeping OpenCDA's original behavior unchanged for other scenarios
+            control_config = self.vm_cfg.get('controller', {})
+            vm.controller = MARLControlManager(control_config)
+            logger.debug(f"Vehicle {self.actor_id}: Using MARL PID controller with correct longitudinal gains")
+
+            return vm
         except Exception as e:
             logger.error(
                 f"Error getting agent for vehicle {self.actor_id}: {e}")
