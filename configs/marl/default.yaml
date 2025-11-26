@@ -196,9 +196,12 @@ tensorboard:
     episode: true         # Log episode rewards/length/rates
     rewards: true         # Log step-level rewards
 
-training:
-  metrics_export_interval: 5   # Export every 5 episodes
-  metrics_export_dir: "metrics_history"  # Custom directory
+# MARL-specific training configuration
+# This section is passed to MARLEnv via coordinator.py
+MARL:
+  training:
+    metrics_export_interval: 5   # Export every 5 episodes
+    metrics_export_dir: "metrics_history"  # Custom directory
 
 # CARLA World Reset Configuration
 # Prevents training slowdown from server-side memory accumulation.

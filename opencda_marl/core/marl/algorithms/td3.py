@@ -324,6 +324,11 @@ class TD3Algorithm(BaseAlgorithm):
         self.noise_clip = config.get('noise_clip', 0.3)
         self.exploration_noise = config.get('exploration_noise', 0.1)
         self.policy_freq = config.get('policy_freq', 2)
+
+        # Exploration noise decay parameters
+        self.initial_exploration_noise = self.exploration_noise  # Store initial value
+        self.noise_decay = config.get('noise_decay', 0.995)  # Decay rate per episode
+        self.min_exploration_noise = config.get('min_exploration_noise', 0.05)  # Minimum noise floor
         self.max_action = config.get('max_action', 60.0)  # Maximum speed in km/h
         self.min_action = config.get('min_action', 0.0)   # Minimum speed in km/h
         
@@ -1001,6 +1006,23 @@ class TD3Algorithm(BaseAlgorithm):
         """Reset for new episode"""
         self.episode_count += 1
 
+        # Decay exploration noise each episode
+        old_noise = self.exploration_noise
+        self.exploration_noise = max(
+            self.min_exploration_noise,
+            self.exploration_noise * self.noise_decay
+        )
+
+        # Log noise decay to TensorBoard
+        if self.writer is not None:
+            self.writer.add_scalar('TD3/exploration_noise', self.exploration_noise, self.episode_count)
+            self.writer.add_scalar('TD3/noise_decay_ratio', self.exploration_noise / self.initial_exploration_noise, self.episode_count)
+
+        # Log noise decay periodically
+        if self.episode_count % 10 == 0:
+            logger.info(f"Episode {self.episode_count}: Exploration noise decayed {old_noise:.4f} → {self.exploration_noise:.4f} "
+                       f"(min: {self.min_exploration_noise}, decay: {self.noise_decay})")
+
         # Auto-clear buffer every N episodes to prevent stale experiences
         if self.clear_episodes and self.episode_count > 0:
             if self.episode_count % self.clear_episodes == 0:
@@ -1042,8 +1064,12 @@ class TD3Algorithm(BaseAlgorithm):
             'clear_episodes': self.clear_episodes,
             'clear_keep_ratio': self.clear_keep_ratio,
             'target_updates': self.training_metrics.get('target_updates', 0),
-            # TD3 uses exploration noise instead of epsilon
-            'epsilon': self.exploration_noise,
+            # TD3 exploration noise parameters
+            'epsilon': self.exploration_noise,  # Current noise level (for GUI compatibility)
+            'exploration_noise': self.exploration_noise,
+            'initial_exploration_noise': self.initial_exploration_noise,
+            'min_exploration_noise': self.min_exploration_noise,
+            'noise_decay': self.noise_decay,
             'actor_loss': self.training_metrics.get('actor_loss', 0.0),
             'critic_loss': self.training_metrics.get('critic_loss', 0.0),
             'device': str(self.device),

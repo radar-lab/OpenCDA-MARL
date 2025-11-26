@@ -1,10 +1,10 @@
 # Extend fields - only these fields will extend instead of replace
 _extend_fields:
   - "world.seed" # Add to base seed for variation
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
 
 description: |-
-  DQN configuration for 4-way intersection with HIGH traffic density.
-  Deep Q-Network with continuous states and neural network approximation.
   This scenario focuses on intersection navigation under heavy congestion.
 
 # Demonstrate seed extension - adds variation to base seed
@@ -25,7 +25,7 @@ meta:
 scenario:
   simulation:
     max_steps: 2400 # 2 minute = 20fps * 60s * 2
-    max_episodes: 100
+    max_episodes: 500
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
     mode: "replay"
@@ -173,7 +173,9 @@ MARL:
     discount: 0.99                    # Discount factor (gamma)
     policy_noise: 0.2                 # Noise added to target policy during critic update
     noise_clip: 0.3                   # Range to clip target policy noise
-    exploration_noise: 0.5            # Maximum noise for aggressive speed exploration (±21 km/h)
+    exploration_noise: 0.3            # Initial exploration noise (reduced from 0.5 for stability)
+    noise_decay: 0.995                # Decay rate per episode (reaches min ~0.05 by episode 200)
+    min_exploration_noise: 0.05       # Minimum noise floor (allows exploitation)
     policy_freq: 2                    # Delayed policy updates (update actor every 2 critic updates)
     
     # Training parameters
