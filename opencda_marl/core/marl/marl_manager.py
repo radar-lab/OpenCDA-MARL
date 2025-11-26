@@ -394,11 +394,24 @@ class MARLManager:
 
         # Log episode metrics to TensorBoard if available
         if episode_metrics and hasattr(self.algorithm, 'log_episode_metrics'):
+            # Extract traffic metrics for separate logging
+            traffic_metrics = {
+                'avg_speed': episode_metrics.get('avg_speed', 0.0),
+                'speed_std': episode_metrics.get('speed_std', 0.0),
+                'speed_variance': episode_metrics.get('speed_variance', 0.0),
+                'min_speed': episode_metrics.get('min_speed', 0.0),
+                'max_speed': episode_metrics.get('max_speed', 0.0),
+                'speed_smoothness': episode_metrics.get('speed_smoothness', 0.0),
+                'avg_step_speed': episode_metrics.get('avg_step_speed', 0.0),
+                'avg_agent_speed_var': episode_metrics.get('avg_agent_speed_var', 0.0),
+            }
+
             self.algorithm.log_episode_metrics(
                 episode_reward=episode_metrics.get('total_reward', 0.0),
-                episode_length=episode_metrics.get('steps', 0),
+                episode_length=episode_metrics.get('step_length', 0),
                 success_rate=episode_metrics.get('success_rate', 0.0),
-                collision_rate=episode_metrics.get('collision_rate', 0.0)
+                collision_rate=episode_metrics.get('collision_rate', 0.0),
+                traffic_metrics=traffic_metrics
             )
 
         self.algorithm.reset_episode()

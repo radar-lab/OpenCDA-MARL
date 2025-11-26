@@ -113,8 +113,8 @@ class MARLEnv:
 
         self.episode_events.extend(self.events)
 
-        # Update training metrics
-        self.metrics.update_step(rewards)
+        # Update training metrics with observations for traffic performance tracking
+        self.metrics.update_step(rewards, observations)
 
     # --------------------------------------------------------------------- #
     # Public Methods

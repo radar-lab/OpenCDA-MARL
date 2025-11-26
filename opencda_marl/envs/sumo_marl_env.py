@@ -338,8 +338,8 @@ class SumoMARLEnv:
         self.current_step += 1
         self.total_steps += 1
 
-        # Update metrics
-        self._update_metrics(rewards, events)
+        # Update metrics with observations for traffic performance tracking
+        self._update_metrics(rewards, events, observations)
 
         # Check if episode is done
         done = self.current_step >= self.max_steps or not next_observations
@@ -515,10 +515,10 @@ class SumoMARLEnv:
 
         return rewards
 
-    def _update_metrics(self, rewards: Dict, events: List[StepEvent]):
+    def _update_metrics(self, rewards: Dict, events: List[StepEvent], observations: Dict = None):
         """Update training metrics."""
-        # Update step metrics with all agent rewards
-        self.metrics.update_step(rewards)
+        # Update step metrics with all agent rewards and observations for traffic tracking
+        self.metrics.update_step(rewards, observations)
 
         # Track events
         for event in events:

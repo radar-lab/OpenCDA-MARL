@@ -167,7 +167,8 @@ class BaseAlgorithm(ABC):
 
     def log_episode_metrics(self, episode_reward: float, episode_length: int,
                            success_rate: float = 0.0, collision_rate: float = 0.0,
-                           additional_metrics: Dict[str, float] = None):
+                           additional_metrics: Dict[str, float] = None,
+                           traffic_metrics: Dict[str, float] = None):
         """
         Log episode-level metrics to TensorBoard with learning quality analysis.
 
@@ -177,6 +178,7 @@ class BaseAlgorithm(ABC):
             success_rate: Success rate (0-1)
             collision_rate: Collision rate (0-1)
             additional_metrics: Additional custom metrics to log
+            traffic_metrics: Traffic performance metrics (avg_speed, speed_variance, etc.)
         """
         # Track reward and episode length history (always track, even without TensorBoard)
         self.reward_history.append(episode_reward)
@@ -209,6 +211,28 @@ class BaseAlgorithm(ABC):
         if reward_ma != 0:
             cv = reward_std / abs(reward_ma)  # Coefficient of variation
             self.writer.add_scalar('Learning/reward_cv', cv, self.episode_count)
+
+        # Traffic performance metrics (RA-L paper-ready)
+        if traffic_metrics:
+            # Core traffic metrics
+            if 'avg_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/avg_speed', traffic_metrics['avg_speed'], self.episode_count)
+            if 'speed_std' in traffic_metrics:
+                self.writer.add_scalar('Traffic/speed_std', traffic_metrics['speed_std'], self.episode_count)
+            if 'speed_variance' in traffic_metrics:
+                self.writer.add_scalar('Traffic/speed_variance', traffic_metrics['speed_variance'], self.episode_count)
+            if 'min_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/min_speed', traffic_metrics['min_speed'], self.episode_count)
+            if 'max_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/max_speed', traffic_metrics['max_speed'], self.episode_count)
+
+            # Traffic flow quality metrics
+            if 'speed_smoothness' in traffic_metrics:
+                self.writer.add_scalar('Traffic/speed_smoothness', traffic_metrics['speed_smoothness'], self.episode_count)
+            if 'avg_step_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/avg_step_speed', traffic_metrics['avg_step_speed'], self.episode_count)
+            if 'avg_agent_speed_var' in traffic_metrics:
+                self.writer.add_scalar('Traffic/avg_agent_speed_var', traffic_metrics['avg_agent_speed_var'], self.episode_count)
 
         # Log additional custom metrics
         if additional_metrics:
