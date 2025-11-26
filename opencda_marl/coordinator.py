@@ -40,6 +40,7 @@ class MARLCoordinator:
         self.carla_client = None
         self.carla_world = None
         self.carla_monitor = None
+        self.world_reset_manager = None
 
         # Callbacks for external control (GUI, etc.)
         self.pre_step_callbacks: List[Callable] = []
@@ -126,6 +127,14 @@ class MARLCoordinator:
                                                         scenario_name=scenario_type,
                                                         agent_name=agent_name)
 
+            # 7. Initialize world reset manager if configured
+            world_reset_cfg = self.config.get('world_reset', {})
+            if (world_reset_cfg.get('reset_frequency', 0) > 0 or
+                world_reset_cfg.get('auto_reset', {}).get('enabled', False)):
+                from opencda_marl.core.world_reset_manager import WorldResetManager
+                self.world_reset_manager = WorldResetManager(world_reset_cfg, self)
+                logger.info("WorldResetManager initialized for CARLA memory management")
+
     # --------------------------------------------------------------------- #
     # main thread
     # --------------------------------------------------------------------- #
@@ -146,6 +155,9 @@ class MARLCoordinator:
             return metrics
 
     def step(self):
+        import time
+        step_start = time.perf_counter()
+
         # Call pre-step callbacks
         for callback in self.pre_step_callbacks:
             callback()
@@ -167,7 +179,10 @@ class MARLCoordinator:
             rewards = self.marl_env.get_current_step_rewards()
         self.evaluation_manager.update_step(metrics, rewards)
 
-        #print(f"states: {self.states}, rewards: {rewards}, metrics: {metrics}")
+        # Record step time for world reset manager performance monitoring
+        step_duration = time.perf_counter() - step_start
+        if self.world_reset_manager:
+            self.world_reset_manager.record_step_time(step_duration)
         
     def run(self):
         """
@@ -211,6 +226,11 @@ class MARLCoordinator:
 
         import gc
         gc.collect()
+
+        # Check for world reset AFTER episode completes (safe timing)
+        # This prevents CARLA server-side memory accumulation slowdown
+        if self.world_reset_manager:
+            self.world_reset_manager.on_episode_end()
 
     def run_gui_mode(self):
         """

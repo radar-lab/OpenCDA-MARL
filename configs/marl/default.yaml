@@ -199,3 +199,24 @@ tensorboard:
 training:
   metrics_export_interval: 5   # Export every 5 episodes
   metrics_export_dir: "metrics_history"  # Custom directory
+
+# CARLA World Reset Configuration
+# Prevents training slowdown from server-side memory accumulation.
+# CARLA server accumulates physics buffers, destroyed actor references, and
+# collision detection caches over time. This config enables periodic world
+# reload to clear that memory while preserving all training state.
+world_reset:
+  # Reset frequency (epochs between world reloads)
+  # Set to 0 to disable periodic reset (not recommended for long training)
+  reset_frequency: 10
+
+  # Auto-reset based on performance monitoring
+  auto_reset:
+    enabled: true              # Enable automatic slowdown detection
+    slowdown_threshold: 1.5    # Trigger reset if step time exceeds baseline by this factor (1.5 = 50% slower)
+    monitoring_window: 100     # Number of steps to average for slowdown detection
+    min_epochs_before_auto: 3  # Minimum epochs before auto-reset can trigger
+
+  # Logging configuration
+  log_reset_events: true       # Log world reset events (recommended)
+  log_step_times: false        # Log individual step times (verbose, for debugging)
