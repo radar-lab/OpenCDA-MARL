@@ -240,7 +240,15 @@ class DQNAlgorithm(BaseAlgorithm):
             # Optimize with gradient clipping for stability
             self.optimizer.zero_grad()
             loss.backward()
+
+            # Compute gradient norm BEFORE clipping (for monitoring)
+            grad_norm_pre = self._compute_grad_norm(self.q_network.parameters())
+
             torch.nn.utils.clip_grad_norm_(self.q_network.parameters(), max_norm=1.0)
+
+            # Compute gradient norm AFTER clipping
+            grad_norm_post = self._compute_grad_norm(self.q_network.parameters())
+
             self.optimizer.step()
 
             # Update target network periodically
@@ -260,7 +268,9 @@ class DQNAlgorithm(BaseAlgorithm):
                 'loss': loss_value,
                 'q_values_mean': q_mean,
                 'epsilon': self.epsilon,
-                'memory_size': len(self.memory)
+                'memory_size': len(self.memory),
+                'grad_norm_pre': grad_norm_pre,
+                'grad_norm_post': grad_norm_post
             })
 
             # TensorBoard logging (using base class methods)
@@ -268,6 +278,8 @@ class DQNAlgorithm(BaseAlgorithm):
             self.log_scalar('Q_values/mean', q_mean, category='q_values')
             self.log_scalar('Exploration/epsilon', self.epsilon, category='episode')
             self.log_scalar('Buffer/size', len(self.memory), category='buffer')
+            self.log_scalar('Gradients/q_network_pre_clip', grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/q_network_post_clip', grad_norm_post, category='losses')
 
             # Explicit cleanup to prevent memory leaks (do this AFTER using tensors for metrics)
             del states, actions, rewards, next_states, dones
@@ -308,6 +320,23 @@ class DQNAlgorithm(BaseAlgorithm):
         # Force garbage collection every few episodes to prevent memory leaks
         if self.episode_count % 3 == 0:
             gc.collect()
+
+    def _compute_grad_norm(self, parameters) -> float:
+        """
+        Compute the L2 norm of gradients for monitoring training stability.
+
+        Args:
+            parameters: Iterator of model parameters
+
+        Returns:
+            Total gradient norm (float)
+        """
+        total_norm = 0.0
+        for p in parameters:
+            if p.grad is not None:
+                param_norm = p.grad.data.norm(2)
+                total_norm += param_norm.item() ** 2
+        return total_norm ** 0.5
 
     def get_training_info(self) -> Dict[str, Any]:
         """Get training information"""

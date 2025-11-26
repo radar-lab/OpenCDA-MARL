@@ -6,7 +6,8 @@ Description  : Base class for all reinforcement learning algorithms
 Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 '''
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
+from collections import deque
 import os
 from datetime import datetime
 import numpy as np
@@ -49,6 +50,17 @@ class BaseAlgorithm(ABC):
         # Training state
         self.training_step = 0
         self.episode_count = 0
+
+        # Reward tracking for convergence analysis
+        self.reward_window_size = config.get('reward_window_size', 10)
+        self.reward_history: deque = deque(maxlen=100)  # Full history (last 100 episodes)
+        self.episode_length_history: deque = deque(maxlen=100)
+
+        # Convergence detection parameters
+        self.convergence_threshold = config.get('convergence_threshold', 0.05)  # 5% variance threshold
+        self.convergence_window = config.get('convergence_window', 10)  # Episodes to check
+        self.is_converged = False
+        self.convergence_episode = None  # Episode when convergence was detected
 
         # Initialize TensorBoard logging
         self._init_tensorboard(config)
@@ -157,7 +169,7 @@ class BaseAlgorithm(ABC):
                            success_rate: float = 0.0, collision_rate: float = 0.0,
                            additional_metrics: Dict[str, float] = None):
         """
-        Log episode-level metrics to TensorBoard.
+        Log episode-level metrics to TensorBoard with learning quality analysis.
 
         Args:
             episode_reward: Total episode reward
@@ -166,13 +178,37 @@ class BaseAlgorithm(ABC):
             collision_rate: Collision rate (0-1)
             additional_metrics: Additional custom metrics to log
         """
+        # Track reward and episode length history (always track, even without TensorBoard)
+        self.reward_history.append(episode_reward)
+        self.episode_length_history.append(episode_length)
+
+        # Compute learning quality metrics
+        reward_ma, reward_var, reward_std = self._compute_reward_statistics()
+        length_ma = self._compute_episode_length_ma()
+
+        # Check for convergence
+        self._check_convergence()
+
         if self.writer is None or not self.tb_metrics.get('episode', True):
             return
 
+        # Core episode metrics
         self.writer.add_scalar('Episode/reward', episode_reward, self.episode_count)
         self.writer.add_scalar('Episode/length', episode_length, self.episode_count)
         self.writer.add_scalar('Episode/success_rate', success_rate, self.episode_count)
         self.writer.add_scalar('Episode/collision_rate', collision_rate, self.episode_count)
+
+        # Learning quality metrics (MARL paper-ready)
+        self.writer.add_scalar('Learning/reward_moving_avg', reward_ma, self.episode_count)
+        self.writer.add_scalar('Learning/reward_variance', reward_var, self.episode_count)
+        self.writer.add_scalar('Learning/reward_std', reward_std, self.episode_count)
+        self.writer.add_scalar('Learning/episode_length_ma', length_ma, self.episode_count)
+        self.writer.add_scalar('Learning/converged', 1.0 if self.is_converged else 0.0, self.episode_count)
+
+        # Normalized coefficient of variation (for convergence visualization)
+        if reward_ma != 0:
+            cv = reward_std / abs(reward_ma)  # Coefficient of variation
+            self.writer.add_scalar('Learning/reward_cv', cv, self.episode_count)
 
         # Log additional custom metrics
         if additional_metrics:
@@ -192,6 +228,102 @@ class BaseAlgorithm(ABC):
         if self.writer is not None:
             self.writer.close()
             logger.info("TensorBoard writer closed")
+
+    # ------------------------------------------------------------------ #
+    # Learning Quality Analysis Methods (for RA-L paper metrics)
+    # ------------------------------------------------------------------ #
+
+    def _compute_reward_statistics(self) -> tuple:
+        """
+        Compute reward moving average, variance, and standard deviation.
+
+        Returns:
+            (moving_average, variance, std_deviation)
+        """
+        if len(self.reward_history) == 0:
+            return 0.0, 0.0, 0.0
+
+        # Use last N episodes for moving average
+        window = list(self.reward_history)[-self.reward_window_size:]
+        reward_ma = float(np.mean(window))
+        reward_var = float(np.var(window))
+        reward_std = float(np.std(window))
+
+        return reward_ma, reward_var, reward_std
+
+    def _compute_episode_length_ma(self) -> float:
+        """Compute moving average of episode lengths."""
+        if len(self.episode_length_history) == 0:
+            return 0.0
+
+        window = list(self.episode_length_history)[-self.reward_window_size:]
+        return float(np.mean(window))
+
+    def _check_convergence(self):
+        """
+        Check if training has converged based on reward stability.
+
+        Convergence is detected when:
+        1. We have enough episodes (at least convergence_window)
+        2. Coefficient of variation (std/mean) is below threshold
+        3. Convergence persists for convergence_window episodes
+        """
+        if self.is_converged:
+            return  # Already converged
+
+        if len(self.reward_history) < self.convergence_window:
+            return  # Not enough data
+
+        # Get recent rewards
+        recent_rewards = list(self.reward_history)[-self.convergence_window:]
+        mean_reward = np.mean(recent_rewards)
+        std_reward = np.std(recent_rewards)
+
+        # Avoid division by zero
+        if abs(mean_reward) < 1e-8:
+            return
+
+        # Coefficient of variation
+        cv = std_reward / abs(mean_reward)
+
+        # Check convergence condition
+        if cv < self.convergence_threshold:
+            self.is_converged = True
+            self.convergence_episode = self.episode_count
+            logger.success(f"🎯 Convergence detected at episode {self.episode_count}! "
+                         f"CV={cv:.4f} < threshold={self.convergence_threshold}")
+
+    def get_learning_statistics(self) -> Dict[str, Any]:
+        """
+        Get comprehensive learning statistics for paper reporting.
+
+        Returns:
+            Dictionary with learning quality metrics
+        """
+        reward_ma, reward_var, reward_std = self._compute_reward_statistics()
+        length_ma = self._compute_episode_length_ma()
+
+        stats = {
+            'episode_count': self.episode_count,
+            'reward_moving_avg': reward_ma,
+            'reward_variance': reward_var,
+            'reward_std': reward_std,
+            'episode_length_ma': length_ma,
+            'is_converged': self.is_converged,
+            'convergence_episode': self.convergence_episode,
+            'reward_history_size': len(self.reward_history),
+        }
+
+        # Add coefficient of variation if mean is non-zero
+        if reward_ma != 0:
+            stats['coefficient_of_variation'] = reward_std / abs(reward_ma)
+
+        # Add full reward history for plotting
+        if len(self.reward_history) > 0:
+            stats['reward_history'] = list(self.reward_history)
+            stats['episode_length_history'] = list(self.episode_length_history)
+
+        return stats
 
     @abstractmethod
     def select_action(self, state: np.ndarray, training: bool = True) -> Any:

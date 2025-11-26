@@ -786,7 +786,15 @@ class TD3Algorithm(BaseAlgorithm):
         # Optimize critic
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
+
+        # Compute gradient norm BEFORE clipping (for monitoring)
+        critic_grad_norm_pre = self._compute_grad_norm(self.critic.parameters())
+
         torch.nn.utils.clip_grad_norm_(self.critic.parameters(), max_norm=1.0)
+
+        # Compute gradient norm AFTER clipping
+        critic_grad_norm_post = self._compute_grad_norm(self.critic.parameters())
+
         self.critic_optimizer.step()
 
         # Log loss values after backward pass (safe to call .item() now)
@@ -794,12 +802,21 @@ class TD3Algorithm(BaseAlgorithm):
             loss_value = critic_loss.item()
             loss1_value = critic_loss_1.item()
             loss2_value = critic_loss_2.item()
-            
+
+            # Store gradient norms in metrics
+            self.training_metrics['critic_grad_norm_pre'] = critic_grad_norm_pre
+            self.training_metrics['critic_grad_norm_post'] = critic_grad_norm_post
+
+            # Log to TensorBoard
+            self.log_scalar('Gradients/critic_pre_clip', critic_grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/critic_post_clip', critic_grad_norm_post, category='losses')
+
             # Log every 100 updates or when loss is significantly high/low
             should_log_loss = (self.training_step % 100 == 0) or (loss_value > 5.0) or (loss_value < 0.01)
             if should_log_loss:
-                logger.info(f"TD3 Critic Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, total={loss_value:.4f}")
-            
+                logger.info(f"TD3 Critic Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
+                           f"total={loss_value:.4f}, grad_norm={critic_grad_norm_pre:.4f}->{critic_grad_norm_post:.4f}")
+
         return loss_value
     
     def _update_critic_with_per(self, ego_states, multi_agent_contexts, actions, rewards,
@@ -849,16 +866,24 @@ class TD3Algorithm(BaseAlgorithm):
         # Optimize critic
         self.critic_optimizer.zero_grad()
         total_loss.backward()
+
+        # Compute gradient norm BEFORE clipping (for monitoring)
+        critic_grad_norm_pre = self._compute_grad_norm(self.critic.parameters())
+
         torch.nn.utils.clip_grad_norm_(self.critic.parameters(), max_norm=1.0)
+
+        # Compute gradient norm AFTER clipping
+        critic_grad_norm_post = self._compute_grad_norm(self.critic.parameters())
+
         self.critic_optimizer.step()
-        
+
         # Store loss values for metrics
         loss_value = total_loss.item()
-        
+
         with torch.no_grad():
             loss1_value = weighted_loss1.item()
             loss2_value = weighted_loss2.item()
-            
+
             # Update training metrics
             self.training_metrics.update({
                 'critic_loss1': loss1_value,
@@ -867,15 +892,21 @@ class TD3Algorithm(BaseAlgorithm):
                 'q2_mean': current_q2.mean().item(),
                 'target_q_mean': target_q_values.mean().item(),
                 'td_error_mean': td_errors.mean().item(),
-                'importance_weights_mean': importance_weights.mean().item()
+                'importance_weights_mean': importance_weights.mean().item(),
+                'critic_grad_norm_pre': critic_grad_norm_pre,
+                'critic_grad_norm_post': critic_grad_norm_post
             })
-            
+
+            # Log gradient norms to TensorBoard
+            self.log_scalar('Gradients/critic_pre_clip', critic_grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/critic_post_clip', critic_grad_norm_post, category='losses')
+
             # Log every 100 updates or when loss is significantly high/low
             should_log_loss = (self.training_step % 100 == 0) or (loss_value > 5.0) or (loss_value < 0.01)
             if should_log_loss:
                 logger.info(f"TD3 PER Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
-                           f"td_error_avg={td_errors.mean().item():.4f}, weights_avg={importance_weights.mean().item():.3f}")
-            
+                           f"td_error_avg={td_errors.mean().item():.4f}, grad_norm={critic_grad_norm_pre:.4f}->{critic_grad_norm_post:.4f}")
+
         return loss_value, td_errors
 
     def _update_actor(self, ego_states, multi_agent_contexts):
@@ -892,12 +923,28 @@ class TD3Algorithm(BaseAlgorithm):
         # Optimize actor
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
+
+        # Compute gradient norm BEFORE clipping (for monitoring)
+        actor_grad_norm_pre = self._compute_grad_norm(self.actor.parameters())
+
         torch.nn.utils.clip_grad_norm_(self.actor.parameters(), max_norm=1.0)
+
+        # Compute gradient norm AFTER clipping
+        actor_grad_norm_post = self._compute_grad_norm(self.actor.parameters())
+
         self.actor_optimizer.step()
 
         # Unfreeze critic parameters
         for param in self.critic.parameters():
             param.requires_grad = True
+
+        # Store gradient norms in metrics
+        self.training_metrics['actor_grad_norm_pre'] = actor_grad_norm_pre
+        self.training_metrics['actor_grad_norm_post'] = actor_grad_norm_post
+
+        # Log gradient norms to TensorBoard
+        self.log_scalar('Gradients/actor_pre_clip', actor_grad_norm_pre, category='losses')
+        self.log_scalar('Gradients/actor_post_clip', actor_grad_norm_post, category='losses')
 
         return actor_loss.item()
 
@@ -912,6 +959,23 @@ class TD3Algorithm(BaseAlgorithm):
         for param, target_param in zip(self.actor.parameters(), self.actor_target.parameters()):
             target_param.data.copy_(
                 self.tau * param.data + (1 - self.tau) * target_param.data)
+
+    def _compute_grad_norm(self, parameters) -> float:
+        """
+        Compute the L2 norm of gradients for monitoring training stability.
+
+        Args:
+            parameters: Iterator of model parameters
+
+        Returns:
+            Total gradient norm (float)
+        """
+        total_norm = 0.0
+        for p in parameters:
+            if p.grad is not None:
+                param_norm = p.grad.data.norm(2)
+                total_norm += param_norm.item() ** 2
+        return total_norm ** 0.5
 
     def reset_episode(self):
         """Reset for new episode"""
