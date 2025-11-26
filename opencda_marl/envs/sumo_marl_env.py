@@ -105,8 +105,10 @@ class SumoMARLEnv:
         self.terminal_agents = set()
         self.current_step_rewards = {}
 
-        # Training metrics
-        self.metrics = Metrics()
+        # Training metrics (export history every N episodes)
+        metrics_export_interval = self.training_config.get('metrics_export_interval', 10)
+        metrics_export_dir = self.training_config.get('metrics_export_dir', 'metrics_history')
+        self.metrics = Metrics(export_interval=metrics_export_interval, export_dir=metrics_export_dir)
 
         # Training mode
         self.is_training_mode = self.training_config.get('training_mode', True)
@@ -551,9 +553,16 @@ class SumoMARLEnv:
         if self.use_traffic_manager and self.traffic_manager:
             self.traffic_manager.reset()
 
-        # Log episode metrics before reset
+        # Log episode metrics before reset (use finish_episode to compute traffic metrics before reset)
         if self.current_episode > 0:
-            episode_metrics = self.metrics.get_current_metrics()
+            # Create episode states snapshot for finish_episode
+            episode_states = {
+                'step': self.current_step,
+                'collision': self.collision_count,
+                'success': self.success_count,
+            }
+            # finish_episode computes traffic metrics (including max_speed) BEFORE resetting
+            episode_metrics = self.metrics.finish_episode(episode_states)
             logger.info(f"Episode {self.current_episode} metrics: {episode_metrics}")
 
             # Reset MARL algorithm and log episode metrics to TensorBoard
@@ -580,7 +589,7 @@ class SumoMARLEnv:
             pass
 
     def get_episode_metrics(self) -> Dict:
-        """Get current episode metrics."""
+        """Get current episode metrics (includes traffic metrics like max_speed)."""
         metrics = self.metrics.get_current_metrics()
         # Add fixed_dt for evaluation manager
         metrics['fixed_dt'] = self.step_length
@@ -594,6 +603,9 @@ class SumoMARLEnv:
         """
         Reset episode and return metrics (alias for coordinator compatibility).
         Returns episode metrics before resetting.
+
+        Note: This uses get_current_metrics() which returns metrics without
+        resetting. The actual reset happens in self.reset().
         """
         metrics = self.get_episode_metrics()
         self.reset()

@@ -405,6 +405,8 @@ class TD3Algorithm(BaseAlgorithm):
                                            recency_ratio=self.recency_ratio)
 
         # Training metrics
+        # Note: actor_grad_norm values are None when actor hasn't updated yet
+        # This prevents logging 0 values when actor update is delayed
         self.training_metrics = {
             'actor_loss': 0.0,
             'critic_loss': 0.0,
@@ -412,7 +414,9 @@ class TD3Algorithm(BaseAlgorithm):
             'q2_mean': 0.0,
             # Delayed policy updates (actor updates every policy_freq steps)
             'target_updates': 0,
-            'memory_size': 0
+            'memory_size': 0,
+            'actor_grad_norm_pre': None,  # None until first actor update
+            'actor_grad_norm_post': None  # None until first actor update
         }
 
         self.training = True
@@ -917,7 +921,7 @@ class TD3Algorithm(BaseAlgorithm):
             # Log every 100 updates or when loss is significantly high/low
             should_log_loss = (self.training_step % 100 == 0) or (loss_value > 5.0) or (loss_value < 0.01)
             if should_log_loss:
-                logger.info(f"TD3 PER Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
+                logger.debug(f"TD3 PER Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
                            f"td_error_avg={td_errors.mean().item():.4f}, grad_norm={critic_grad_norm_pre:.4f}->{critic_grad_norm_post:.4f}")
 
         return loss_value, td_errors
@@ -951,13 +955,15 @@ class TD3Algorithm(BaseAlgorithm):
         for param in self.critic.parameters():
             param.requires_grad = True
 
-        # Store gradient norms in metrics
+        # Store gradient norms in metrics (only when actor actually updates)
         self.training_metrics['actor_grad_norm_pre'] = actor_grad_norm_pre
         self.training_metrics['actor_grad_norm_post'] = actor_grad_norm_post
 
-        # Log gradient norms to TensorBoard
-        self.log_scalar('Gradients/actor_pre_clip', actor_grad_norm_pre, category='losses')
-        self.log_scalar('Gradients/actor_post_clip', actor_grad_norm_post, category='losses')
+        # Log gradient norms to TensorBoard only when actor updates
+        # This prevents logging 0 values during delayed policy updates
+        if actor_grad_norm_pre > 0:  # Only log when there are actual gradients
+            self.log_scalar('Gradients/actor_pre_clip', actor_grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/actor_post_clip', actor_grad_norm_post, category='losses')
 
         return actor_loss.item()
 

@@ -6,7 +6,7 @@ Description  : Base class for all reinforcement learning algorithms
 Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 '''
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, Optional
 from collections import deque
 import os
 from datetime import datetime
@@ -56,9 +56,14 @@ class BaseAlgorithm(ABC):
         self.reward_history: deque = deque(maxlen=100)  # Full history (last 100 episodes)
         self.episode_length_history: deque = deque(maxlen=100)
 
-        # Convergence detection parameters
-        self.convergence_threshold = config.get('convergence_threshold', 0.05)  # 5% variance threshold
+        # Success/collision tracking for MARL traffic convergence
+        self.success_rate_history: deque = deque(maxlen=100)
+        self.collision_rate_history: deque = deque(maxlen=100)
+
+        # Convergence detection parameters (more lenient for MARL traffic scenarios)
+        self.convergence_threshold = config.get('convergence_threshold', 0.15)  # 15% CV threshold (was 5%)
         self.convergence_window = config.get('convergence_window', 10)  # Episodes to check
+        self.min_episodes_for_convergence = config.get('min_episodes_for_convergence', 20)  # Need at least 20 episodes
         self.is_converged = False
         self.convergence_episode = None  # Episode when convergence was detected
 
@@ -184,27 +189,30 @@ class BaseAlgorithm(ABC):
         self.reward_history.append(episode_reward)
         self.episode_length_history.append(episode_length)
 
+        # Track success/collision rates for MARL traffic convergence analysis
+        self.success_rate_history.append(success_rate)
+        self.collision_rate_history.append(collision_rate)
+
         # Compute learning quality metrics
         reward_ma, reward_var, reward_std = self._compute_reward_statistics()
         length_ma = self._compute_episode_length_ma()
 
-        # Check for convergence
+        # Check for convergence (MARL-aware)
         self._check_convergence()
 
         if self.writer is None or not self.tb_metrics.get('episode', True):
             return
 
-        # Core episode metrics
+        # Core episode metrics (episode_length removed - not useful for fixed simulation length)
         self.writer.add_scalar('Episode/reward', episode_reward, self.episode_count)
-        self.writer.add_scalar('Episode/length', episode_length, self.episode_count)
         self.writer.add_scalar('Episode/success_rate', success_rate, self.episode_count)
         self.writer.add_scalar('Episode/collision_rate', collision_rate, self.episode_count)
 
         # Learning quality metrics (MARL paper-ready)
+        # Note: episode_length_ma removed - not useful for fixed simulation length
         self.writer.add_scalar('Learning/reward_moving_avg', reward_ma, self.episode_count)
         self.writer.add_scalar('Learning/reward_variance', reward_var, self.episode_count)
         self.writer.add_scalar('Learning/reward_std', reward_std, self.episode_count)
-        self.writer.add_scalar('Learning/episode_length_ma', length_ma, self.episode_count)
         self.writer.add_scalar('Learning/converged', 1.0 if self.is_converged else 0.0, self.episode_count)
 
         # Normalized coefficient of variation (for convergence visualization)
@@ -287,20 +295,29 @@ class BaseAlgorithm(ABC):
 
     def _check_convergence(self):
         """
-        Check if training has converged based on reward stability.
+        Check if training has converged based on reward and performance stability.
 
-        Convergence is detected when:
-        1. We have enough episodes (at least convergence_window)
-        2. Coefficient of variation (std/mean) is below threshold
-        3. Convergence persists for convergence_window episodes
+        MARL Traffic Convergence Criteria:
+        1. Minimum episodes reached (default: 20)
+        2. Reward CV (coefficient of variation) below threshold (default: 15%)
+        3. Success rate stabilized (CV < 20%)
+        4. Collision rate decreasing or stable
+
+        This approach is more suitable for MARL traffic scenarios where:
+        - Early episodes have high variance due to exploration
+        - Success/collision rates are key performance indicators
         """
         if self.is_converged:
             return  # Already converged
 
+        # Need minimum episodes before checking convergence
+        if self.episode_count < self.min_episodes_for_convergence:
+            return
+
         if len(self.reward_history) < self.convergence_window:
             return  # Not enough data
 
-        # Get recent rewards
+        # Get recent metrics
         recent_rewards = list(self.reward_history)[-self.convergence_window:]
         mean_reward = np.mean(recent_rewards)
         std_reward = np.std(recent_rewards)
@@ -309,15 +326,35 @@ class BaseAlgorithm(ABC):
         if abs(mean_reward) < 1e-8:
             return
 
-        # Coefficient of variation
-        cv = std_reward / abs(mean_reward)
+        # Coefficient of variation for rewards
+        reward_cv = std_reward / abs(mean_reward)
+
+        # Check success rate stability (if tracked)
+        success_rate_stable = True
+        if len(self.success_rate_history) >= self.convergence_window:
+            recent_success = list(self.success_rate_history)[-self.convergence_window:]
+            mean_success = np.mean(recent_success)
+            if mean_success > 0.01:  # Only check if there are meaningful successes
+                success_cv = np.std(recent_success) / mean_success
+                success_rate_stable = success_cv < 0.20  # 20% CV for success rate
+
+        # Check collision rate trend (should be decreasing or stable)
+        collision_improving = True
+        if len(self.collision_rate_history) >= self.convergence_window:
+            recent_collision = list(self.collision_rate_history)[-self.convergence_window:]
+            # Compare first half to second half
+            first_half = np.mean(recent_collision[:self.convergence_window//2])
+            second_half = np.mean(recent_collision[self.convergence_window//2:])
+            collision_improving = second_half <= first_half * 1.1  # Allow 10% tolerance
 
         # Check convergence condition
-        if cv < self.convergence_threshold:
+        reward_converged = reward_cv < self.convergence_threshold
+        if reward_converged and success_rate_stable and collision_improving:
             self.is_converged = True
             self.convergence_episode = self.episode_count
-            logger.success(f"🎯 Convergence detected at episode {self.episode_count}! "
-                         f"CV={cv:.4f} < threshold={self.convergence_threshold}")
+            logger.success(f"Convergence detected at episode {self.episode_count}! "
+                         f"Reward CV={reward_cv:.4f}, Success stable={success_rate_stable}, "
+                         f"Collision improving={collision_improving}")
 
     def get_learning_statistics(self) -> Dict[str, Any]:
         """

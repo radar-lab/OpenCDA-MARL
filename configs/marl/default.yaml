@@ -195,3 +195,7 @@ tensorboard:
     buffer: true          # Log replay buffer statistics
     episode: true         # Log episode rewards/length/rates
     rewards: true         # Log step-level rewards
+
+training:
+  metrics_export_interval: 5   # Export every 5 episodes
+  metrics_export_dir: "metrics_history"  # Custom directory

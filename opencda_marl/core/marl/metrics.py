@@ -138,12 +138,22 @@ class TrainingMetrics:
         # Compute traffic performance metrics for current episode
         traffic_metrics = self._compute_traffic_metrics()
 
+        # Compute success/collision rates from tracked counts
+        active_agents = len(self.agent_rewards)
+        total_vehicles = self.successes + self.collisions + active_agents
+        success_rate = (self.successes / total_vehicles * 100) if total_vehicles > 0 else 0.0
+        collision_rate = (self.collisions / total_vehicles * 100) if total_vehicles > 0 else 0.0
+
         if not self.episode_rewards:
             metrics = {
                 'step_reward': self.current_reward,
                 'step_length': self.current_length,
                 'total_reward': self.current_total_reward,
-                'avg_reward': avg_reward
+                'avg_reward': avg_reward,
+                'success_rate': success_rate,
+                'collision_rate': collision_rate,
+                'successes': self.successes,
+                'collisions': self.collisions,
             }
             metrics.update(traffic_metrics)
             return metrics
@@ -158,6 +168,10 @@ class TrainingMetrics:
             'step_length': self.current_length,
             'total_reward': self.current_total_reward,
             'avg_reward': avg_reward,
+            'success_rate': success_rate,
+            'collision_rate': collision_rate,
+            'successes': self.successes,
+            'collisions': self.collisions,
             f'mean_reward_episode_{window_size}': float(np.mean(recent_rewards)),
             f'std_reward_episode_{window_size}': float(np.std(recent_rewards)),
             'max_reward_episode': max(rewards_list),

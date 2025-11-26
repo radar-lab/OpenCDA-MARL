@@ -51,11 +51,13 @@ class MARLEnv:
         self.reward_params = self._default_reward_params()
         self.reward_params.update(self.config.get('rewards', {}))
 
-        # Training metrics
-        self.metrics = Metrics()
-
         # Training configuration
         self.training_config = self.config.get('training', {})
+
+        # Training metrics (export history every N episodes)
+        metrics_export_interval = self.training_config.get('metrics_export_interval', 10)
+        metrics_export_dir = self.training_config.get('metrics_export_dir', 'metrics_history')
+        self.metrics = Metrics(export_interval=metrics_export_interval, export_dir=metrics_export_dir)
         self.is_training_mode = self.training_config.get('training_mode', True)
         
         # Override training mode for baseline agents
