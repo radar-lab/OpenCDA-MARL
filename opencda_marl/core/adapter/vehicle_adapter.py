@@ -14,8 +14,6 @@ import numpy as np
 from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl.core.adapter.vehicle_defaults import get_vehicle_manager_defaults
-from opencda_marl.core.actuation.marl_control_manager import MARLControlManager
-
 from opencda_marl.core.adapter.exception import CollisionException
 from opencda_marl.core.safety.marl_safety_manager import MARLSafetyManager
 from opencda_marl.core.agents import AgentFactory

@@ -404,6 +404,10 @@ class MARLManager:
                 'speed_smoothness': episode_metrics.get('speed_smoothness', 0.0),
                 'avg_step_speed': episode_metrics.get('avg_step_speed', 0.0),
                 'avg_agent_speed_var': episode_metrics.get('avg_agent_speed_var', 0.0),
+                # Target speed metrics (RL-commanded speeds)
+                'target_speed_mean': episode_metrics.get('target_speed_mean', 0.0),
+                'target_speed_max': episode_metrics.get('target_speed_max', 0.0),
+                'target_speed_min': episode_metrics.get('target_speed_min', 0.0),
             }
 
             self.algorithm.log_episode_metrics(

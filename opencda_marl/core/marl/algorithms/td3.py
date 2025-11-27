@@ -462,7 +462,8 @@ class TD3Algorithm(BaseAlgorithm):
         """
         try:
             # During warmup phase, return None to use vanilla agent
-            if len(self.memory) < self.warmup_steps:
+            # Skip warmup if model was loaded from checkpoint (_pretrained=True)
+            if len(self.memory) < self.warmup_steps and not self._pretrained:
                 # Log warmup progress only every 2000 samples to reduce verbosity
                 if len(self.memory) % 2000 == 0:
                     logger.info(f"TD3: Warmup phase {len(self.memory)}/{self.warmup_steps}, using vanilla agent")
@@ -1149,7 +1150,9 @@ class TD3Algorithm(BaseAlgorithm):
             if 'training_metrics' in save_data:
                 self.training_metrics = save_data['training_metrics']
 
-            logger.info(f"TD3 model loaded from {path}")
+            # Mark as pretrained to skip warmup phase
+            self._pretrained = True
+            logger.info(f"TD3 model loaded from {path} (skipping warmup)")
 
         except Exception as e:
             logger.error(f"Error loading TD3 model: {e}")

@@ -55,8 +55,13 @@ class MARLAgentManager:
 
         for i, adapter in enumerate(self._vehicle_adapters):
             try:
-                if adapter.actor_id in target_speed.keys():
-                    agent_target_speed = target_speed[adapter.actor_id]
+                # Handle both int and string keys from MARL manager
+                # CARLA uses int actor IDs, but observation extractor may use string keys
+                actor_id = adapter.actor_id
+                if actor_id in target_speed:
+                    agent_target_speed = target_speed[actor_id]
+                elif str(actor_id) in target_speed:
+                    agent_target_speed = target_speed[str(actor_id)]
                 else:
                     agent_target_speed = None
                 adapter.step(agent_target_speed)
