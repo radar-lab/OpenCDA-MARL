@@ -139,9 +139,11 @@ class MARLVehicleAdapter:
 
                 # Get speed using getter method
                 if hasattr(agent, 'get_speed'):
-                    obs['speed'] = round(agent.get_speed(), 2)
+                    # Convert from m/s to km/h for consistency with target speeds
+                    obs['speed'] = round(agent.get_speed() * 3.6, 2)
                 elif hasattr(agent, '_ego_speed'):
-                    obs['speed'] = round(agent._ego_speed, 2)
+                    # Convert from m/s to km/h for consistency with target speeds
+                    obs['speed'] = round(agent._ego_speed * 3.6, 2)
                 else:
                     obs['speed'] = 0.0
 

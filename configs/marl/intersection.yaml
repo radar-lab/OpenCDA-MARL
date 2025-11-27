@@ -200,7 +200,7 @@ MARL:
     
     # Action bounds (continuous speed control in km/h) - prevents traffic jams
     max_action: 65.0                  # Maximum speed
-    min_action: 30.0                  # Minimum speed (prevents stopping)
+    min_action: 10.0                  # Minimum speed (prevents stopping)
     warmup_steps: 500                 # Reduced warmup for faster TD3 takeover
 
   # Training configuration

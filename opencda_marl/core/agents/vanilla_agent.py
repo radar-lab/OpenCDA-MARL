@@ -228,7 +228,7 @@ class VanillaAgent(BasicAgent):
     # Public getter methods for state information
     # --------------------------------------------------------------------- #
     def get_speed(self) -> float:
-        """Get current ego vehicle speed in m/s."""
+        """Get current ego vehicle speed in km/h."""
         return self._ego_speed
     
     def get_position(self) -> tuple:

@@ -341,7 +341,7 @@ class TD3Algorithm(BaseAlgorithm):
         self.initial_exploration_noise = self.exploration_noise  # Store initial value
         self.noise_decay = config.get('noise_decay', 0.995)  # Decay rate per episode
         self.min_exploration_noise = config.get('min_exploration_noise', 0.05)  # Minimum noise floor
-        self.max_action = config.get('max_action', 60.0)  # Maximum speed in km/h
+        self.max_action = config.get('max_action', 65.0)  # Maximum speed in km/h
         self.min_action = config.get('min_action', 0.0)   # Minimum speed in km/h
         
         # Warmup configuration
