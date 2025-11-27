@@ -171,7 +171,7 @@ class Actor(nn.Module):
 
         # Debug logging for network outputs (periodic)
         if not self.is_target and self.forward_count % 5000 == 0:
-            logger.info(f"Actor Debug (batch mean) - Pre-norm: {x.mean().item():.3f}, "
+            logger.debug(f"Actor Debug (batch mean) - Pre-norm: {x.mean().item():.3f}, "
                        f"Normalized: {x_normalized.mean().item():.3f}, "
                        f"Tanh: {tanh_out.mean().item():.3f}, Action: {action.mean().item():.1f} km/h")
 
@@ -495,7 +495,7 @@ class TD3Algorithm(BaseAlgorithm):
                 # Debug logging for action selection (periodic)
                 if len(self.memory) % 2000 == 0:
                     raw_val = raw_action.squeeze().item()
-                    logger.info(f"TD3 Action Debug - Raw: {raw_val:.1f}, +Noise: {final_speed:.1f}, Episode: {self.episode_count}")
+                    logger.debug(f"TD3 Action Debug - Raw: {raw_val:.1f}, +Noise: {final_speed:.1f}, Episode: {self.episode_count}")
                 
                 # Force exploration in early episodes to break out of 30 km/h trap
                 if self.episode_count < 3 and training and not self._pretrained:

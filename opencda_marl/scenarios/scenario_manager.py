@@ -97,7 +97,8 @@ class MARLScenarioManager(BaseScenarioManager):
     def get_traffic_info(self) -> Dict[str, Any]:
         return {
             'queue_count': self.agent_manager.get_queue_count(),
-            'agent_type': self.agent_manager.agent_type
+            'agent_type': self.agent_manager.agent_type,
+            'pending_spawns': self.traffic_manager.total_events
         }
 
     def get_observations(self) -> Dict[str, Any]:

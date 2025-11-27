@@ -137,13 +137,11 @@ class MARLVehicleAdapter:
             if hasattr(self.vm, 'agent'):
                 agent = self.vm.agent
 
-                # Get speed using getter method
+                # Get speed (already in km/h from agent)
                 if hasattr(agent, 'get_speed'):
-                    # Convert from m/s to km/h for consistency with target speeds
-                    obs['speed'] = round(agent.get_speed() * 3.6, 2)
+                    obs['speed'] = round(agent.get_speed(), 2)
                 elif hasattr(agent, '_ego_speed'):
-                    # Convert from m/s to km/h for consistency with target speeds
-                    obs['speed'] = round(agent._ego_speed * 3.6, 2)
+                    obs['speed'] = round(agent._ego_speed, 2)
                 else:
                     obs['speed'] = 0.0
 

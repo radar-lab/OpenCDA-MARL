@@ -47,7 +47,8 @@ class MARLAgent(VanillaAgent):
 
         When target_speed is provided by RL:
         - Use RL target_speed directly (RL controls speed)
-        - Still get target_location from local planner (agent controls path)
+        - Call local_planner.run_step() to advance waypoints along route
+        - Return updated target_location for path following
 
         When target_speed is None (warmup or baseline):
         - Fall back to VanillaAgent's default behavior
@@ -71,11 +72,14 @@ class MARLAgent(VanillaAgent):
         if self.is_close_to_destination():
             raise StopIteration("Destination reached - simulation complete")
 
-        # RL mode: Use RL-provided target speed directly
-        # Get target location from local planner for path following
+        # RL mode: Use RL-provided target speed, but still update local planner
         local_planner = self.get_local_planner()
-        if local_planner and hasattr(local_planner, 'target_waypoint') and local_planner.target_waypoint:
-            target_location = local_planner.target_waypoint.transform.location
+
+        # CRITICAL: Call local planner's run_step to advance waypoints along the route
+        # This ensures the waypoint buffer is updated and vehicle follows the planned path
+        # Without this call, the vehicle would keep targeting the same stale waypoint
+        if local_planner:
+            _, target_location = local_planner.run_step([], [], [], target_speed=target_speed)
         else:
             target_location = self._ego_pos.location if self._ego_pos else None
 

@@ -152,6 +152,10 @@ class MARLCoordinator:
             metrics = self.states.copy()
             if self.marl_env:
                 metrics.update(self.marl_env.get_episode_metrics())
+            # Add pending spawns from traffic manager for accurate throughput calculation
+            if self.scenario_manager:
+                traffic_info = self.scenario_manager.get_traffic_info()
+                metrics['pending_spawns'] = traffic_info.get('pending_spawns', 0)
             return metrics
 
     def step(self):

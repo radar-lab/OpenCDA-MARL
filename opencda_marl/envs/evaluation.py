@@ -87,6 +87,8 @@ class EvaluationManager:
         # Initialize reward tracking
         self.cumulative_reward = 0.0
         self.agent_cumulative_rewards = {}
+        # Track when all vehicles complete for accurate throughput calculation
+        self.last_completion_step = None
         
         if not self.is_enabled():    
             logger.info("Evaluation disabled - no history tracking")
@@ -165,6 +167,7 @@ class EvaluationManager:
             # Reset reward tracking for new episode
             self.cumulative_reward = 0.0
             self.agent_cumulative_rewards.clear()
+            self.last_completion_step = None  # Reset for next episode
 
         self._mem_management()
         self._data_management()
@@ -183,7 +186,15 @@ class EvaluationManager:
         success = metrics.get('success', 0)
         collision = metrics.get('collision', 0)
         active_agents = metrics.get('active_agents', 0)
+        pending_spawns = metrics.get('pending_spawns', 0)
         total_vehicles = success + collision + active_agents
+
+        # Track the step when ALL vehicles complete:
+        # - No pending spawns (all vehicles have been spawned)
+        # - No active agents (all spawned vehicles have finished)
+        if pending_spawns == 0 and active_agents == 0 and (success > 0 or collision > 0):
+            if self.last_completion_step is None:
+                self.last_completion_step = step
 
         # calculate current rates
         success_rate = (success / total_vehicles *
@@ -192,8 +203,10 @@ class EvaluationManager:
                           100) if total_vehicles > 0 else 0
 
         # throughput: how many vehicles have completed per hour
-        if step > 0:
-            vps = success / step / self.fixed_dt
+        # Use completion step if all vehicles finished, otherwise current step
+        effective_step = self.last_completion_step if self.last_completion_step else step
+        if effective_step > 0:
+            vps = success / effective_step / self.fixed_dt
             throughput = vps * 3600
         else:
             throughput = 0.0

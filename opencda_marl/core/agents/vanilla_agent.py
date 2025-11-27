@@ -185,23 +185,29 @@ class VanillaAgent(BasicAgent):
             # Signal completion without forceful exit - let the scenario manager handle cleanup
             raise StopIteration("Destination reached - simulation complete")
 
-        # Get target location from local planner (needed for both RL and fallback)
+        # Get local planner
         local_planner = self.get_local_planner()
-        if local_planner and hasattr(local_planner, 'target_waypoint') and local_planner.target_waypoint:
-            target_location = local_planner.target_waypoint.transform.location
-        else:
-            # Fallback: use current position if no waypoint available
-            target_location = self._ego_pos.location if self._ego_pos else None
 
-        # CRITICAL FIX: If RL provides target_speed, use it directly!
-        # This ensures the RL algorithm actually controls vehicle speed.
-        # Previously, target_speed was ignored and BasicAgent computed its own control.
+        # CRITICAL FIX: If RL provides target_speed, still call local_planner.run_step()
+        # to advance waypoints along the route. Otherwise vehicle won't follow the route.
         if target_speed is not None:
+            if local_planner:
+                # Call run_step to update waypoint buffers and get target location
+                _, target_location = local_planner.run_step([], [], [], target_speed=target_speed)
+            else:
+                target_location = self._ego_pos.location if self._ego_pos else None
+
             # Clamp to safe range [0, max_speed]
             clamped_speed = max(0.0, min(target_speed, self.max_speed))
             return clamped_speed, target_location
 
         # Fallback behavior: only used when no RL target_speed provided (warmup phase)
+        # Get target location from local planner for fallback path
+        if local_planner and hasattr(local_planner, 'target_waypoint') and local_planner.target_waypoint:
+            target_location = local_planner.target_waypoint.transform.location
+        else:
+            target_location = self._ego_pos.location if self._ego_pos else None
+
         try:
             # Get control from BasicAgent's CARLA implementation
             control = super().run_step()
