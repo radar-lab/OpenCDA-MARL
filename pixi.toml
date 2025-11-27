@@ -2,7 +2,7 @@
 authors = ["AXIBA <leolihao@arizona.edu>"]
 channels = ["conda-forge", "pytorch", "nvidia"]
 name = "OpenCDA"
-platforms = ["win-64"]
+platforms = ["win-64","linux-64"]
 version = "0.1.0-alpha"
 
 [system-requirements]
@@ -81,8 +81,15 @@ typing_extensions = ">=4.15.0,<5"
 tensorboard = ">=2.20.0,<3"
 
 [pypi-dependencies]
+gitpython = ">=3.1.30"
+sumolib = ">=1.24.0, <2"
+
+[target.win-64.pypi-dependencies]
 torch = { index = "https://download.pytorch.org/whl/nightly/cu128" }
 torchvision = { index = "https://download.pytorch.org/whl/nightly/cu128" }
 carla = { path = "./dependencies/whl/carla-0.9.15-cp310-cp310-win_amd64.whl" }
-gitpython = ">=3.1.30"
-sumolib = ">=1.24.0, <2"
+
+[target.linux-64.pypi-dependencies]
+torch = { index = "https://download.pytorch.org/whl/cu130" }
+torchvision = { index = "https://download.pytorch.org/whl/cu130" }
+carla = { path = "./dependencies/whl/carla-0.9.15-cp310-cp310-manylinux_2_27_x86_64.whl" }

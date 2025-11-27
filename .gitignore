@@ -157,3 +157,4 @@ ready*
 /.spec-workflow
 /runs
 /metrics_history
+/.pixi
