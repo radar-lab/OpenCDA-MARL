@@ -25,7 +25,7 @@ meta:
 scenario:
   simulation:
     max_steps: 2400 # 2 minute = 20fps * 60s * 2
-    max_episodes: 10
+    max_episodes: 500
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
     mode: "replay"
@@ -116,7 +116,7 @@ agents:
     local_planner:
       trajectory_update_freq: 5
       debug: false
-      debug_trajectory: false # Keep trajectory clean for RL
+      debug_trajectory: true # Keep trajectory clean for RL
 
 MARL:
   # Algorithm selection: q_learning, td3, sac, ppo, dqn
@@ -201,7 +201,7 @@ MARL:
     # Action bounds (continuous speed control in km/h) - prevents traffic jams
     max_action: 65.0                  # Maximum speed
     min_action: 10.0                  # Minimum speed (prevents stopping)
-    warmup_steps: 500                 # Reduced warmup for faster TD3 takeover
+    warmup_steps: 1000                 # Reduced warmup for faster TD3 takeover
 
   # Training configuration
   training:

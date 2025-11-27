@@ -192,8 +192,10 @@ class VanillaAgent(BasicAgent):
         # to advance waypoints along the route. Otherwise vehicle won't follow the route.
         if target_speed is not None:
             if local_planner:
-                # Call run_step to update waypoint buffers and get target location
-                _, target_location = local_planner.run_step([], [], [], target_speed=target_speed)
+                # Call run_step to advance waypoints (no parameters needed for this LocalPlanner)
+                local_planner.run_step()
+                # Get target location from updated waypoint
+                target_location = local_planner.target_waypoint.transform.location if local_planner.target_waypoint else None
             else:
                 target_location = self._ego_pos.location if self._ego_pos else None
 

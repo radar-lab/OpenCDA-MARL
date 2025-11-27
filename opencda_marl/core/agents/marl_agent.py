@@ -79,7 +79,10 @@ class MARLAgent(VanillaAgent):
         # This ensures the waypoint buffer is updated and vehicle follows the planned path
         # Without this call, the vehicle would keep targeting the same stale waypoint
         if local_planner:
-            _, target_location = local_planner.run_step([], [], [], target_speed=target_speed)
+            # Call run_step to update waypoint buffers (no parameters needed for this LocalPlanner)
+            local_planner.run_step()
+            # Get target location from the updated target_waypoint
+            target_location = local_planner.target_waypoint.transform.location if local_planner.target_waypoint else None
         else:
             target_location = self._ego_pos.location if self._ego_pos else None
 
