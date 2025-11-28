@@ -15,6 +15,7 @@ SUMO_HOME = "D:\\IDKs\\Eclipse\\Sumo"
 start = "python opencda.py"
 
 # TensorBoard for training visualization
+fix-tensorboard = "python scripts/fix_tensorboard_open3d.py"  # Fix Open3D plugin issue
 tensorboard = "tensorboard --logdir=runs"
 tb = "tensorboard --logdir=runs"  # Short alias
 
