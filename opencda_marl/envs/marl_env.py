@@ -65,19 +65,20 @@ class MARLEnv:
             self.is_training_mode = False
             logger.info(f"Baseline agent '{agent_type}' detected - disabling training mode")
 
-        # Initialize checkpoint manager if training
-        if self.is_training_mode:
-            checkpoint_dir = self.training_config.get(
-                'checkpoint_dir', f'checkpoints/{algorithm}')
-            self.checkpoint_manager = CheckpointManager(
-                checkpoint_dir, algorithm)
+        # Initialize checkpoint manager
+        # Note: We need checkpoint manager even in evaluation mode to load trained weights
+        checkpoint_dir = self.training_config.get(
+            'checkpoint_dir', f'checkpoints/{algorithm}')
+        self.checkpoint_manager = CheckpointManager(
+            checkpoint_dir, algorithm) if self.is_training_mode else None
 
-            # Load checkpoint if specified
-            load_checkpoint = self.training_config.get('load_checkpoint')
-            if load_checkpoint:
-                self._load_checkpoint_from_config(load_checkpoint)
-        else:
-            self.checkpoint_manager = None
+        # Load checkpoint if specified - works in BOTH training and evaluation modes
+        # In evaluation mode (training_mode: false), this loads trained weights to test performance
+        load_checkpoint = self.training_config.get('load_checkpoint')
+        if load_checkpoint:
+            self._load_checkpoint_from_config(load_checkpoint)
+            if not self.is_training_mode:
+                logger.info(f"Evaluation mode: Loaded checkpoint '{load_checkpoint}' for testing")
 
     def step(self):
         # Get current observations from scenario manager

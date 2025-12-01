@@ -27,8 +27,12 @@ class MARLManager:
         logger.success(f"MARLManager initialized with {algorithm}")
 
     def _merge_shared_config(self, algo_config: Dict) -> Dict:
-        """Merge shared config (tensorboard, etc.) with algorithm-specific config."""
+        """Merge shared config (tensorboard, training mode, etc.) with algorithm-specific config."""
         merged = algo_config.copy()
+
+        # Pass training_mode to algorithm (affects TensorBoard and learning)
+        training_config = self.config.get('training', {})
+        merged['training_mode'] = training_config.get('training_mode', True)
 
         # Merge tensorboard config (algorithm can override)
         tb_config = self.config.get('tensorboard', {})
@@ -39,6 +43,15 @@ class MARLManager:
             base_tb = tb_config.copy() if isinstance(tb_config, dict) else {}
             base_tb.update(merged['tensorboard'])
             merged['tensorboard'] = base_tb
+
+        # Disable TensorBoard in evaluation mode (training_mode: false)
+        # This prevents recording non-training metrics during checkpoint testing
+        if not merged['training_mode']:
+            if isinstance(merged.get('tensorboard'), dict):
+                merged['tensorboard']['enabled'] = False
+            else:
+                merged['tensorboard'] = {'enabled': False}
+            logger.info("Evaluation mode: TensorBoard disabled (training_mode: false)")
 
         return merged
 
