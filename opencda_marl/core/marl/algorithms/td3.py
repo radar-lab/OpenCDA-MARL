@@ -1093,6 +1093,7 @@ class TD3Algorithm(BaseAlgorithm):
 
     def log_episode_metrics(self, episode_reward: float, episode_length: int,
                            success_rate: float = 0.0, collision_rate: float = 0.0,
+                           near_miss_count: int = 0,
                            additional_metrics: Dict[str, float] = None,
                            traffic_metrics: Dict[str, float] = None):
         """Log episode-level metrics to TensorBoard (extends base class)"""
@@ -1103,6 +1104,7 @@ class TD3Algorithm(BaseAlgorithm):
         # Call base class method
         super().log_episode_metrics(
             episode_reward, episode_length, success_rate, collision_rate,
+            near_miss_count=near_miss_count,
             additional_metrics=td3_metrics, traffic_metrics=traffic_metrics
         )
 

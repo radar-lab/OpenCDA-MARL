@@ -35,7 +35,8 @@ class TrainingMetrics:
             'speed_variances': [],
             'episode_lengths': [],
             'success_counts': [],
-            'collision_counts': []
+            'collision_counts': [],
+            'near_miss_counts': []  # Track near-miss events for learning analysis
         }
 
         # Export configuration
@@ -274,6 +275,7 @@ class TrainingMetrics:
         # BUG FIX: These were never being updated from episode states
         episode_successes = states.get('success', 0)
         episode_collisions = states.get('collision', 0)
+        episode_near_misses = states.get('near_miss_count', 0)
         self.successes += episode_successes
         self.collisions += episode_collisions
 
@@ -295,6 +297,7 @@ class TrainingMetrics:
         self._full_history['episode_lengths'].append(self.current_length)
         self._full_history['success_counts'].append(episode_successes)
         self._full_history['collision_counts'].append(episode_collisions)
+        self._full_history['near_miss_counts'].append(episode_near_misses)
 
         # Check if it's time to export
         if self.export_interval > 0 and self._episode_counter % self.export_interval == 0:
@@ -302,7 +305,8 @@ class TrainingMetrics:
 
         metrics = self.get_current_metrics()
         metrics.update({
-            'episode_states': states
+            'episode_states': states,
+            'near_miss_count': episode_near_misses  # Add for TensorBoard logging
         })
         self.reset()
         return metrics
@@ -338,7 +342,8 @@ class TrainingMetrics:
                 'speed_variances': [],
                 'episode_lengths': [],
                 'success_counts': [],
-                'collision_counts': []
+                'collision_counts': [],
+                'near_miss_counts': []
             }
         except Exception as e:
             logger.error(f"Failed to export metrics history: {e}")

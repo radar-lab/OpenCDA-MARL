@@ -1,0 +1,54 @@
+# DQN Agent Configuration for Paper Experiments
+# Deep Q-Network - discrete action space MARL agent
+
+_base_: "../default.yaml"
+
+description: |-
+  DQN MARL agent for paper experiments.
+  Discrete speed actions with neural network Q-function.
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: false
+
+MARL:
+  algorithm: "dqn"
+  state_dim: 7    # rel_x, rel_y, speed, heading, dist_intersection, dist_front, lane_pos
+
+  dqn:
+    # Discrete speed actions (km/h)
+    speed_actions: [20, 35, 50, 65]
+
+    # Neural network architecture
+    hidden_dims: [128, 64]
+
+    # DQN training parameters
+    epsilon: 0.3
+    epsilon_decay: 0.995
+    epsilon_min: 0.05
+    learning_rate: 0.001
+    discount_factor: 0.99
+
+    # Experience replay
+    memory_size: 25000
+    batch_size: 128
+
+    # Target network update
+    target_update_freq: 100
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/paper/dqn/"
+    save_freq: 1
+    keep_checkpoints: 5
+    load_checkpoint: null

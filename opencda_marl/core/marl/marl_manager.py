@@ -428,6 +428,7 @@ class MARLManager:
                 episode_length=episode_metrics.get('step_length', 0),
                 success_rate=episode_metrics.get('success_rate', 0.0),
                 collision_rate=episode_metrics.get('collision_rate', 0.0),
+                near_miss_count=episode_metrics.get('near_miss_count', 0),
                 traffic_metrics=traffic_metrics
             )
 

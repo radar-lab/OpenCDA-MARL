@@ -47,6 +47,11 @@ class MARLEnv:
         self.terminal_agents = set()  # Track agents that received terminal rewards
         self.current_step_rewards = {}  # Store current step rewards for evaluation
 
+        # Near-miss tracking (TTC < threshold without collision)
+        # Shows safety learning: decreasing near-misses = learning to avoid danger
+        self.near_miss_count = 0  # Count per episode
+        self.near_miss_agents = set()  # Track agents with near-miss this step (prevent double counting)
+
         # Reward parameters
         self.reward_params = self._default_reward_params()
         self.reward_params.update(self.config.get('rewards', {}))
@@ -304,7 +309,7 @@ class MARLEnv:
                 if observations and agent_id in observations:
                     obs = observations[agent_id]
                     min_ttc = obs.get('min_ttc', float('inf'))
-                    ttc_reward = self._calculate_ttc_reward(min_ttc)
+                    ttc_reward = self._calculate_ttc_reward(min_ttc, agent_id)
                     base_reward += ttc_reward
 
                     # Phase 3: Add progress reward (requires previous observations)
@@ -383,15 +388,19 @@ class MARLEnv:
     # TTC and Progress Reward Methods (Phase 3 Enhancement)
     # --------------------------------------------------------------------- #
 
-    def _calculate_ttc_reward(self, min_ttc: float) -> float:
+    def _calculate_ttc_reward(self, min_ttc: float, agent_id: int = None) -> float:
         """
         Calculate TTC-based safety reward.
 
         Penalizes dangerous proximity to other vehicles before collision occurs.
         This provides proactive safety feedback rather than reactive collision penalty.
 
+        Also tracks near-miss events (TTC < caution_threshold) for learning analysis.
+        Near-misses are counted in both danger and critical zones.
+
         Args:
             min_ttc: Minimum time-to-collision across all nearby vehicles (seconds)
+            agent_id: Agent ID for near-miss tracking (optional)
 
         Returns:
             float: TTC reward (0.0 for safe, negative for dangerous situations)
@@ -405,8 +414,18 @@ class MARLEnv:
         elif min_ttc > caution_threshold:
             return self.reward_params.get('ttc_caution_penalty', -0.5)
         elif min_ttc > danger_threshold:
+            # Danger zone - count as near-miss (TTC between danger and caution thresholds)
+            if agent_id is not None and agent_id not in self.near_miss_agents:
+                self.near_miss_count += 1
+                self.near_miss_agents.add(agent_id)
+                logger.debug(f"Near-miss (danger): agent {agent_id}, TTC={min_ttc:.2f}s")
             return self.reward_params.get('ttc_danger_penalty', -2.0)
         else:
+            # Critical zone - also count as near-miss (TTC below danger threshold)
+            if agent_id is not None and agent_id not in self.near_miss_agents:
+                self.near_miss_count += 1
+                self.near_miss_agents.add(agent_id)
+                logger.debug(f"Near-miss (critical): agent {agent_id}, TTC={min_ttc:.2f}s")
             return self.reward_params.get('ttc_critical_penalty', -5.0)
 
     def _calculate_progress_reward(self, current_dist_to_dest: float, prev_dist_to_dest: float,
@@ -463,7 +482,9 @@ class MARLEnv:
             'collision': self.sm.states['collision'],  # Current episode stats
             'success': self.sm.states['success'],  # Current episode stats
             'active_agents': self.sm.states['active_agents'],
-            'fixed_dt': self.sm.states.get('fixed_dt', 0.05)
+            'fixed_dt': self.sm.states.get('fixed_dt', 0.05),
+            # Near-miss tracking for learning analysis
+            'near_miss_count': self.near_miss_count
         }
 
         # Finish current episode metrics with clean episode-specific snapshot
@@ -482,6 +503,10 @@ class MARLEnv:
         self.previous_observations.clear()
         self.terminal_agents = set()
         self.current_step_rewards.clear()
+
+        # Reset near-miss tracking for new episode
+        self.near_miss_count = 0
+        self.near_miss_agents.clear()
 
         logger.info(f"Episode {current_episode} reset completed")
         return episode_metrics

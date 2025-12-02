@@ -25,10 +25,10 @@ meta:
 scenario:
   simulation:
     max_steps: 2400 # 2 minute = 20fps * 60s * 2
-    max_episodes: 500
+    max_episodes: 100
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
-    mode: "live"
+    mode: "replay"
     replay_file: "recordings/lite_2minL.json"
     #replay_file: "recordings/quick_test.json"
     base_speed: 45.0 # km/h base speed for vehicles
@@ -201,20 +201,21 @@ MARL:
     # Action bounds (continuous speed control in km/h) - prevents traffic jams
     max_action: 65.0                  # Maximum speed
     min_action: 10.0                  # Minimum speed (prevents stopping)
-    warmup_steps: 1000                 # Reduced warmup for faster TD3 takeover
+    warmup_steps: 0                 # Reduced warmup for faster TD3 takeover
 
   # Training configuration
   training:
     # Training control
-    training_mode: true # Set to false for evaluation only
+    training_mode: true # Set to false for evaluation only (uses scenario.simulation.max_episodes)
 
     # Checkpoint settings
-    checkpoint_dir: "checkpoints/"
+    checkpoint_dir: "checkpoints_test/"
     save_freq: 1
     keep_checkpoints: 3
 
-    # Resume training
-    load_checkpoint: "checkpoints/td3/latest_checkpoint.pth"
+    # Resume training / Evaluation checkpoint
+    #load_checkpoint: "checkpoints/td3/latest_checkpoint.pth"
+    load_checkpoint: null
 
   rewards:
     # Terminal rewards

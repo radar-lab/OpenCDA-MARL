@@ -172,6 +172,7 @@ class BaseAlgorithm(ABC):
 
     def log_episode_metrics(self, episode_reward: float, episode_length: int,
                            success_rate: float = 0.0, collision_rate: float = 0.0,
+                           near_miss_count: int = 0,
                            additional_metrics: Dict[str, float] = None,
                            traffic_metrics: Dict[str, float] = None):
         """
@@ -182,6 +183,7 @@ class BaseAlgorithm(ABC):
             episode_length: Number of steps in episode
             success_rate: Success rate (0-1)
             collision_rate: Collision rate (0-1)
+            near_miss_count: Number of near-miss events (TTC < threshold without collision)
             additional_metrics: Additional custom metrics to log
             traffic_metrics: Traffic performance metrics (avg_speed, speed_variance, etc.)
         """
@@ -207,6 +209,10 @@ class BaseAlgorithm(ABC):
         self.writer.add_scalar('Episode/reward', episode_reward, self.episode_count)
         self.writer.add_scalar('Episode/success_rate', success_rate, self.episode_count)
         self.writer.add_scalar('Episode/collision_rate', collision_rate, self.episode_count)
+
+        # Safety metric: Near-miss count (TTC < threshold without collision)
+        # Decreasing near-misses = agent learning to avoid dangerous situations
+        self.writer.add_scalar('Safety/near_miss_count', near_miss_count, self.episode_count)
 
         # Learning quality metrics (MARL paper-ready)
         # Note: episode_length_ma removed - not useful for fixed simulation length

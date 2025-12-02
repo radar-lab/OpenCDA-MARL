@@ -1,0 +1,105 @@
+# TD3 Agent Configuration for Paper Experiments
+# Twin Delayed DDPG - continuous action space MARL agent
+
+_base_: "../default.yaml"
+
+description: |-
+  TD3 MARL agent for paper experiments.
+  No warmup - learns from scratch without vanilla agent experience.
+  44D state space (9D ego + 35D nearby vehicles).
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: false
+
+MARL:
+  algorithm: "td3"
+  state_dim: 44    # 9D ego + 35D nearby vehicles
+  action_dim: 1    # Continuous speed control
+
+  td3:
+    # Feature configuration (44D total)
+    features:
+      rel_x: 1
+      rel_y: 1
+      position_x: 1
+      position_y: 1
+      lane_position: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      waypoint_buffer: 1
+      nearby_vehicles: 35
+
+    # Nearby vehicle detection
+    nearby_vehicle_config:
+      detection_radius: 50.0
+      max_vehicles: 5
+      features_per_vehicle: 7
+      include_ttc: true
+      max_relative_velocity: 40.0
+      max_ttc: 10.0
+
+    # LSTM conflict encoder
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 44
+      hidden_size: 256
+      num_layers: 1
+
+    # Motion planner architecture
+    motion_planner:
+      num_layers: 5
+      input_dim: [300, 1024, 1024, 512, 256]
+      output_dim: [1024, 1024, 512, 256, 1]
+
+    # Learning rates
+    learning_rate_actor: 1e-3
+    learning_rate_critic: 1e-3
+
+    # TD3 hyperparameters
+    tau: 0.01
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.3
+    exploration_noise: 0.3
+    noise_decay: 0.995
+    min_exploration_noise: 0.05
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 256
+    memory_size: 25000
+    recency_ratio: 0.5
+
+    # Auto-clear configuration
+    clear_episodes: 1
+    clear_keep_ratio: 0.6
+
+    # PER configuration
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 0.001
+
+    # Action bounds
+    max_action: 65.0
+    min_action: 10.0
+    warmup_steps: 0    # NO WARMUP - learn from scratch
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/paper/td3/"
+    save_freq: 1
+    keep_checkpoints: 5
+    load_checkpoint: null

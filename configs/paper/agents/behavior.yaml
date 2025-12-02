@@ -1,0 +1,11 @@
+# Behavior Agent Configuration for Paper Experiments
+# Simple reactive agent (stop/slow only) - baseline comparison
+
+_base_: "../default.yaml"
+
+description: |-
+  Behavior agent baseline for paper experiments.
+  Simple reactive control with collision avoidance.
+
+agents:
+  agent_type: "behavior"
