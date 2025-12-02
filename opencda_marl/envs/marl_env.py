@@ -52,6 +52,11 @@ class MARLEnv:
         self.near_miss_count = 0  # Count per episode
         self.near_miss_agents = set()  # Track agents with near-miss this step (prevent double counting)
 
+        # TTC violation tracking (TTC < safe_threshold)
+        # Tracks % of agent-steps with dangerous TTC for paper metrics
+        self.ttc_violation_count = 0  # Count of TTC violations per episode
+        self.ttc_check_count = 0  # Total TTC checks per episode
+
         # Reward parameters
         self.reward_params = self._default_reward_params()
         self.reward_params.update(self.config.get('rewards', {}))
@@ -409,6 +414,13 @@ class MARLEnv:
         caution_threshold = self.reward_params.get('ttc_caution_threshold', 2.0)
         danger_threshold = self.reward_params.get('ttc_danger_threshold', 1.0)
 
+        # Track TTC checks for violation rate calculation
+        self.ttc_check_count += 1
+
+        # Track any TTC below safe threshold as a violation (for paper metrics)
+        if min_ttc <= safe_threshold and min_ttc != float('inf'):
+            self.ttc_violation_count += 1
+
         if min_ttc > safe_threshold or min_ttc == float('inf'):
             return 0.0  # Safe - no penalty
         elif min_ttc > caution_threshold:
@@ -474,6 +486,12 @@ class MARLEnv:
         # Create episode-specific state snapshot BEFORE any resets
         # This captures the actual current episode stats
         current_episode = self.sm.states.get('episode', 0)
+
+        # Calculate TTC violation rate (% of TTC checks that were violations)
+        ttc_violation_rate = 0.0
+        if self.ttc_check_count > 0:
+            ttc_violation_rate = (self.ttc_violation_count / self.ttc_check_count) * 100.0
+
         episode_states = {
             'max_steps': self.sm.states['max_steps'],
             'max_episodes': self.sm.states['max_episodes'],
@@ -484,7 +502,9 @@ class MARLEnv:
             'active_agents': self.sm.states['active_agents'],
             'fixed_dt': self.sm.states.get('fixed_dt', 0.05),
             # Near-miss tracking for learning analysis
-            'near_miss_count': self.near_miss_count
+            'near_miss_count': self.near_miss_count,
+            # TTC violation rate for paper metrics (% of checks with TTC < safe threshold)
+            'ttc_violation_rate': ttc_violation_rate
         }
 
         # Finish current episode metrics with clean episode-specific snapshot
@@ -507,6 +527,10 @@ class MARLEnv:
         # Reset near-miss tracking for new episode
         self.near_miss_count = 0
         self.near_miss_agents.clear()
+
+        # Reset TTC violation tracking for new episode
+        self.ttc_violation_count = 0
+        self.ttc_check_count = 0
 
         logger.info(f"Episode {current_episode} reset completed")
         return episode_metrics

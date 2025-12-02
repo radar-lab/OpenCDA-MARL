@@ -39,7 +39,7 @@ scenario:
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
     mode: "replay"
-    replay_file: "recordings/lite_2minL.json"
+    replay_file: "recordings/Heavy_Traffic_500vph"
     base_speed: 45.0 # km/h base speed for vehicles
     active_junctions: [4]
 
@@ -74,7 +74,7 @@ scenario:
 
     flows:
       - name: "north"
-        rate_vph: 200
+        rate_vph: 500
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -86,7 +86,7 @@ scenario:
           width: 0.3
 
       - name: "south"
-        rate_vph: 200
+        rate_vph: 500
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -98,7 +98,7 @@ scenario:
           width: 0.4
 
       - name: "east"
-        rate_vph: 200
+        rate_vph: 500
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -110,7 +110,7 @@ scenario:
           width: 0.25
 
       - name: "west"
-        rate_vph: 200
+        rate_vph: 500
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -214,4 +214,4 @@ world_reset:
     monitoring_window: 100
     min_epochs_before_auto: 3
   log_reset_events: true
-  log_step_times: false
+  log_step_times: true

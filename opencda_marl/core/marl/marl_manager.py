@@ -421,6 +421,8 @@ class MARLManager:
                 'target_speed_mean': episode_metrics.get('target_speed_mean', 0.0),
                 'target_speed_max': episode_metrics.get('target_speed_max', 0.0),
                 'target_speed_min': episode_metrics.get('target_speed_min', 0.0),
+                # Throughput metric (vehicles per hour)
+                'throughput': episode_metrics.get('throughput', 0.0),
             }
 
             self.algorithm.log_episode_metrics(
@@ -429,6 +431,7 @@ class MARLManager:
                 success_rate=episode_metrics.get('success_rate', 0.0),
                 collision_rate=episode_metrics.get('collision_rate', 0.0),
                 near_miss_count=episode_metrics.get('near_miss_count', 0),
+                ttc_violation_rate=episode_metrics.get('ttc_violation_rate', 0.0),
                 traffic_metrics=traffic_metrics
             )
 

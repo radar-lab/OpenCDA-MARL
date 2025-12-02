@@ -107,7 +107,8 @@ MARL:
     checkpoint_dir: "checkpoints/"
     save_freq: 1
     keep_checkpoints: 3
-    load_checkpoint: null
+    # Load well-trained backup checkpoint (Episode 462: 92.5% success, 7.5% collision)
+    load_checkpoint: "checkpoints/td3/td3_lite_best_checkpoint.pth"
 
   rewards:
     # Terminal rewards
@@ -115,22 +116,25 @@ MARL:
     success: 400.0
 
     # Per-step rewards
-    step_penalty: -1.5
-    speed_bonus: 0.5
-    speed_threshold: 45.0
+    # Reduced step_penalty to avoid incentivizing unsafe speeding
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0  # Lower threshold for speed bonus
 
-    # TTC-based safety reward
-    ttc_safe_threshold: 3.0
-    ttc_caution_threshold: 2.0
-    ttc_danger_threshold: 1.0
-    ttc_caution_penalty: -0.5
-    ttc_danger_penalty: -2.0
-    ttc_critical_penalty: -5.0
+    # TTC-based safety reward (isolated for clearer safety learning)
+    # Wider thresholds give agent more time to learn safe behavior
+    ttc_safe_threshold: 4.0       # seconds - no penalty above this (was 3.0)
+    ttc_caution_threshold: 2.5    # seconds - caution zone (was 2.0)
+    ttc_danger_threshold: 1.5     # seconds - danger zone (was 1.0)
+    # Stronger TTC penalties to emphasize safety over speed
+    ttc_caution_penalty: -1.0     # penalty in caution zone (was -0.5)
+    ttc_danger_penalty: -4.0      # penalty in danger zone (was -2.0)
+    ttc_critical_penalty: -10.0   # penalty in critical zone (was -5.0)
 
-    # Progress reward
-    progress_scale: 0.5
+    # Progress reward - slightly reduced to balance with safety
+    progress_scale: 0.4
     junction_threshold: 5.0
 
-    # Stop penalty
-    stop_threshold: 5.0
-    stop_penalty: -3.0
+    # Stop penalty - reduced to not overly punish cautious stopping
+    stop_threshold: 3.0   # km/h - more lenient threshold
+    stop_penalty: -1.5    # reduced penalty (was -3.0)

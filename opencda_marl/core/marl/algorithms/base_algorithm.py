@@ -173,6 +173,7 @@ class BaseAlgorithm(ABC):
     def log_episode_metrics(self, episode_reward: float, episode_length: int,
                            success_rate: float = 0.0, collision_rate: float = 0.0,
                            near_miss_count: int = 0,
+                           ttc_violation_rate: float = 0.0,
                            additional_metrics: Dict[str, float] = None,
                            traffic_metrics: Dict[str, float] = None):
         """
@@ -184,6 +185,7 @@ class BaseAlgorithm(ABC):
             success_rate: Success rate (0-1)
             collision_rate: Collision rate (0-1)
             near_miss_count: Number of near-miss events (TTC < threshold without collision)
+            ttc_violation_rate: Percentage of TTC checks that were below safe threshold
             additional_metrics: Additional custom metrics to log
             traffic_metrics: Traffic performance metrics (avg_speed, speed_variance, etc.)
         """
@@ -205,14 +207,17 @@ class BaseAlgorithm(ABC):
         if self.writer is None or not self.tb_metrics.get('episode', True):
             return
 
-        # Core episode metrics (episode_length removed - not useful for fixed simulation length)
+        # Core episode metrics
         self.writer.add_scalar('Episode/reward', episode_reward, self.episode_count)
         self.writer.add_scalar('Episode/success_rate', success_rate, self.episode_count)
         self.writer.add_scalar('Episode/collision_rate', collision_rate, self.episode_count)
+        self.writer.add_scalar('Episode/length', episode_length, self.episode_count)
 
-        # Safety metric: Near-miss count (TTC < threshold without collision)
+        # Safety metrics: Near-miss count and TTC violation rate
         # Decreasing near-misses = agent learning to avoid dangerous situations
         self.writer.add_scalar('Safety/near_miss_count', near_miss_count, self.episode_count)
+        # TTC violation rate: % of TTC checks with TTC < safe threshold (lower = safer)
+        self.writer.add_scalar('Safety/ttc_violation_rate', ttc_violation_rate, self.episode_count)
 
         # Learning quality metrics (MARL paper-ready)
         # Note: episode_length_ma removed - not useful for fixed simulation length
@@ -261,6 +266,9 @@ class BaseAlgorithm(ABC):
                 self.writer.add_scalar('Traffic/target_speed_max', traffic_metrics['target_speed_max'], self.episode_count)
             if 'target_speed_min' in traffic_metrics:
                 self.writer.add_scalar('Traffic/target_speed_min', traffic_metrics['target_speed_min'], self.episode_count)
+            # throughput: Vehicles completing per hour (success rate efficiency)
+            if 'throughput' in traffic_metrics:
+                self.writer.add_scalar('Traffic/throughput', traffic_metrics['throughput'], self.episode_count)
 
         # Log additional custom metrics
         if additional_metrics:

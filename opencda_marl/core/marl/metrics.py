@@ -306,7 +306,8 @@ class TrainingMetrics:
         metrics = self.get_current_metrics()
         metrics.update({
             'episode_states': states,
-            'near_miss_count': episode_near_misses  # Add for TensorBoard logging
+            'near_miss_count': episode_near_misses,  # Add for TensorBoard logging
+            'ttc_violation_rate': states.get('ttc_violation_rate', 0.0)  # % of TTC checks with violations
         })
         self.reset()
         return metrics
