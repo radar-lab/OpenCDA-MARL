@@ -519,8 +519,11 @@ class SumoMARLEnv:
 
     def _update_metrics(self, rewards: Dict, events: List[StepEvent], observations: Dict = None):
         """Update training metrics."""
+        # Count successes this step for accurate episode_length tracking
+        step_successes = sum(1 for e in events if e.event_type == 'success')
+
         # Update step metrics with all agent rewards and observations for traffic tracking
-        self.metrics.update_step(rewards, observations)
+        self.metrics.update_step(rewards, observations, step_successes=step_successes)
 
         # Track events
         for event in events:
@@ -560,6 +563,7 @@ class SumoMARLEnv:
                 'step': self.current_step,
                 'collision': self.collision_count,
                 'success': self.success_count,
+                'fixed_dt': self.step_length,  # For throughput calculation
             }
             # finish_episode computes traffic metrics (including max_speed) BEFORE resetting
             episode_metrics = self.metrics.finish_episode(episode_states)

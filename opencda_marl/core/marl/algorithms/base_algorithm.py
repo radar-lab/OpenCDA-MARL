@@ -275,6 +275,10 @@ class BaseAlgorithm(ABC):
             for name, value in additional_metrics.items():
                 self.writer.add_scalar(f'Episode/{name}', value, self.episode_count)
 
+        # ============ IMPROVEMENT METRICS (for paper-ready visualization) ============
+        # These show relative improvement over training, better for long training runs
+        self._log_improvement_metrics(success_rate, collision_rate, traffic_metrics)
+
         # Flush periodically (every 10 episodes) instead of every episode
         # Reduces I/O blocking during training
         if self.episode_count % 10 == 0:
@@ -415,6 +419,94 @@ class BaseAlgorithm(ABC):
             stats['episode_length_history'] = list(self.episode_length_history)
 
         return stats
+
+    def _log_improvement_metrics(self, success_rate: float, collision_rate: float,
+                                  traffic_metrics: Dict[str, float] = None):
+        """
+        Log improvement metrics for paper-ready visualization.
+
+        These metrics show relative improvement over training, which is more meaningful
+        than raw values for long training runs (100K+ episodes).
+
+        Metrics logged:
+        - Windowed moving averages (100-episode window)
+        - Delta from baseline (improvement from first 100 episodes)
+        - Percentage improvement from baseline
+        - Time-to-target tracking (episodes to reach X% success rate)
+        """
+        if self.writer is None:
+            return
+
+        window_size = 100  # Use 100-episode windows for smoother curves
+
+        # Track success/collision rate moving averages with larger window
+        if len(self.success_rate_history) >= window_size:
+            # 100-episode moving average (smoother than 10-episode)
+            recent_success = list(self.success_rate_history)[-window_size:]
+            recent_collision = list(self.collision_rate_history)[-window_size:]
+
+            success_ma_100 = float(np.mean(recent_success))
+            collision_ma_100 = float(np.mean(recent_collision))
+
+            self.writer.add_scalar('Improvement/success_rate_ma100', success_ma_100, self.episode_count)
+            self.writer.add_scalar('Improvement/collision_rate_ma100', collision_ma_100, self.episode_count)
+
+            # Calculate baseline from first 100 episodes
+            baseline_success = list(self.success_rate_history)[:window_size]
+            baseline_collision = list(self.collision_rate_history)[:window_size]
+
+            baseline_success_avg = float(np.mean(baseline_success))
+            baseline_collision_avg = float(np.mean(baseline_collision))
+
+            # Absolute improvement (delta from baseline)
+            success_delta = success_ma_100 - baseline_success_avg
+            collision_delta = collision_ma_100 - baseline_collision_avg
+
+            self.writer.add_scalar('Improvement/success_rate_delta', success_delta, self.episode_count)
+            self.writer.add_scalar('Improvement/collision_rate_delta', collision_delta, self.episode_count)
+
+            # Percentage improvement from baseline
+            # Formula: (current - baseline) / baseline * 100
+            if baseline_success_avg > 1.0:  # Avoid division by near-zero
+                success_improvement_pct = (success_ma_100 - baseline_success_avg) / baseline_success_avg * 100
+                self.writer.add_scalar('Improvement/success_improvement_pct', success_improvement_pct, self.episode_count)
+
+            if baseline_collision_avg > 1.0:
+                # For collision, negative improvement is good (reduction)
+                collision_reduction_pct = (baseline_collision_avg - collision_ma_100) / baseline_collision_avg * 100
+                self.writer.add_scalar('Improvement/collision_reduction_pct', collision_reduction_pct, self.episode_count)
+
+        # Track throughput improvement
+        if traffic_metrics and 'throughput' in traffic_metrics:
+            # Store throughput history for improvement calculation
+            if not hasattr(self, 'throughput_history'):
+                self.throughput_history = []
+            self.throughput_history.append(traffic_metrics['throughput'])
+
+            if len(self.throughput_history) >= window_size:
+                recent_throughput = self.throughput_history[-window_size:]
+                baseline_throughput = self.throughput_history[:window_size]
+
+                throughput_ma_100 = float(np.mean(recent_throughput))
+                baseline_throughput_avg = float(np.mean(baseline_throughput))
+
+                self.writer.add_scalar('Improvement/throughput_ma100', throughput_ma_100, self.episode_count)
+
+                if baseline_throughput_avg > 0:
+                    throughput_improvement_pct = (throughput_ma_100 - baseline_throughput_avg) / baseline_throughput_avg * 100
+                    self.writer.add_scalar('Improvement/throughput_improvement_pct', throughput_improvement_pct, self.episode_count)
+
+        # Time-to-target tracking: log when key milestones are reached
+        # Track first episode to reach 70%, 80%, 90% success rate
+        if not hasattr(self, '_milestone_episodes'):
+            self._milestone_episodes = {70: None, 80: None, 90: None, 95: None}
+
+        for target_pct, first_episode in self._milestone_episodes.items():
+            if first_episode is None and success_rate >= target_pct:
+                self._milestone_episodes[target_pct] = self.episode_count
+                self.writer.add_scalar(f'Milestone/episodes_to_{target_pct}pct_success',
+                                      self.episode_count, self.episode_count)
+                logger.info(f"Milestone reached: {target_pct}% success rate at episode {self.episode_count}")
 
     @abstractmethod
     def select_action(self, state: np.ndarray, training: bool = True) -> Any:

@@ -427,7 +427,7 @@ class MARLManager:
 
             self.algorithm.log_episode_metrics(
                 episode_reward=episode_metrics.get('total_reward', 0.0),
-                episode_length=episode_metrics.get('step_length', 0),
+                episode_length=episode_metrics.get('episode_length', episode_metrics.get('step_length', 0)),
                 success_rate=episode_metrics.get('success_rate', 0.0),
                 collision_rate=episode_metrics.get('collision_rate', 0.0),
                 near_miss_count=episode_metrics.get('near_miss_count', 0),

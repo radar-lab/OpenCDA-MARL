@@ -240,6 +240,9 @@ class EvaluationManager:
             'success_rate': success_rate,
             'collision_rate': collision_rate,
             'throughput': throughput,
+            # Episode length: step when ALL vehicles completed (for consistent reporting)
+            'episode_length': effective_step,  # Same as used in throughput calc
+            'total_simulation_steps': step,    # Total steps for reference
             'step_reward': step_reward,
             'cumulative_reward': self.cumulative_reward,
             'avg_reward_per_agent': avg_reward_per_agent,
@@ -501,11 +504,34 @@ class EvaluationManager:
             
             # Save summary to JSON file
             self._save_final_summary(final_stats)
-            
+
             # Generate final comparison plot if we have multiple episodes
             if num_episodes > 1:
                 self.plot_episode_comparison()
-            
+
+            # Generate learning progress visualization with improvement metrics
+            # This is the paper-ready plot with tables and statistics
+            if num_episodes >= 100 and self.plotter:
+                logger.info("Generating learning progress analysis...")
+                self.plotter.plot_learning_progress(self.episode_history, window_size=100)
+
+                # Generate and save improvement report
+                improvement_report = self.plotter.generate_improvement_report(
+                    self.episode_history, window_size=100)
+                self._save_improvement_report(improvement_report)
+
+                # Log key improvement metrics
+                if 'summary' in improvement_report:
+                    summary = improvement_report['summary']
+                    logger.info(f"=== IMPROVEMENT SUMMARY ===")
+                    logger.info(f"Success Rate: {summary['success_improvement_pct']:+.1f}% improvement")
+                    logger.info(f"Collision Rate: {summary['collision_reduction_pct']:+.1f}% reduction")
+                    logger.info(f"Throughput: {summary['throughput_improvement_pct']:+.1f}% improvement")
+                    if summary.get('episodes_to_80pct_success'):
+                        logger.info(f"Reached 80% success at episode {summary['episodes_to_80pct_success']}")
+                    if summary.get('episodes_to_90pct_success'):
+                        logger.info(f"Reached 90% success at episode {summary['episodes_to_90pct_success']}")
+
             logger.info("=== EVALUATION COMPLETE ===")
             
         except Exception as e:
@@ -513,11 +539,41 @@ class EvaluationManager:
             import traceback
             logger.debug(traceback.format_exc())
     
+    def _save_improvement_report(self, report: dict):
+        """Save improvement report to JSON file"""
+        try:
+            # Add timestamp
+            report['generated_at'] = datetime.now().isoformat()
+
+            # Convert numpy types to Python types for JSON serialization
+            def convert_numpy(obj):
+                if isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, dict):
+                    return {k: convert_numpy(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [convert_numpy(item) for item in obj]
+                return obj
+
+            report = convert_numpy(report)
+
+            # Save to JSON
+            json_path = self.data_dir / "improvement_report.json"
+            with open(json_path, 'w') as f:
+                json.dump(report, f, indent=2)
+
+            logger.info(f"Improvement report saved: {json_path}")
+
+        except Exception as e:
+            logger.warning(f"Failed to save improvement report: {e}")
+
     def _save_final_summary(self, summary_stats: dict):
         """Save final summary statistics to file"""
         try:
 
-            
+
             # Add timestamp
             summary_stats['generated_at'] = datetime.now().isoformat()
             

@@ -514,10 +514,336 @@ Throughput: {episode_data['throughput']:.1f} vph"""
         ax4_twin.legend(loc='upper right')
         
         plt.tight_layout()
-        
+
         # Save plot
         plt.savefig(output_path, dpi=150, bbox_inches='tight')
         plt.close()
-        
+
         logger.info(f"Summary comparison plot saved: {output_path}")
         return output_path
+
+    def plot_learning_progress(self, episode_history: List[Dict],
+                                window_size: int = 100) -> Path:
+        """
+        Generate comprehensive learning progress visualization with improvement metrics.
+
+        This is designed for paper-ready figures showing:
+        - Smoothed learning curves (moving averages)
+        - Performance improvement table
+        - Time-to-target statistics
+        - Relative improvement percentages
+
+        Args:
+            episode_history: List of episode statistics dictionaries
+            window_size: Window size for moving averages (default 100)
+
+        Returns:
+            Path to saved plot file
+        """
+        if not episode_history or len(episode_history) < window_size:
+            logger.warning(f"Learning progress plot requires at least {window_size} episodes")
+            return None
+
+        # Extract data
+        num_episodes = len(episode_history)
+        episodes = list(range(num_episodes))
+        success_rates = [ep['success_rate'] for ep in episode_history]
+        collision_rates = [ep['collision_rate'] for ep in episode_history]
+        throughputs = [ep['throughput'] for ep in episode_history]
+        cumulative_rewards = [ep.get('cumulative_reward', 0) for ep in episode_history]
+
+        # Calculate moving averages
+        def moving_average(data, window):
+            return [np.mean(data[max(0, i-window+1):i+1]) for i in range(len(data))]
+
+        success_ma = moving_average(success_rates, window_size)
+        collision_ma = moving_average(collision_rates, window_size)
+        throughput_ma = moving_average(throughputs, window_size)
+        reward_ma = moving_average(cumulative_rewards, window_size)
+
+        # Calculate improvement statistics
+        baseline_window = min(window_size, num_episodes // 4)  # First quarter or window_size
+        final_window = min(window_size, num_episodes // 4)  # Last quarter or window_size
+
+        baseline_success = np.mean(success_rates[:baseline_window])
+        final_success = np.mean(success_rates[-final_window:])
+        baseline_collision = np.mean(collision_rates[:baseline_window])
+        final_collision = np.mean(collision_rates[-final_window:])
+        baseline_throughput = np.mean(throughputs[:baseline_window])
+        final_throughput = np.mean(throughputs[-final_window:])
+        baseline_reward = np.mean(cumulative_rewards[:baseline_window])
+        final_reward = np.mean(cumulative_rewards[-final_window:])
+
+        # Calculate percentage improvements
+        def calc_improvement_pct(baseline, final):
+            if abs(baseline) < 0.01:
+                return 0.0
+            return (final - baseline) / abs(baseline) * 100
+
+        success_improvement = calc_improvement_pct(baseline_success, final_success)
+        collision_reduction = calc_improvement_pct(baseline_collision, final_collision) * -1  # Negative is good
+        throughput_improvement = calc_improvement_pct(baseline_throughput, final_throughput)
+        reward_improvement = calc_improvement_pct(baseline_reward, final_reward)
+
+        # Calculate time-to-target (episodes to reach X% success rate)
+        milestones = [50, 60, 70, 80, 90, 95]
+        time_to_target = {}
+        for target in milestones:
+            for i, rate in enumerate(success_rates):
+                if rate >= target:
+                    time_to_target[target] = i
+                    break
+            if target not in time_to_target:
+                time_to_target[target] = None  # Never reached
+
+        # Create figure with subplots and table
+        fig = plt.figure(figsize=(18, 14))
+        gs = fig.add_gridspec(3, 3, height_ratios=[1, 1, 0.6], hspace=0.3, wspace=0.3)
+
+        fig.suptitle(f'Learning Progress Analysis - {self.scenario_name} - {self.agent_name}\n'
+                    f'({num_episodes} Episodes, {window_size}-Episode Moving Average)',
+                    fontsize=14, fontweight='bold')
+
+        # ============ Plot 1: Success Rate with Moving Average ============
+        ax1 = fig.add_subplot(gs[0, 0])
+        ax1.plot(episodes, success_rates, alpha=0.3, color='green', linewidth=0.5, label='Raw')
+        ax1.plot(episodes, success_ma, color='green', linewidth=2, label=f'MA-{window_size}')
+        ax1.axhline(y=baseline_success, color='gray', linestyle='--', alpha=0.5, label=f'Baseline: {baseline_success:.1f}%')
+        ax1.axhline(y=final_success, color='darkgreen', linestyle='--', alpha=0.7, label=f'Final: {final_success:.1f}%')
+        ax1.fill_between(episodes, success_ma, alpha=0.2, color='green')
+        ax1.set_xlabel('Episode')
+        ax1.set_ylabel('Success Rate (%)')
+        ax1.set_title(f'Success Rate (Δ{success_improvement:+.1f}%)')
+        ax1.legend(loc='lower right', fontsize=8)
+        ax1.grid(True, alpha=0.3)
+        ax1.set_ylim(0, 105)
+
+        # ============ Plot 2: Collision Rate with Moving Average ============
+        ax2 = fig.add_subplot(gs[0, 1])
+        ax2.plot(episodes, collision_rates, alpha=0.3, color='red', linewidth=0.5, label='Raw')
+        ax2.plot(episodes, collision_ma, color='red', linewidth=2, label=f'MA-{window_size}')
+        ax2.axhline(y=baseline_collision, color='gray', linestyle='--', alpha=0.5, label=f'Baseline: {baseline_collision:.1f}%')
+        ax2.axhline(y=final_collision, color='darkred', linestyle='--', alpha=0.7, label=f'Final: {final_collision:.1f}%')
+        ax2.fill_between(episodes, collision_ma, alpha=0.2, color='red')
+        ax2.set_xlabel('Episode')
+        ax2.set_ylabel('Collision Rate (%)')
+        ax2.set_title(f'Collision Rate (Δ{-collision_reduction:+.1f}%)')
+        ax2.legend(loc='upper right', fontsize=8)
+        ax2.grid(True, alpha=0.3)
+        ax2.set_ylim(0, max(collision_rates) * 1.1 + 5)
+
+        # ============ Plot 3: Throughput with Moving Average ============
+        ax3 = fig.add_subplot(gs[0, 2])
+        ax3.plot(episodes, throughputs, alpha=0.3, color='blue', linewidth=0.5, label='Raw')
+        ax3.plot(episodes, throughput_ma, color='blue', linewidth=2, label=f'MA-{window_size}')
+        ax3.axhline(y=baseline_throughput, color='gray', linestyle='--', alpha=0.5, label=f'Baseline: {baseline_throughput:.0f}')
+        ax3.axhline(y=final_throughput, color='darkblue', linestyle='--', alpha=0.7, label=f'Final: {final_throughput:.0f}')
+        ax3.fill_between(episodes, throughput_ma, alpha=0.2, color='blue')
+        ax3.set_xlabel('Episode')
+        ax3.set_ylabel('Throughput (vph)')
+        ax3.set_title(f'Throughput (Δ{throughput_improvement:+.1f}%)')
+        ax3.legend(loc='lower right', fontsize=8)
+        ax3.grid(True, alpha=0.3)
+
+        # ============ Plot 4: Cumulative Reward with Moving Average ============
+        ax4 = fig.add_subplot(gs[1, 0])
+        ax4.plot(episodes, cumulative_rewards, alpha=0.3, color='purple', linewidth=0.5, label='Raw')
+        ax4.plot(episodes, reward_ma, color='purple', linewidth=2, label=f'MA-{window_size}')
+        ax4.axhline(y=baseline_reward, color='gray', linestyle='--', alpha=0.5)
+        ax4.axhline(y=final_reward, color='darkviolet', linestyle='--', alpha=0.7)
+        ax4.fill_between(episodes, reward_ma, alpha=0.2, color='purple')
+        ax4.set_xlabel('Episode')
+        ax4.set_ylabel('Cumulative Reward')
+        ax4.set_title(f'Episode Reward (Δ{reward_improvement:+.1f}%)')
+        ax4.legend(loc='lower right', fontsize=8)
+        ax4.grid(True, alpha=0.3)
+
+        # ============ Plot 5: Success vs Collision Tradeoff ============
+        ax5 = fig.add_subplot(gs[1, 1])
+        # Color by episode (gradient from blue to red)
+        colors = plt.cm.coolwarm(np.linspace(0, 1, num_episodes))
+        scatter = ax5.scatter(collision_rates, success_rates, c=episodes, cmap='coolwarm',
+                             alpha=0.6, s=20, label='Episodes')
+        ax5.scatter([baseline_collision], [baseline_success], color='blue', s=200,
+                   marker='s', edgecolors='black', linewidths=2, label='Start', zorder=5)
+        ax5.scatter([final_collision], [final_success], color='red', s=200,
+                   marker='*', edgecolors='black', linewidths=2, label='End', zorder=5)
+        # Draw arrow from start to end
+        ax5.annotate('', xy=(final_collision, final_success),
+                    xytext=(baseline_collision, baseline_success),
+                    arrowprops=dict(arrowstyle='->', color='black', lw=2))
+        ax5.set_xlabel('Collision Rate (%)')
+        ax5.set_ylabel('Success Rate (%)')
+        ax5.set_title('Learning Trajectory (Success vs Collision)')
+        ax5.legend(loc='best', fontsize=8)
+        ax5.grid(True, alpha=0.3)
+        cbar = plt.colorbar(scatter, ax=ax5)
+        cbar.set_label('Episode')
+
+        # ============ Plot 6: Time-to-Target Bar Chart ============
+        ax6 = fig.add_subplot(gs[1, 2])
+        reached_targets = [(t, e) for t, e in time_to_target.items() if e is not None]
+        if reached_targets:
+            targets, episodes_to_reach = zip(*reached_targets)
+            bars = ax6.barh([f'{t}%' for t in targets], episodes_to_reach, color='teal', alpha=0.7)
+            ax6.set_xlabel('Episodes to Reach Target')
+            ax6.set_ylabel('Success Rate Target')
+            ax6.set_title('Time-to-Target Analysis')
+            # Add value labels
+            for bar, val in zip(bars, episodes_to_reach):
+                ax6.text(val + max(episodes_to_reach) * 0.02, bar.get_y() + bar.get_height()/2,
+                        f'{val}', va='center', fontsize=9)
+            ax6.grid(True, alpha=0.3, axis='x')
+        else:
+            ax6.text(0.5, 0.5, 'No targets reached yet', transform=ax6.transAxes,
+                    ha='center', va='center', fontsize=12)
+            ax6.set_title('Time-to-Target Analysis')
+
+        # ============ Performance Improvement Table ============
+        ax_table = fig.add_subplot(gs[2, :])
+        ax_table.axis('off')
+
+        # Create table data
+        table_data = [
+            ['Metric', 'Baseline\n(First 100 ep)', 'Final\n(Last 100 ep)', 'Absolute Δ', 'Relative Δ', 'Status'],
+            ['Success Rate (%)', f'{baseline_success:.1f}', f'{final_success:.1f}',
+             f'{final_success - baseline_success:+.1f}', f'{success_improvement:+.1f}%',
+             '✓ Improved' if success_improvement > 0 else '✗ Declined'],
+            ['Collision Rate (%)', f'{baseline_collision:.1f}', f'{final_collision:.1f}',
+             f'{final_collision - baseline_collision:+.1f}', f'{-collision_reduction:+.1f}%',
+             '✓ Reduced' if collision_reduction > 0 else '✗ Increased'],
+            ['Throughput (vph)', f'{baseline_throughput:.0f}', f'{final_throughput:.0f}',
+             f'{final_throughput - baseline_throughput:+.0f}', f'{throughput_improvement:+.1f}%',
+             '✓ Improved' if throughput_improvement > 0 else '✗ Declined'],
+            ['Episode Reward', f'{baseline_reward:.0f}', f'{final_reward:.0f}',
+             f'{final_reward - baseline_reward:+.0f}', f'{reward_improvement:+.1f}%',
+             '✓ Improved' if reward_improvement > 0 else '✗ Declined'],
+        ]
+
+        # Add time-to-target summary row
+        reached_str = ', '.join([f'{t}%@ep{e}' for t, e in time_to_target.items() if e is not None])
+        if not reached_str:
+            reached_str = 'None reached'
+        table_data.append(['Time-to-Target', '-', '-', '-', '-', reached_str])
+
+        # Create and style table
+        table = ax_table.table(cellText=table_data[1:], colLabels=table_data[0],
+                               loc='center', cellLoc='center',
+                               colColours=['lightgray']*6)
+        table.auto_set_font_size(False)
+        table.set_fontsize(10)
+        table.scale(1.2, 1.8)
+
+        # Color code the status column
+        for i in range(1, len(table_data)):
+            cell = table[(i-1, 5)]
+            if '✓' in table_data[i][5]:
+                cell.set_facecolor('#90EE90')  # Light green
+            elif '✗' in table_data[i][5]:
+                cell.set_facecolor('#FFB6C1')  # Light red
+            else:
+                cell.set_facecolor('#FFFACD')  # Light yellow
+
+        ax_table.set_title('Performance Improvement Summary', fontsize=12, fontweight='bold', pad=20)
+
+        plt.tight_layout()
+
+        # Save plot
+        plot_filename = f"learning_progress_{self.scenario_name}_{self.agent_name}.png"
+        plot_path = self.output_dir / plot_filename
+
+        plt.savefig(plot_path, dpi=150, bbox_inches='tight')
+        plt.close()
+
+        logger.info(f"Learning progress plot saved: {plot_path}")
+        return plot_path
+
+    def generate_improvement_report(self, episode_history: List[Dict],
+                                     window_size: int = 100) -> Dict[str, Any]:
+        """
+        Generate a comprehensive improvement statistics report.
+
+        Returns a dictionary with all improvement metrics for paper/report use.
+
+        Args:
+            episode_history: List of episode statistics dictionaries
+            window_size: Window size for baseline/final calculations
+
+        Returns:
+            Dictionary with improvement statistics
+        """
+        if not episode_history or len(episode_history) < 2:
+            return {'error': 'Insufficient data for improvement analysis'}
+
+        num_episodes = len(episode_history)
+
+        # Extract data
+        success_rates = [ep['success_rate'] for ep in episode_history]
+        collision_rates = [ep['collision_rate'] for ep in episode_history]
+        throughputs = [ep['throughput'] for ep in episode_history]
+        cumulative_rewards = [ep.get('cumulative_reward', 0) for ep in episode_history]
+
+        # Calculate baseline and final windows
+        baseline_window = min(window_size, num_episodes // 4)
+        final_window = min(window_size, num_episodes // 4)
+
+        def calc_stats(data, baseline_w, final_w):
+            baseline = data[:baseline_w]
+            final = data[-final_w:]
+
+            baseline_mean = np.mean(baseline)
+            final_mean = np.mean(final)
+
+            improvement_abs = final_mean - baseline_mean
+            improvement_pct = (improvement_abs / abs(baseline_mean) * 100) if abs(baseline_mean) > 0.01 else 0
+
+            return {
+                'baseline_mean': baseline_mean,
+                'baseline_std': np.std(baseline),
+                'final_mean': final_mean,
+                'final_std': np.std(final),
+                'improvement_absolute': improvement_abs,
+                'improvement_percent': improvement_pct,
+                'min': min(data),
+                'max': max(data),
+                'overall_mean': np.mean(data),
+                'overall_std': np.std(data),
+            }
+
+        # Time-to-target analysis
+        milestones = [50, 60, 70, 80, 90, 95]
+        time_to_target = {}
+        for target in milestones:
+            for i, rate in enumerate(success_rates):
+                if rate >= target:
+                    time_to_target[target] = i
+                    break
+            if target not in time_to_target:
+                time_to_target[target] = None
+
+        report = {
+            'num_episodes': num_episodes,
+            'window_size': window_size,
+            'success_rate': calc_stats(success_rates, baseline_window, final_window),
+            'collision_rate': calc_stats(collision_rates, baseline_window, final_window),
+            'throughput': calc_stats(throughputs, baseline_window, final_window),
+            'cumulative_reward': calc_stats(cumulative_rewards, baseline_window, final_window),
+            'time_to_target': time_to_target,
+            'scenario_name': self.scenario_name,
+            'agent_name': self.agent_name,
+        }
+
+        # Add summary statistics
+        report['summary'] = {
+            'success_improvement_pct': report['success_rate']['improvement_percent'],
+            'collision_reduction_pct': -report['collision_rate']['improvement_percent'],
+            'throughput_improvement_pct': report['throughput']['improvement_percent'],
+            'reward_improvement_pct': report['cumulative_reward']['improvement_percent'],
+            'best_success_rate': max(success_rates),
+            'best_throughput': max(throughputs),
+            'lowest_collision_rate': min(collision_rates),
+            'episodes_to_80pct_success': time_to_target.get(80),
+            'episodes_to_90pct_success': time_to_target.get(90),
+        }
+
+        return report

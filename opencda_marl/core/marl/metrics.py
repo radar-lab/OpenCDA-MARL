@@ -59,6 +59,9 @@ class TrainingMetrics:
         self.collisions = 0
         self.successes = 0
 
+        # Track step when LAST vehicle completes (for accurate episode length)
+        self.last_completion_step = 0
+
         # Traffic performance tracking (per episode)
         self.step_speeds: List[float] = []  # All speeds at each step
         self.step_avg_speeds: List[float] = []  # Average speed per step
@@ -69,7 +72,8 @@ class TrainingMetrics:
     # --------------------------------------------------------------------- #
 
     def update_step(self, rewards: Dict[int, float], observations: Optional[Dict] = None,
-                    target_speeds: Optional[Dict[int, float]] = None):
+                    target_speeds: Optional[Dict[int, float]] = None,
+                    step_successes: int = 0):
         """
         Update metrics for current step.
 
@@ -77,6 +81,7 @@ class TrainingMetrics:
             rewards: Dictionary of agent_id -> reward
             observations: Optional dictionary of agent observations (containing speed data)
             target_speeds: Optional dictionary of agent_id -> RL-commanded target speed (km/h)
+            step_successes: Number of vehicles that succeeded this step (for tracking last completion)
         """
         self.current_reward = sum(rewards.values()) if rewards else 0.0
         self.current_total_reward += self.current_reward
@@ -85,6 +90,10 @@ class TrainingMetrics:
             if agent_id not in self.agent_rewards:
                 self.agent_rewards[agent_id] = 0.0
             self.agent_rewards[agent_id] += reward
+
+        # Track step when vehicles complete (for accurate episode length)
+        if step_successes > 0:
+            self.last_completion_step = self.current_length
 
         # Track traffic performance metrics if observations provided
         if observations:
@@ -284,17 +293,30 @@ class TrainingMetrics:
         avg_speed = traffic_metrics.get('avg_speed', 0.0)
         speed_variance = traffic_metrics.get('speed_variance', 0.0)
 
+        # Calculate actual episode length: step when LAST vehicle reaches destination
+        # If no vehicles completed, use total simulation steps as fallback
+        effective_episode_length = self.last_completion_step if self.last_completion_step > 0 else self.current_length
+
+        # Calculate throughput: successful vehicles per hour
+        # Formula: (successes / effective_steps / fixed_dt) * 3600
+        fixed_dt = states.get('fixed_dt', 0.05)  # 20 FPS = 0.05s per step
+        if effective_episode_length > 0 and fixed_dt > 0:
+            vehicles_per_second = episode_successes / effective_episode_length / fixed_dt
+            throughput = vehicles_per_second * 3600  # Convert to vehicles per hour
+        else:
+            throughput = 0.0
+
         # Add to rolling windows (bounded memory)
         self.episode_rewards.append(self.current_total_reward)
         self.episode_states.append(states)
         self.episode_avg_speeds.append(avg_speed)
         self.episode_speed_variances.append(speed_variance)
 
-        # Add to full history for export
+        # Add to full history for export (use effective length, not total steps)
         self._full_history['rewards'].append(self.current_total_reward)
         self._full_history['avg_speeds'].append(avg_speed)
         self._full_history['speed_variances'].append(speed_variance)
-        self._full_history['episode_lengths'].append(self.current_length)
+        self._full_history['episode_lengths'].append(effective_episode_length)
         self._full_history['success_counts'].append(episode_successes)
         self._full_history['collision_counts'].append(episode_collisions)
         self._full_history['near_miss_counts'].append(episode_near_misses)
@@ -307,7 +329,10 @@ class TrainingMetrics:
         metrics.update({
             'episode_states': states,
             'near_miss_count': episode_near_misses,  # Add for TensorBoard logging
-            'ttc_violation_rate': states.get('ttc_violation_rate', 0.0)  # % of TTC checks with violations
+            'ttc_violation_rate': states.get('ttc_violation_rate', 0.0),  # % of TTC checks with violations
+            'throughput': throughput,  # Vehicles per hour
+            'episode_length': effective_episode_length,  # Step when LAST vehicle completed
+            'total_simulation_steps': self.current_length  # Total steps for reference
         })
         self.reset()
         return metrics

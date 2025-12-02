@@ -126,9 +126,12 @@ class MARLEnv:
 
         self.episode_events.extend(self.events)
 
+        # Count successes this step for accurate episode_length tracking
+        step_successes = sum(1 for e in self.events if e.event_type == "success")
+
         # Update training metrics with observations and RL-commanded target speeds
         # Pass target_speeds directly so we track what RL commanded (not adapter cached values)
-        self.metrics.update_step(rewards, next_observations, target_speeds)
+        self.metrics.update_step(rewards, next_observations, target_speeds, step_successes)
 
     # --------------------------------------------------------------------- #
     # Public Methods
