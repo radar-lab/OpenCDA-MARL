@@ -317,6 +317,21 @@ class MARLEnv:
                     ttc_reward = self._calculate_ttc_reward(min_ttc, agent_id)
                     base_reward += ttc_reward
 
+                    # Yielding bonus: reward for slowing down when nearby vehicle has low TTC
+                    # This encourages cooperative behavior - yield to let others pass safely
+                    yielding_bonus = self.reward_params.get('yielding_bonus', 0.0)
+                    if yielding_bonus > 0 and agent_id in self.previous_observations:
+                        yielding_ttc_threshold = self.reward_params.get('yielding_ttc_threshold', 3.0)
+                        yielding_speed_drop = self.reward_params.get('yielding_speed_drop', 10.0)
+
+                        # Check if there's a nearby vehicle with low TTC
+                        if min_ttc < yielding_ttc_threshold and min_ttc != float('inf'):
+                            # Check if ego vehicle is slowing down (yielding behavior)
+                            prev_speed = self.previous_observations[agent_id].get('speed', 0.0)
+                            if prev_speed - speed_kmh >= yielding_speed_drop:
+                                base_reward += yielding_bonus
+                                logger.debug(f"Yielding bonus to agent {agent_id}: slowed {prev_speed:.1f} -> {speed_kmh:.1f} km/h, TTC={min_ttc:.2f}s")
+
                     # Phase 3: Add progress reward (requires previous observations)
                     if agent_id in self.previous_observations:
                         prev_obs = self.previous_observations[agent_id]
@@ -395,13 +410,12 @@ class MARLEnv:
 
     def _calculate_ttc_reward(self, min_ttc: float, agent_id: int = None) -> float:
         """
-        Calculate TTC-based safety reward.
+        Calculate TTC-based safety reward using smooth exponential penalty.
 
-        Penalizes dangerous proximity to other vehicles before collision occurs.
-        This provides proactive safety feedback rather than reactive collision penalty.
+        Uses smooth exponential function instead of hard thresholds for better
+        gradient-based learning. Penalty increases smoothly as TTC decreases.
 
-        Also tracks near-miss events (TTC < caution_threshold) for learning analysis.
-        Near-misses are counted in both danger and critical zones.
+        Formula: penalty = -max_penalty * exp(-decay_rate * ttc)
 
         Args:
             min_ttc: Minimum time-to-collision across all nearby vehicles (seconds)
@@ -410,35 +424,37 @@ class MARLEnv:
         Returns:
             float: TTC reward (0.0 for safe, negative for dangerous situations)
         """
-        safe_threshold = self.reward_params.get('ttc_safe_threshold', 3.0)
-        caution_threshold = self.reward_params.get('ttc_caution_threshold', 2.0)
-        danger_threshold = self.reward_params.get('ttc_danger_threshold', 1.0)
+        safe_threshold = self.reward_params.get('ttc_safe_threshold', 4.0)
+        max_penalty = self.reward_params.get('ttc_max_penalty', 10.0)
+        decay_rate = self.reward_params.get('ttc_decay_rate', 1.5)
+        near_miss_threshold = self.reward_params.get('ttc_near_miss_threshold', 2.0)
 
         # Track TTC checks for violation rate calculation
         self.ttc_check_count += 1
 
-        # Track any TTC below safe threshold as a violation (for paper metrics)
-        if min_ttc <= safe_threshold and min_ttc != float('inf'):
-            self.ttc_violation_count += 1
-
+        # Safe - no penalty (above threshold or no nearby vehicles)
         if min_ttc > safe_threshold or min_ttc == float('inf'):
-            return 0.0  # Safe - no penalty
-        elif min_ttc > caution_threshold:
-            return self.reward_params.get('ttc_caution_penalty', -0.5)
-        elif min_ttc > danger_threshold:
-            # Danger zone - count as near-miss (TTC between danger and caution thresholds)
-            if agent_id is not None and agent_id not in self.near_miss_agents:
+            return 0.0
+
+        # Track any TTC below safe threshold as a violation (for paper metrics)
+        self.ttc_violation_count += 1
+
+        # Smooth exponential penalty: increases as TTC decreases
+        # At TTC=4.0s: penalty ≈ -0.02 (near zero)
+        # At TTC=2.0s: penalty ≈ -0.5
+        # At TTC=1.0s: penalty ≈ -2.2
+        # At TTC=0.5s: penalty ≈ -4.7
+        # At TTC=0.0s: penalty = -10.0
+        penalty = -max_penalty * math.exp(-decay_rate * min_ttc)
+
+        # Near-miss tracking (for metrics) - count when TTC drops below threshold
+        if min_ttc < near_miss_threshold and agent_id is not None:
+            if agent_id not in self.near_miss_agents:
                 self.near_miss_count += 1
                 self.near_miss_agents.add(agent_id)
-                logger.debug(f"Near-miss (danger): agent {agent_id}, TTC={min_ttc:.2f}s")
-            return self.reward_params.get('ttc_danger_penalty', -2.0)
-        else:
-            # Critical zone - also count as near-miss (TTC below danger threshold)
-            if agent_id is not None and agent_id not in self.near_miss_agents:
-                self.near_miss_count += 1
-                self.near_miss_agents.add(agent_id)
-                logger.debug(f"Near-miss (critical): agent {agent_id}, TTC={min_ttc:.2f}s")
-            return self.reward_params.get('ttc_critical_penalty', -5.0)
+                logger.debug(f"Near-miss: agent {agent_id}, TTC={min_ttc:.2f}s, penalty={penalty:.2f}")
+
+        return penalty
 
     def _calculate_progress_reward(self, current_dist_to_dest: float, prev_dist_to_dest: float,
                                     current_dist_to_int: float, prev_dist_to_int: float) -> float:

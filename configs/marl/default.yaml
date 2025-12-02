@@ -39,7 +39,7 @@ scenario:
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
     mode: "replay"
-    replay_file: "recordings/Heavy_Traffic_500vph"
+    replay_file: "recordings/Heavy_Traffic_500vph.json"
     base_speed: 45.0 # km/h base speed for vehicles
     active_junctions: [4]
 

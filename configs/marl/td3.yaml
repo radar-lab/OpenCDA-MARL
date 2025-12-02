@@ -48,7 +48,7 @@ MARL:
 
     # Nearby vehicle detection
     nearby_vehicle_config:
-      detection_radius: 50.0
+      detection_radius: 30.0   # Reduced from 50m - focus on immediate threats
       max_vehicles: 5
       features_per_vehicle: 7
       include_ttc: true
@@ -77,16 +77,17 @@ MARL:
     discount: 0.99
     policy_noise: 0.2
     noise_clip: 0.3
-    exploration_noise: 0.3
-    noise_decay: 0.995
-    min_exploration_noise: 0.05
+    # Position-aware exploration: base noise scaled by distance to intersection
+    exploration_noise: 0.5        # Higher initial (was 0.3)
+    noise_decay: 0.998            # Slower decay (was 0.995)
+    min_exploration_noise: 0.15   # Higher floor (was 0.05)
     policy_freq: 2
 
     # Training parameters
     batch_size: 256
 
     # Replay buffer
-    memory_size: 25000
+    memory_size: 50000         # Increased from 25000 - more diverse experiences
     recency_ratio: 0.5
     clear_episodes: 1
     clear_keep_ratio: 0.6
@@ -99,7 +100,7 @@ MARL:
 
     # Action bounds (km/h)
     max_action: 65.0
-    min_action: 10.0
+    min_action: 0.0   # Allow full stops for yielding (was 10.0)
     warmup_steps: 0
 
   training:
@@ -121,15 +122,13 @@ MARL:
     speed_bonus: 0.3
     speed_threshold: 45.0  # Lower threshold for speed bonus
 
-    # TTC-based safety reward (isolated for clearer safety learning)
-    # Wider thresholds give agent more time to learn safe behavior
-    ttc_safe_threshold: 4.0       # seconds - no penalty above this (was 3.0)
-    ttc_caution_threshold: 2.5    # seconds - caution zone (was 2.0)
-    ttc_danger_threshold: 1.5     # seconds - danger zone (was 1.0)
-    # Stronger TTC penalties to emphasize safety over speed
-    ttc_caution_penalty: -1.0     # penalty in caution zone (was -0.5)
-    ttc_danger_penalty: -4.0      # penalty in danger zone (was -2.0)
-    ttc_critical_penalty: -10.0   # penalty in critical zone (was -5.0)
+    # TTC-based safety reward - SMOOTH EXPONENTIAL (no hard thresholds)
+    # Formula: penalty = -max_penalty * exp(-decay_rate * ttc)
+    # This provides continuous gradient for better learning
+    ttc_safe_threshold: 4.0       # seconds - no penalty above this
+    ttc_max_penalty: 10.0         # maximum penalty at TTC=0
+    ttc_decay_rate: 1.5           # controls steepness of exponential curve
+    ttc_near_miss_threshold: 2.0  # TTC below this counts as near-miss for metrics
 
     # Progress reward - slightly reduced to balance with safety
     progress_scale: 0.4
@@ -138,3 +137,9 @@ MARL:
     # Stop penalty - reduced to not overly punish cautious stopping
     stop_threshold: 3.0   # km/h - more lenient threshold
     stop_penalty: -1.5    # reduced penalty (was -3.0)
+
+    # Yielding bonus - reward for slowing when nearby vehicle has low TTC
+    # Encourages cooperative behavior: slow down to let others pass safely
+    yielding_bonus: 0.5           # bonus when yielding successfully
+    yielding_ttc_threshold: 3.0   # TTC below this triggers yielding check
+    yielding_speed_drop: 10.0     # speed reduction (km/h) to qualify as yielding

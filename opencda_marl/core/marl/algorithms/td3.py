@@ -479,10 +479,28 @@ class TD3Algorithm(BaseAlgorithm):
 
                 # Add exploration noise during training
                 if training:
-                    noise = torch.randn_like(
-                        raw_action) * self.exploration_noise
-                    action = torch.clamp(
-                        raw_action + noise, self.min_action, self.max_action)
+                    # SMART EXPLORATION: Scale noise by distance to intersection
+                    # ego_state shape: [1, state_dim], index 6 = dist_to_intersection
+                    dist_to_intersection = ego_state[0, 6].item()
+
+                    # Distance-based noise scaling and speed bias
+                    if dist_to_intersection > 50.0:
+                        # FAR: Aggressive exploration (encourage high speeds)
+                        noise_scale = 1.5
+                        speed_bias = 10.0
+                    elif dist_to_intersection > 20.0:
+                        # MID: Balanced exploration
+                        noise_scale = 1.0
+                        speed_bias = 0.0
+                    else:
+                        # NEAR: Cautious but still explore full range
+                        noise_scale = 0.8
+                        speed_bias = -5.0
+
+                    # Apply scaled noise with position-based bias
+                    noise = torch.randn_like(raw_action) * self.exploration_noise * noise_scale
+                    action = raw_action + noise + speed_bias
+                    action = torch.clamp(action, self.min_action, self.max_action)
                 else:
                     action = raw_action
 
@@ -491,17 +509,12 @@ class TD3Algorithm(BaseAlgorithm):
 
                 if final_speed > self.max_action:
                     final_speed = self.max_action
-                
+
                 # Debug logging for action selection (periodic)
                 if len(self.memory) % 2000 == 0:
                     raw_val = raw_action.squeeze().item()
-                    logger.debug(f"TD3 Action Debug - Raw: {raw_val:.1f}, +Noise: {final_speed:.1f}, Episode: {self.episode_count}")
-                
-                # Force exploration in early episodes to break out of 30 km/h trap
-                if self.episode_count < 3 and training and not self._pretrained:
-                    forced_speed = np.random.uniform(35, 60)  # Force higher speeds
-                    logger.debug(f"Forced exploration Episode {self.episode_count}: {forced_speed:.1f} km/h (was {final_speed:.1f})")
-                    return forced_speed
+                    dist_info = f", dist={dist_to_intersection:.0f}m" if training else ""
+                    logger.debug(f"TD3 Action Debug - Raw: {raw_val:.1f}, +Noise: {final_speed:.1f}, Episode: {self.episode_count}{dist_info}")
 
                 return final_speed
 
