@@ -1,0 +1,62 @@
+description: |-
+  DQN (Deep Q-Network) reinforcement learning agent.
+  Discrete action space with neural network approximation.
+
+_extend_fields:
+  - "world.seed"
+
+world:
+  seed: 5 # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65 # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: false
+
+MARL:
+  algorithm: "dqn"
+
+  state_dim: 7 # rel_x, rel_y, speed, heading_angle, dist_intersection, dist_front, lane_pos
+
+  dqn:
+    # Discrete speed actions (km/h)
+    speed_actions: [30, 45, 60]
+
+    # Neural network architecture
+    hidden_dims: [64, 32]
+
+    # DQN training parameters
+    epsilon: 0.2
+    epsilon_decay: 0.995
+    epsilon_min: 0.01
+    learning_rate: 0.003
+    discount_factor: 0.95
+
+    # Experience replay
+    memory_size: 10000
+    batch_size: 128
+
+    # Target network update
+    target_update_freq: 50
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/"
+    save_freq: 5
+    keep_checkpoints: 10
+    load_checkpoint: null
+
+  rewards:
+    collision: -130.0
+    success: 130.0
+    step_penalty: -0.5

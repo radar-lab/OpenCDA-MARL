@@ -209,7 +209,7 @@ MARL:
     training_mode: true # Set to false for evaluation only (uses scenario.simulation.max_episodes)
 
     # Checkpoint settings
-    checkpoint_dir: "checkpoints_test/"
+    checkpoint_dir: "checkpoints/"
     save_freq: 1
     keep_checkpoints: 3
 

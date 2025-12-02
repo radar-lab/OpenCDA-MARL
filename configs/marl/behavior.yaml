@@ -1,0 +1,9 @@
+description: |-
+  Behavior-based agent for intersection scenario.
+  Traditional agent using OpenCDA BehaviorAgent - no training required.
+
+agents:
+  agent_type: "behavior"
+
+  # Uses agents.vehicle.behavior config from default.yaml
+  # BehaviorAgent inherits vehicle behavior settings

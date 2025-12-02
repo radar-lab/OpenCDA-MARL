@@ -1,31 +1,36 @@
-# TD3 Agent Configuration for Paper Experiments
-# Twin Delayed DDPG - continuous action space MARL agent
-
-_base_: "../default.yaml"
-
 description: |-
-  TD3 MARL agent for paper experiments.
-  No warmup - learns from scratch without vanilla agent experience.
-  44D state space (9D ego + 35D nearby vehicles).
+  TD3 (Twin Delayed DDPG) deep reinforcement learning agent.
+  Continuous action space with LSTM conflict encoder.
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5 # Added to default seed (11) = 16 total
 
 agents:
   agent_type: "marl"
 
   marl:
     debug: false
-    max_speed: 65
+    max_speed: 65 # km/h
     emergency_param: 0.4
     ignore_traffic_light: true
     collision_time_ahead: 1.5
+
     local_planner:
       trajectory_update_freq: 5
       debug: false
-      debug_trajectory: false
+      debug_trajectory: true
 
 MARL:
   algorithm: "td3"
-  state_dim: 44    # 9D ego + 35D nearby vehicles
-  action_dim: 1    # Continuous speed control
+
+  # State/Action dimensions
+  state_dim: 44 # 9D ego + 35D nearby vehicles
+  action_dim: 1 # Continuous speed control
 
   td3:
     # Feature configuration (44D total)
@@ -39,7 +44,7 @@ MARL:
       dist_to_intersection: 1
       dist_to_front_vehicle: 1
       waypoint_buffer: 1
-      nearby_vehicles: 35
+      nearby_vehicles: 35 # 5 vehicles x 7 features
 
     # Nearby vehicle detection
     nearby_vehicle_config:
@@ -79,27 +84,53 @@ MARL:
 
     # Training parameters
     batch_size: 256
+
+    # Replay buffer
     memory_size: 25000
     recency_ratio: 0.5
-
-    # Auto-clear configuration
     clear_episodes: 1
     clear_keep_ratio: 0.6
 
-    # PER configuration
+    # Prioritized Experience Replay
     use_per: true
     per_alpha: 0.6
     per_beta: 0.4
     per_beta_increment: 0.001
 
-    # Action bounds
+    # Action bounds (km/h)
     max_action: 65.0
     min_action: 10.0
-    warmup_steps: 0    # NO WARMUP - learn from scratch
+    warmup_steps: 0
 
   training:
     training_mode: true
-    checkpoint_dir: "checkpoints/paper/td3/"
+    checkpoint_dir: "checkpoints/"
     save_freq: 1
-    keep_checkpoints: 5
+    keep_checkpoints: 3
     load_checkpoint: null
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -1.5
+    speed_bonus: 0.5
+    speed_threshold: 45.0
+
+    # TTC-based safety reward
+    ttc_safe_threshold: 3.0
+    ttc_caution_threshold: 2.0
+    ttc_danger_threshold: 1.0
+    ttc_caution_penalty: -0.5
+    ttc_danger_penalty: -2.0
+    ttc_critical_penalty: -5.0
+
+    # Progress reward
+    progress_scale: 0.5
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 5.0
+    stop_penalty: -3.0

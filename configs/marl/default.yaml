@@ -1,7 +1,8 @@
 description: |-
-  MARL default configuration that other MARL configurations can inherit from.
+  MARL default configuration - contains common settings shared by all agents.
+  Agent-specific configurations inherit from this file via OmegaConf merge.
 
-# Base OpenCDA configuration
+# Base OpenCDA world configuration
 world:
   sync_mode: true
   host: 127.0.0.1
@@ -13,54 +14,138 @@ world:
     sun_altitude_angle: 15 # 90 is the midday and -90 is the midnight
     cloudiness: 0 # 0 is the clean sky and 100 is the thickest cloud
     precipitation: 0 # rain, 100 is the heaviest rain
-    precipitation_deposits: 0 # Determines the creation of puddles. Values range from 0 to 100, being 0 none at all and 100 a road completely capped with water.
+    precipitation_deposits: 0 # Determines the creation of puddles. Values range from 0 to 100
     wind_intensity: 0 # it will influence the rain
     fog_density: 0 # fog thickness, 100 is the largest
     fog_distance: 0 # Fog start distance. Values range from 0 to infinite.
-    fog_falloff: 0 # Density of the fog (as in specific mass) from 0 to infinity. The bigger the value, the more dense and heavy it will be, and the fog will reach smaller heights
+    fog_falloff: 0 # Density of the fog from 0 to infinity
     wetness: 0
 
+# Spectator view preset
+spectator:
+  preset: "intersection_bird_eye"
+
+# Scenario metadata
+meta:
+  scenario_type: "intersection"
+  town: "intersection_12_lane_fixed"
+
+# Scenario configuration (shared across all agents)
 scenario:
+  simulation:
+    max_steps: 2400 # 2 minute = 20fps * 60s * 2
+    max_episodes: 100
+
   traffic:
+    # Traffic mode: 'record', 'replay', or 'live'
+    mode: "replay"
+    replay_file: "recordings/lite_2minL.json"
+    base_speed: 45.0 # km/h base speed for vehicles
+    active_junctions: [4]
+
     # Vehicle Type Configuration
-    # Using inclusion-based approach for consistent collision detection and simulation
-    # Recommended: Similar-sized sedans for consistent physics and collision detection
-    # ENABLED VEHICLES
     included_vehicle_types:
-      - "vehicle.audi.a2"           # Compact sedan
-      - "vehicle.bmw.grandtourer"   # Family sedan  
-      - "vehicle.citroen.c3"        # Compact car
-      - "vehicle.lincoln.mkz_2017"  # Luxury sedan
-      - "vehicle.seat.leon"         # Compact sedan
-    # DISABLED VEHICLES (Choose either included_vehicle_types or excluded_vehicle_types)
+      - "vehicle.audi.a2"
+      - "vehicle.bmw.grandtourer"
+      - "vehicle.citroen.c3"
+      - "vehicle.lincoln.mkz_2017"
+      - "vehicle.seat.leon"
     excluded_vehicle_types:
       - "walker"
 
-# Agent behavior configuration (based on OpenCDA behavior_agent)
-# This config is used for all agent types (traffic, RL agents, rule-based agents)
+    planner:
+      distance: 5.0 # base spacing (m)
+      spawn_offset: 7 # multiples of safe_distance upstream
+      dest_offset: 7 # multiples of safe_distance downstream
+      spawn_z_lift: 0.3 # small lift to avoid ground collision
+      wp_step: 1.0 # stepping granularity along lanes (m)
+      allow_uturn: false
+      visualize:
+        entry_wp: false
+        exit_wp: false
+        spawn_wp: false
+        dest_wp: false
+        route_line: false
+        junction_center: true
+        bbox: false
+        extent_box: true
+        text: true
+        life_time: 10.0
+
+    flows:
+      - name: "north"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "north"
+        speed_variation: 0.2
+        middle_peak:
+          intensity: 0.4
+          position: 0.5
+          width: 0.3
+
+      - name: "south"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "south"
+        speed_variation: 0.15
+        middle_peak:
+          intensity: 0.3
+          position: 0.4
+          width: 0.4
+
+      - name: "east"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "east"
+        speed_variation: 0.1
+        middle_peak:
+          intensity: 0.35
+          position: 0.6
+          width: 0.25
+
+      - name: "west"
+        rate_vph: 200
+        lanes: [0, 1, 2]
+        start_step: 0
+        end_step: 2400
+        direction: "west"
+        speed_variation: 0.25
+        middle_peak:
+          intensity: 0.5
+          position: 0.45
+          width: 0.35
+
+# Base vehicle configuration (sensing, localization - shared by all agents)
 agents:
-  # Vehicle configuration for VehicleManager
+  debug: false
+
   vehicle:
     sensing:
       perception:
-        activate: false # when not activated, objects positions will be retrieved from server directly
+        activate: false
         camera:
-          visualize: 0 # how many camera images need to be visualized. 0 means no visualization for camera
-          num: 1 # how many cameras are mounted on the vehicle
-          positions: [[2.5, 0, 1.0, 0]] # relative positions (x,y,z,yaw) of the camera
-        lidar: # lidar sensor configuration, check CARLA sensor reference for more details
+          visualize: 0
+          num: 1
+          positions: [[2.5, 0, 1.0, 0]]
+        lidar:
           visualize: false
 
       localization:
-        activate: true # when not activated, ego position will be retrieved from server directly
-        use_kalman: false # Disable Kalman filter to prevent route following lag
-        dt: 0.1 # used for kalman filter
+        activate: true
+        use_kalman: false
+        dt: 0.1
         debug_helper:
           show_animation: false
 
     map_manager:
-      visualize: false  # Enable BEV visualization (shows cv2 window for each vehicle)
-      activate: false   # Activate map manager for BEV generation
+      visualize: false
+      activate: false
 
     v2x:
       enabled: true
@@ -71,155 +156,62 @@ agents:
 
     behavior:
       debug: false
-      max_speed: 45 # maximum speed, km/h (~30 mph - typical US arterial intersection speed)
-      # when a vehicles needs to be close to another vehicle asap
-      tailgate_speed: 50 
-      # max_speed - speed_lim_dist = target speed
-      speed_lim_dist: 5 
-      # used in car following mode to decrease speed for distance keeping
+      max_speed: 45
+      tailgate_speed: 50
+      speed_lim_dist: 5
       speed_decrease: 15
-      # ttc safety thresholding for decreasing speed
       safety_time: 4
-      # used to identify whether a emergency stop needed
       emergency_param: 0.4
-      # whether overtake allowed, typically false for platoon leader
-      overtake_allowed: true 
-      # used for collision checking
+      overtake_allowed: true
       collision_time_ahead: 1.5
-      # the vehicle can not do another overtake during next certain steps
-      overtake_counter_recover: 35 
-      # whether to ignore traffic light
-      ignore_traffic_light: false # respect traffic lights in intersection scenarios
-      # the unit distance between two adjacent waypoints in meter
-      sample_resolution: 1.0 # waypoint distance in meters (finer for intersection navigation)
-        
-      # Local planner configuration (required by OpenCDA BehaviorAgent)
+      overtake_counter_recover: 35
+      ignore_traffic_light: false
+      sample_resolution: 1.0
+
       local_planner:
-        buffer_size: 12 # waypoint buffer size
-        trajectory_update_freq: 15 # trajectory points updating frequency
-        waypoint_update_freq: 9 # waypoint updating frequency
-        min_dist: 2 # pop waypoints too close to current location (smaller for intersections)
-        trajectory_dt: 0.10 # trajectory sampling time (faster for intersection scenarios)
-        debug: true # whether to draw future/history waypoints
-        debug_trajectory: true # whether to draw trajectory points and path
-
-  vanilla:
-    debug: false
-    max_speed: 45 # maximum speed, km/h
-    emergency_param: 0.4 # used to identify whether a emergency stop needed
-    ignore_traffic_light: true # whether to ignore traffic light
-    collision_time_ahead: 1.5 # used for collision checking
-
-    local_planner:  # trajectory planning related
-      trajectory_update_freq: 9 # trajectory points updating frequency
-      debug: false # whether to draw future/history waypoints
-      debug_trajectory: true # whether to draw the trajectory points and path
-
-  # RuleBasedAgent configuration (3-stage rule-based with JAIR enhancements)
-  rule_based:
-    debug: false
-    debug_rules: false
-    max_speed: 65 # Maximum speed (km/h) - matches agent_behavior for consistency
-    emergency_param: 0.4 # used to identify whether a emergency stop needed
-    ignore_traffic_light: true # whether to ignore traffic light
-    collision_time_ahead: 1.5 # used for collision checking
-    local_planner:  # trajectory planning related
-        trajectory_update_freq: 5 # trajectory points updating frequency
-        debug: false # whether to draw future/history waypoints
-        debug_trajectory: true # whether to draw the trajectory points and path
-
-    # Stage 1: Junction Management (Enhanced with trajectory prediction & dynamic speed adjustment)
-    junction_approach_distance: 70.0 # Distance to start junction management (meters)
-    junction_conflict_distance: 50.0 # Distance to check for conflicting vehicles (meters)
-    junction_speed_factor: 0.6 # Reduce speed to 60% at junctions (dynamic adjustment)
-    junction_min_reduction: 30.0 # Minimum speed reduction at junctions (km/h)
-    #~CRITICAL: previous 15.0 achieves 75%/25% success/collision rate
-    # junction_min_reduction: 15.0 # Minimum speed reduction at junctions (km/h)
-
-  
-    # Trajectory-based conflict detection (replaces heading difference)
-    #~CRITICAL: previous: 3.0/2.0/1.0 achieves 75%/25% success/collision rate
-    trajectory_lookahead_time: 8.0 # Time horizon for trajectory prediction (seconds)
-    ttc_threshold: 5.0 # Minimum TTC difference for conflict detection (seconds)
-    trajectory_step_size: 3.0 # Step size for trajectory prediction (meters)
-    
-    # Stage 2: Car Following (Enhanced with leading vehicle speed consideration)
-    #~CRITICAL: previous speed buffer/time_headway are 5.0/2.0 
-    #~          achieves 75%/25% success/collision rate
-    following_speed_buffer: 8.0 # Speed buffer below leading vehicle (km/h)
-    time_headway: 3.0 # Time headway for safe following (seconds)
-    following_gain: 0.5 # Car following controller gain
-    minimum_distance_buffer: 5.0 # Minimum physical distance buffer (meters)
-    same_lane_tolerance_deg: 30 # Heading tolerance for same lane detection (degrees)
-    front_cone_angle_deg: 45 # Front detection cone angle (degrees)
-
-    # Stage 3: Cruising
-    #~CRITICAL: previous: 0.95 achieves 75%/25% success/collision rate
-    #~Increase to 1.0 to faster when cruising
-    cruising_speed_factor: 1.0 # 95% of vanilla when cruising
-
+        buffer_size: 12
+        trajectory_update_freq: 15
+        waypoint_update_freq: 9
+        min_dist: 2
+        trajectory_dt: 0.10
+        debug: true
+        debug_trajectory: true
 
 # Evaluation System Configuration
 evaluation:
-  # Evaluation modes:
-  # - 'full': Detailed time-series tracking with plotting capabilities
-  # - 'lightweight': Summary-only tracking for efficient training
-  # - 'disabled': No evaluation tracking
   mode: "full"
   root_dir: "evaluation_outputs"
-  
-  # Data management
-  save_interval: 1  # Save every N episodes
-  compression: true   # Use compression for data storage
-  
-  # Memory management
-  keep_last_n_files: 0  # Keep only last N episode files (0 = keep all)
-  keep_summaries: 1000  # Number of episode summaries to retain in memory (lightweight mode)
-
-  # Visualization settings
-  plot_interval: 5    # Generate plots every N episodes (full mode only)
+  save_interval: 1
+  compression: true
+  keep_last_n_files: 0
+  keep_summaries: 1000
+  plot_interval: 5
 
 # TensorBoard Configuration
-# Shared across all MARL algorithms (TD3, DQN, Q-Learning, etc.)
-# View logs with: pixi run tensorboard
 tensorboard:
-  enabled: true           # Enable/disable TensorBoard logging
-  log_dir: "runs"         # Base directory for TensorBoard logs
-  # run_name: "custom"    # Optional: custom run name (default: timestamp)
-  log_frequency: 1        # Log every N training steps (1 = every step)
-
-  # Metrics to log (can be overridden per algorithm)
+  enabled: true
+  log_dir: "runs"
+  log_frequency: 1
   metrics:
-    losses: true          # Log actor/critic losses
-    q_values: true        # Log Q-value estimates
-    buffer: true          # Log replay buffer statistics
-    episode: true         # Log episode rewards/length/rates
-    rewards: true         # Log step-level rewards
+    losses: true
+    q_values: true
+    buffer: true
+    episode: true
+    rewards: true
 
-# MARL-specific training configuration
-# This section is passed to MARLEnv via coordinator.py
+# MARL training base configuration
 MARL:
   training:
-    metrics_export_interval: 5   # Export every 5 episodes
-    metrics_export_dir: "metrics_history"  # Custom directory
+    metrics_export_interval: 5
+    metrics_export_dir: "metrics_history"
 
 # CARLA World Reset Configuration
-# Prevents training slowdown from server-side memory accumulation.
-# CARLA server accumulates physics buffers, destroyed actor references, and
-# collision detection caches over time. This config enables periodic world
-# reload to clear that memory while preserving all training state.
 world_reset:
-  # Reset frequency (epochs between world reloads)
-  # Set to 0 to disable periodic reset (not recommended for long training)
   reset_frequency: 10
-
-  # Auto-reset based on performance monitoring
   auto_reset:
-    enabled: true              # Enable automatic slowdown detection
-    slowdown_threshold: 1.5    # Trigger reset if step time exceeds baseline by this factor (1.5 = 50% slower)
-    monitoring_window: 100     # Number of steps to average for slowdown detection
-    min_epochs_before_auto: 3  # Minimum epochs before auto-reset can trigger
-
-  # Logging configuration
-  log_reset_events: true       # Log world reset events (recommended)
-  log_step_times: false        # Log individual step times (verbose, for debugging)
+    enabled: true
+    slowdown_threshold: 1.5
+    monitoring_window: 100
+    min_epochs_before_auto: 3
+  log_reset_events: true
+  log_step_times: false

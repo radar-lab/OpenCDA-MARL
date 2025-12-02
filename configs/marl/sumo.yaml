@@ -1,0 +1,113 @@
+description: |-
+  SUMO-only MARL training for intersection navigation.
+  Uses TraCI for 10-80x faster training compared to CARLA.
+  Trained policies can be transferred to CARLA for fine-tuning.
+
+meta:
+  scenario_type: "intersection_sumo"
+  simulator: "sumo"
+  sumo_cfg: "opencda_marl/assets/intersection_sumo/intersection.sumocfg"
+
+world:
+  sync_mode: true
+  fixed_delta_seconds: 0.05
+  seed: 11
+  sumo_port: 8873
+  sumo_gui: true # Set to false for headless training
+
+scenario:
+  simulation:
+    max_steps: 2400
+    max_episodes: 1000 # Fast training in SUMO
+
+  traffic:
+    mode: "replay"
+    replay_file: "recordings/lite_2min_SUMO.json"
+    base_speed: 45.0
+    active_junctions: [4]
+
+    planner:
+      distance: 5.0
+      spawn_offset: 7
+      dest_offset: 7
+      spawn_z_lift: 0.3
+      wp_step: 1.0
+      allow_uturn: false
+
+agents:
+  count: 10 # Can scale to 50+ in SUMO
+  agent_type: "marl"
+
+  marl:
+    max_speed: 65
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+MARL:
+  algorithm: "td3"
+
+  state_dim: 9
+  action_dim: 1
+
+  td3:
+    features:
+      rel_x: 1
+      rel_y: 1
+      position_x: 1
+      position_y: 1
+      lane_position: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      waypoint_buffer: 1
+
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 9
+      hidden_size: 256
+      num_layers: 1
+
+    motion_planner:
+      num_layers: 5
+      input_dim: [265, 1024, 1024, 512, 256]
+      output_dim: [1024, 1024, 512, 256, 1]
+
+    learning_rate_actor: 1e-3
+    learning_rate_critic: 1e-3
+
+    tau: 0.01
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.3
+    exploration_noise: 0.5 # Higher exploration in SUMO
+    policy_freq: 2
+
+    batch_size: 256
+    memory_size: 25000
+    recency_ratio: 0.5
+    clear_episodes: 1
+    clear_keep_ratio: 0.6
+
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 0.001
+
+    max_action: 65.0
+    min_action: 30.0
+    warmup_steps: 500
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/sumo_td3/"
+    save_freq: 10
+    keep_checkpoints: 5
+    load_checkpoint: null
+
+  rewards:
+    collision: -500.0
+    success: 400.0
+    step_penalty: -1.5
+    speed_bonus: 0.5
+    speed_threshold: 45.0

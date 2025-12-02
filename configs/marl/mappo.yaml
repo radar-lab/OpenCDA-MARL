@@ -1,0 +1,92 @@
+description: |-
+  MAPPO (Multi-Agent Proximal Policy Optimization) agent.
+  On-policy algorithm for cooperative multi-agent learning.
+
+_extend_fields:
+  - "world.seed"
+
+world:
+  seed: 5 # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65 # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "mappo"
+
+  # State/Action dimensions (same as TD3 for comparison)
+  state_dim: 44 # 9D ego + 35D nearby vehicles
+  action_dim: 1 # Continuous speed control
+
+  mappo:
+    # Network architecture
+    actor_hidden_dims: [256, 256]
+    critic_hidden_dims: [256, 256]
+
+    # PPO hyperparameters
+    learning_rate: 3e-4
+    gamma: 0.99 # Discount factor
+    gae_lambda: 0.95 # GAE lambda
+    clip_epsilon: 0.2 # PPO clip parameter
+    entropy_coef: 0.01 # Entropy bonus coefficient
+    value_loss_coef: 0.5 # Value function loss coefficient
+    max_grad_norm: 0.5 # Gradient clipping
+
+    # Training parameters
+    n_steps: 2048 # Steps per rollout
+    n_epochs: 10 # PPO epochs per update
+    batch_size: 64 # Minibatch size
+    normalize_advantage: true
+
+    # Action bounds (km/h)
+    max_action: 65.0
+    min_action: 10.0
+
+    # Multi-agent specific
+    share_policy: true # Whether agents share policy parameters
+    use_centralized_critic: true # CTDE: centralized training
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/"
+    save_freq: 5
+    keep_checkpoints: 5
+    load_checkpoint: null
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -1.5
+    speed_bonus: 0.5
+    speed_threshold: 45.0
+
+    # TTC-based safety reward
+    ttc_safe_threshold: 3.0
+    ttc_caution_threshold: 2.0
+    ttc_danger_threshold: 1.0
+    ttc_caution_penalty: -0.5
+    ttc_danger_penalty: -2.0
+    ttc_critical_penalty: -5.0
+
+    # Progress reward
+    progress_scale: 0.5
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 5.0
+    stop_penalty: -3.0
