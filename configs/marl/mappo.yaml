@@ -49,6 +49,29 @@ MARL:
   action_dim: 1  # Continuous speed control
 
   mappo:
+    # ============ Feature Configuration (same as TD3 for fair comparison) ============
+    # 44D total state space
+    features:
+      rel_x: 1
+      rel_y: 1
+      position_x: 1
+      position_y: 1
+      lane_position: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      waypoint_buffer: 1
+      nearby_vehicles: 35  # 5 vehicles x 7 features
+
+    # Nearby vehicle detection (same as TD3)
+    nearby_vehicle_config:
+      detection_radius: 30.0
+      max_vehicles: 5
+      features_per_vehicle: 7
+      include_ttc: true
+      max_relative_velocity: 40.0
+      max_ttc: 10.0
+
     # ============ Network Architecture ============
     # Actor network (decentralized - uses local observation)
     actor_hidden_dims: [256, 256]

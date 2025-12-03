@@ -19,6 +19,14 @@ class ObservationExtractor:
             self.features_config = self.td3_config.get('features', {})
             self.custom_features = self.features_config  # Direct access to features
             self.state_dim = self._calculate_custom_feature_dim()
+        elif algorithm == 'mappo':
+            # MAPPO uses same feature config as TD3 for fair comparison
+            self.mappo_config = config.get('mappo', {})
+            # Try to get features from mappo config, fallback to td3 config
+            self.features_config = self.mappo_config.get('features',
+                                    config.get('td3', {}).get('features', {}))
+            self.custom_features = self.features_config
+            self.state_dim = self._calculate_custom_feature_dim()
 
     def extract(self, observations: Dict) -> Dict[int, np.ndarray]:
         """
@@ -32,7 +40,8 @@ class ObservationExtractor:
         """
         if self.algorithm == 'q_learning':
             return self._extract_discrete(observations)
-        elif self.algorithm == 'td3':
+        elif self.algorithm in ('td3', 'mappo'):
+            # Both TD3 and MAPPO use multi-agent observations
             return self._extract_multi_agent(observations)
         else:
             return self._extract_continuous(observations)
