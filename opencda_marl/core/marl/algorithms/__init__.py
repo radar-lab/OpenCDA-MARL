@@ -7,10 +7,17 @@ Description  : MARL Algorithms Package
 This package contains implementations of various reinforcement learning algorithms
 for the MARL agent system.
 
+Available algorithms:
+- QLearningAlgorithm: Tabular Q-learning for discrete state/action spaces
+- DQNAlgorithm: Deep Q-Network for continuous state, discrete action spaces
+- TD3Algorithm: Twin Delayed DDPG for continuous state/action spaces (off-policy)
+- MAPPOAlgorithm: Multi-Agent PPO for cooperative multi-agent learning (on-policy)
+
 Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 '''
 from .q_learning import QLearningAlgorithm
 from .dqn import DQNAlgorithm
 from .td3 import TD3Algorithm
+from .mappo import MAPPOAlgorithm
 
-__all__ = ['QLearningAlgorithm', 'DQNAlgorithm', 'TD3Algorithm']
+__all__ = ['QLearningAlgorithm', 'DQNAlgorithm', 'TD3Algorithm', 'MAPPOAlgorithm']

@@ -1,19 +1,37 @@
+# MAPPO (Multi-Agent Proximal Policy Optimization) Configuration
+# Reference: "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games"
+#            Yu et al., NeurIPS 2021
+# GitHub: https://github.com/marlbenchmark/on-policy
+#
+# Citation:
+# @article{yu2022surprising,
+#   title={The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games},
+#   author={Yu, Chao and Velu, Akash and Vinitsky, Eugene and others},
+#   journal={Advances in Neural Information Processing Systems},
+#   volume={35},
+#   pages={24611--24624},
+#   year={2022}
+# }
+
 description: |-
-  MAPPO (Multi-Agent Proximal Policy Optimization) agent.
-  On-policy algorithm for cooperative multi-agent learning.
+  MAPPO (Multi-Agent Proximal Policy Optimization) for cooperative autonomous
+  intersection management. Uses CTDE paradigm with centralized critic and
+  decentralized actors.
 
 _extend_fields:
   - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
 
 world:
-  seed: 5 # Added to default seed (11) = 16 total
+  seed: 5  # Added to default seed (11) = 16 total
 
 agents:
   agent_type: "marl"
 
   marl:
     debug: false
-    max_speed: 65 # km/h
+    max_speed: 65  # km/h
     emergency_param: 0.4
     ignore_traffic_light: true
     collision_time_ahead: 1.5
@@ -26,67 +44,118 @@ agents:
 MARL:
   algorithm: "mappo"
 
-  # State/Action dimensions (same as TD3 for comparison)
-  state_dim: 44 # 9D ego + 35D nearby vehicles
-  action_dim: 1 # Continuous speed control
+  # State/Action dimensions (same as TD3 for fair comparison)
+  state_dim: 44  # 9D ego + 35D nearby vehicles
+  action_dim: 1  # Continuous speed control
 
   mappo:
-    # Network architecture
+    # ============ Network Architecture ============
+    # Actor network (decentralized - uses local observation)
     actor_hidden_dims: [256, 256]
+
+    # Critic network (centralized - sees global state)
     critic_hidden_dims: [256, 256]
 
-    # PPO hyperparameters
+    # LSTM encoder for multi-agent context
+    lstm_hidden_size: 256
+    lstm_num_layers: 1
+
+    # Initial exploration std (Gaussian policy)
+    init_std: 0.5
+
+    # ============ PPO Hyperparameters ============
+    # Clipping parameter (prevents large policy updates)
+    clip_param: 0.2
+
+    # Number of epochs per update
+    ppo_epochs: 10
+
+    # Mini-batches per epoch
+    num_mini_batch: 4
+
+    # ============ Loss Coefficients ============
+    # Entropy coefficient (encourages exploration)
+    # Higher = more exploration, lower = more exploitation
+    entropy_coef: 0.01
+
+    # Value loss coefficient
+    value_loss_coef: 0.5
+
+    # Gradient clipping (prevents gradient explosion)
+    max_grad_norm: 0.5
+
+    # ============ GAE Parameters ============
+    # Discount factor (same as TD3)
+    gamma: 0.99
+
+    # GAE lambda (bias-variance tradeoff)
+    # Higher = lower bias, higher variance
+    gae_lambda: 0.95
+
+    # Whether to use GAE (recommended)
+    use_gae: true
+
+    # ============ Learning Rate ============
     learning_rate: 3e-4
-    gamma: 0.99 # Discount factor
-    gae_lambda: 0.95 # GAE lambda
-    clip_epsilon: 0.2 # PPO clip parameter
-    entropy_coef: 0.01 # Entropy bonus coefficient
-    value_loss_coef: 0.5 # Value function loss coefficient
-    max_grad_norm: 0.5 # Gradient clipping
 
-    # Training parameters
-    n_steps: 2048 # Steps per rollout
-    n_epochs: 10 # PPO epochs per update
-    batch_size: 64 # Minibatch size
-    normalize_advantage: true
+    # Optional: Linear LR decay
+    use_lr_decay: false
 
-    # Action bounds (km/h)
-    max_action: 65.0
-    min_action: 10.0
+    # ============ Rollout Settings ============
+    # Steps to collect before each update
+    # On-policy: data used once then discarded
+    n_steps: 128
 
-    # Multi-agent specific
-    share_policy: true # Whether agents share policy parameters
-    use_centralized_critic: true # CTDE: centralized training
+    # Mini-batch size for updates
+    batch_size: 32
+
+    # ============ Action Bounds (same as TD3) ============
+    max_action: 65.0  # Maximum speed in km/h
+    min_action: 0.0   # Allow full stops for yielding
+
+    # ============ CTDE Settings ============
+    # Centralized Training, Decentralized Execution
+    use_centralized_V: true   # Critic sees global state
+    share_policy: true        # All agents share actor parameters
 
   training:
     training_mode: true
     checkpoint_dir: "checkpoints/"
-    save_freq: 5
-    keep_checkpoints: 5
-    load_checkpoint: null
+    save_freq: 10  # Save every 10 episodes (more frequent for on-policy)
+    keep_checkpoints: 3
+    # Optional: Load from checkpoint
+    # load_checkpoint: "checkpoints/mappo/mappo_best_checkpoint.pth"
 
+  # ============ Rewards (same as TD3 for fair comparison) ============
   rewards:
     # Terminal rewards
     collision: -500.0
     success: 400.0
 
     # Per-step rewards
-    step_penalty: -1.5
-    speed_bonus: 0.5
+    step_penalty: -0.8
+    speed_bonus: 0.3
     speed_threshold: 45.0
 
-    # TTC-based safety reward
-    ttc_safe_threshold: 3.0
-    ttc_caution_threshold: 2.0
-    ttc_danger_threshold: 1.0
-    ttc_caution_penalty: -0.5
-    ttc_danger_penalty: -2.0
-    ttc_critical_penalty: -5.0
+    # TTC-based safety reward (DISABLED - same as TD3)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
 
     # Progress reward
-    progress_scale: 0.5
+    progress_scale: 0.4
     junction_threshold: 5.0
 
     # Stop penalty
-    stop_threshold: 5.0
-    stop_penalty: -3.0
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0
