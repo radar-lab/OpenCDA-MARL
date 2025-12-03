@@ -468,13 +468,28 @@ class WorldResetManager:
             world = self.coordinator.carla_world
             if world:
                 actors = world.get_actors()
-                destroyed_count = 0
+
+                # First destroy sensors (they are attached to vehicles)
+                sensor_count = 0
+                for actor in actors.filter('sensor.*'):
+                    if actor.is_alive:
+                        try:
+                            actor.stop()  # Stop listening first
+                            actor.destroy()
+                            sensor_count += 1
+                        except Exception as e:
+                            logger.debug(f"Error destroying sensor {actor.id}: {e}")
+                if sensor_count > 0:
+                    logger.debug(f"Destroyed {sensor_count} remaining sensor actors")
+
+                # Then destroy vehicles
+                vehicle_count = 0
                 for actor in actors.filter('vehicle.*'):
                     if actor.is_alive:
                         actor.destroy()
-                        destroyed_count += 1
-                if destroyed_count > 0:
-                    logger.debug(f"Destroyed {destroyed_count} remaining vehicle actors")
+                        vehicle_count += 1
+                if vehicle_count > 0:
+                    logger.debug(f"Destroyed {vehicle_count} remaining vehicle actors")
         except Exception as e:
             logger.warning(f"Error during actor cleanup: {e}")
 

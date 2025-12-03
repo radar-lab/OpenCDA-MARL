@@ -74,11 +74,13 @@ class CollisionSensor(object):
         """
         self._history.clear()
         try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
+            if hasattr(self, 'sensor') and self.sensor is not None:
+                if self.sensor.is_alive:
+                    self.sensor.stop()
+                    self.sensor.destroy()
+                self.sensor = None  # Clear reference to avoid GC warning
         except Exception as e:
-            print(f"Warning: Failed to destroy collision sensor: {e}")
+            pass  # Suppress warning - sensor may already be destroyed with vehicle
 
 
 class IMUSensor(object):
@@ -125,11 +127,14 @@ class IMUSensor(object):
 
     def destroy(self) -> None:
         try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
+            if hasattr(self, 'sensor') and self.sensor is not None:
+                if self.sensor.is_alive:
+                    self.sensor.stop()
+                    self.sensor.destroy()
+                self.sensor = None  # Clear reference to avoid GC warning
+            self.vehicle = None  # Clear vehicle reference
         except Exception as e:
-            print(f"Warning: Failed to destroy IMU sensor: {e}")
+            pass  # Suppress warning - sensor may already be destroyed with vehicle
 
 
 class StuckDetector(object):

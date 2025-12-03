@@ -313,19 +313,36 @@ class MARLEnv:
                 except Exception as e:
                     logger.debug(f"Could not get speed for agent {agent_id}: {e}")
 
-                # Phase 3: Add TTC-based safety reward
+                # Phase 3: TTC-based safety reward - DISABLED
+                # TTC penalty was causing overly conservative behavior
+                # Collision penalty (-500) is sufficient safety signal
+                # Keep TTC tracking for metrics only
                 if observations and agent_id in observations:
                     obs = observations[agent_id]
                     min_ttc = obs.get('min_ttc', float('inf'))
-                    ttc_reward = self._calculate_ttc_reward(min_ttc, agent_id)
-                    base_reward += ttc_reward
+
+                    # Track TTC metrics (for paper/analysis) without affecting reward
+                    self._track_ttc_metrics(min_ttc, agent_id)
+
+                    # Clearance speed bonus: reward faster speeds when path is clear
+                    # This teaches: "go fast when safe, collision penalty teaches when to slow"
+                    clearance_speed_bonus = self.reward_params.get('clearance_speed_bonus', 0.3)
+                    clearance_threshold = self.reward_params.get('clearance_threshold', 30.0)
+                    dist_to_front = obs.get('distance_to_front_vehicle', float('inf'))
+
+                    if dist_to_front > clearance_threshold or dist_to_front == float('inf'):
+                        if speed_kmh > 20.0:  # Above minimum useful speed
+                            speed_ratio = min(speed_kmh / 65.0, 1.0)
+                            clearance_bonus = clearance_speed_bonus * speed_ratio
+                            base_reward += clearance_bonus
+                            logger.debug(f"Clearance bonus to agent {agent_id}: speed={speed_kmh:.1f}, dist_front={dist_to_front:.1f}m, bonus={clearance_bonus:.3f}")
 
                     # Yielding bonus: reward for slowing down when nearby vehicle has low TTC
                     # This encourages cooperative behavior - yield to let others pass safely
                     yielding_bonus = self.reward_params.get('yielding_bonus', 0.0)
                     if yielding_bonus > 0 and agent_id in self.previous_observations:
                         yielding_ttc_threshold = self.reward_params.get('yielding_ttc_threshold', 3.0)
-                        yielding_speed_drop = self.reward_params.get('yielding_speed_drop', 10.0)
+                        yielding_speed_drop = self.reward_params.get('yielding_speed_drop', 5.0)
 
                         # Check if there's a nearby vehicle with low TTC
                         if min_ttc < yielding_ttc_threshold and min_ttc != float('inf'):
@@ -458,6 +475,34 @@ class MARLEnv:
                 logger.debug(f"Near-miss: agent {agent_id}, TTC={min_ttc:.2f}s, penalty={penalty:.2f}")
 
         return penalty
+
+    def _track_ttc_metrics(self, min_ttc: float, agent_id: int = None) -> None:
+        """
+        Track TTC metrics without affecting reward (for paper/analysis).
+
+        This is called after TTC reward was disabled to maintain metric tracking
+        for violation rates and near-miss counts.
+
+        Args:
+            min_ttc: Minimum time-to-collision across all nearby vehicles (seconds)
+            agent_id: Agent ID for near-miss tracking (optional)
+        """
+        safe_threshold = self.reward_params.get('ttc_safe_threshold', 4.0)
+        near_miss_threshold = self.reward_params.get('ttc_near_miss_threshold', 2.0)
+
+        # Track TTC checks for violation rate calculation
+        self.ttc_check_count += 1
+
+        # Track any TTC below safe threshold as a violation (for paper metrics)
+        if min_ttc < safe_threshold and min_ttc != float('inf'):
+            self.ttc_violation_count += 1
+
+        # Near-miss tracking (for metrics)
+        if min_ttc < near_miss_threshold and agent_id is not None:
+            if agent_id not in self.near_miss_agents:
+                self.near_miss_count += 1
+                self.near_miss_agents.add(agent_id)
+                logger.debug(f"Near-miss tracked: agent {agent_id}, TTC={min_ttc:.2f}s")
 
     def _calculate_progress_reward(self, current_dist_to_dest: float, prev_dist_to_dest: float,
                                     current_dist_to_int: float, prev_dist_to_int: float) -> float:

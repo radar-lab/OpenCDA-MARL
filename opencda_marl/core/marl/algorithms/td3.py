@@ -484,18 +484,19 @@ class TD3Algorithm(BaseAlgorithm):
                     dist_to_intersection = ego_state[0, 6].item()
 
                     # Distance-based noise scaling and speed bias
-                    if dist_to_intersection > 50.0:
-                        # FAR: Aggressive exploration (encourage high speeds)
-                        noise_scale = 1.5
-                        speed_bias = 10.0
-                    elif dist_to_intersection > 20.0:
-                        # MID: Balanced exploration
+                    # Thresholds scaled for ~35m spawn-to-intersection distance
+                    if dist_to_intersection > 25.0:
+                        # FAR (25-35m): Initial approach - encourage faster exploration
+                        noise_scale = 1.3
+                        speed_bias = 5.0
+                    elif dist_to_intersection > 10.0:
+                        # MID (10-25m): Decision zone - balanced exploration
                         noise_scale = 1.0
                         speed_bias = 0.0
                     else:
-                        # NEAR: Cautious but still explore full range
+                        # NEAR (<10m): Intersection entry - slight caution
                         noise_scale = 0.8
-                        speed_bias = -5.0
+                        speed_bias = -3.0
 
                     # Apply scaled noise with position-based bias
                     noise = torch.randn_like(raw_action) * self.exploration_noise * noise_scale

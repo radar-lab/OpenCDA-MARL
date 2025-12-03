@@ -84,11 +84,13 @@ class GnssSensor(object):
     def destroy(self):
         """Destroy the GNSS sensor."""
         try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
+            if hasattr(self, 'sensor') and self.sensor is not None:
+                if self.sensor.is_alive:
+                    self.sensor.stop()
+                    self.sensor.destroy()
+                self.sensor = None  # Clear reference to avoid GC warning
         except Exception as e:
-            print(f"Warning: Failed to destroy GNSS sensor: {e}")
+            pass  # Suppress warning - sensor may already be destroyed with vehicle
 
 
 class ImuSensor(object):
@@ -150,11 +152,13 @@ class ImuSensor(object):
     def destroy(self):
         """Destroy the IMU sensor."""
         try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
+            if hasattr(self, 'sensor') and self.sensor is not None:
+                if self.sensor.is_alive:
+                    self.sensor.stop()
+                    self.sensor.destroy()
+                self.sensor = None  # Clear reference to avoid GC warning
         except Exception as e:
-            print(f"Warning: Failed to destroy IMU sensor: {e}")
+            pass  # Suppress warning - sensor may already be destroyed with vehicle
 
 
 class LocalizationManager(object):
@@ -360,11 +364,13 @@ class LocalizationManager(object):
         try:
             if hasattr(self, 'gnss') and self.gnss:
                 self.gnss.destroy()
+                self.gnss = None
         except Exception as e:
-            print(f"Warning: Failed to destroy GNSS sensor: {e}")
-        
+            pass  # Suppress warning - sensor may already be destroyed
+
         try:
             if hasattr(self, 'imu') and self.imu:
                 self.imu.destroy()
+                self.imu = None
         except Exception as e:
-            print(f"Warning: Failed to destroy IMU sensor: {e}")
+            pass  # Suppress warning - sensor may already be destroyed
