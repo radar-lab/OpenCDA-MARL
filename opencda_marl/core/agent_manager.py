@@ -115,18 +115,22 @@ class MARLAgentManager:
             try:
                 if adapter.vm and hasattr(adapter.vm, 'safety_manager') and adapter.vm.safety_manager:
                     sm = adapter.vm.safety_manager
+                    # Stop collision sensor (use stop() method if available)
                     if hasattr(sm, 'collision_sensor') and sm.collision_sensor:
-                        if hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
+                        if hasattr(sm.collision_sensor, 'stop'):
+                            sm.collision_sensor.stop()
+                        elif hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
                             try:
                                 if sm.collision_sensor.sensor.is_alive:
                                     sm.collision_sensor.sensor.stop()
                             except Exception:
                                 pass
-                    if hasattr(sm, 'imu_sensor') and sm.imu_sensor:
-                        if hasattr(sm.imu_sensor, 'sensor') and sm.imu_sensor.sensor:
+                    # Stop other sensors in the list
+                    for sensor in sm.sensors:
+                        if sensor is not None and hasattr(sensor, 'sensor') and sensor.sensor:
                             try:
-                                if sm.imu_sensor.sensor.is_alive:
-                                    sm.imu_sensor.sensor.stop()
+                                if sensor.sensor.is_alive:
+                                    sensor.sensor.stop()
                             except Exception:
                                 pass
             except Exception as e:
@@ -300,20 +304,22 @@ class MARLAgentManager:
             try:
                 if adapter.vm and hasattr(adapter.vm, 'safety_manager') and adapter.vm.safety_manager:
                     sm = adapter.vm.safety_manager
-                    # Stop collision sensor listening
+                    # Stop collision sensor listening (use stop() method if available)
                     if hasattr(sm, 'collision_sensor') and sm.collision_sensor:
-                        if hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
+                        if hasattr(sm.collision_sensor, 'stop'):
+                            sm.collision_sensor.stop()
+                        elif hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
                             try:
                                 if sm.collision_sensor.sensor.is_alive:
                                     sm.collision_sensor.sensor.stop()
                             except Exception:
                                 pass
-                    # Stop IMU sensor listening
-                    if hasattr(sm, 'imu_sensor') and sm.imu_sensor:
-                        if hasattr(sm.imu_sensor, 'sensor') and sm.imu_sensor.sensor:
+                    # Stop other sensors in the list
+                    for sensor in sm.sensors:
+                        if sensor is not None and hasattr(sensor, 'sensor') and sensor.sensor:
                             try:
-                                if sm.imu_sensor.sensor.is_alive:
-                                    sm.imu_sensor.sensor.stop()
+                                if sensor.sensor.is_alive:
+                                    sensor.sensor.stop()
                             except Exception:
                                 pass
             except Exception as e:

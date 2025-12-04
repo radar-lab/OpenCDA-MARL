@@ -89,12 +89,26 @@ class MARLCollisionSensor:
     def tick(self, data_dict):
         pass
 
+    def stop(self) -> None:
+        """
+        Stop the sensor callback (but don't destroy yet).
+        Safe to call multiple times.
+        """
+        self._active = False
+        try:
+            if hasattr(self, 'sensor') and self.sensor is not None:
+                if self.sensor.is_alive and not getattr(self, '_stopped', False):
+                    self.sensor.stop()
+                    self._stopped = True
+        except Exception:
+            pass
+
     def destroy(self) -> None:
         """
         Safe destroy sequence:
         1. Set active flag to False to stop callbacks
         2. Clear history
-        3. Stop sensor
+        3. Stop sensor (if not already stopped)
         4. Destroy sensor
         5. Clear references
         """
@@ -104,11 +118,14 @@ class MARLCollisionSensor:
         # Step 2: Clear history
         self._history.clear()
 
-        # Step 3-4: Stop and destroy sensor
+        # Step 3-4: Stop (if needed) and destroy sensor
         try:
             if hasattr(self, 'sensor') and self.sensor is not None:
                 if self.sensor.is_alive:
-                    self.sensor.stop()
+                    # Only stop if not already stopped
+                    if not getattr(self, '_stopped', False):
+                        self.sensor.stop()
+                        self._stopped = True
                     self.sensor.destroy()
                 self.sensor = None
         except Exception:
