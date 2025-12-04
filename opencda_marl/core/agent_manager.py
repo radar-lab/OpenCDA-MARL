@@ -95,22 +95,64 @@ class MARLAgentManager:
             self._remove_adapter_by_index(i)
 
     def _remove_adapter_by_index(self, index: int):
+        """
+        Remove a single vehicle adapter and its vehicle with safe cleanup.
+
+        Uses a similar phased approach as cleanup() but for single vehicle:
+        1. Stop sensor callbacks
+        2. Small delay for callbacks to complete
+        3. Destroy adapter
+        4. Destroy vehicle
+        """
+        import time
+
         if 0 <= index < len(self._vehicle_adapters):
             adapter = self._vehicle_adapters[index]
             vehicle = self._spawned_vehicles[index]
+            actor_id = adapter.actor_id
 
-            # Clean up the adapter (this will destroy the VehicleManager)
-            adapter.destroy()
+            # Phase 1: Stop sensor callbacks first
+            try:
+                if adapter.vm and hasattr(adapter.vm, 'safety_manager') and adapter.vm.safety_manager:
+                    sm = adapter.vm.safety_manager
+                    if hasattr(sm, 'collision_sensor') and sm.collision_sensor:
+                        if hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
+                            try:
+                                if sm.collision_sensor.sensor.is_alive:
+                                    sm.collision_sensor.sensor.stop()
+                            except Exception:
+                                pass
+                    if hasattr(sm, 'imu_sensor') and sm.imu_sensor:
+                        if hasattr(sm.imu_sensor, 'sensor') and sm.imu_sensor.sensor:
+                            try:
+                                if sm.imu_sensor.sensor.is_alive:
+                                    sm.imu_sensor.sensor.stop()
+                            except Exception:
+                                pass
+            except Exception as e:
+                logger.debug(f"Error stopping sensors for adapter {actor_id}: {e}")
 
-            # Destroy the CARLA vehicle actor
-            if vehicle.is_alive:
-                vehicle.destroy()
+            # Phase 2: Small delay for sensor callbacks to complete
+            time.sleep(0.02)
+
+            # Phase 3: Clean up the adapter (this will destroy the VehicleManager)
+            try:
+                adapter.destroy()
+            except Exception as e:
+                logger.debug(f"Error destroying adapter {actor_id}: {e}")
+
+            # Phase 4: Destroy the CARLA vehicle actor
+            try:
+                if vehicle.is_alive:
+                    vehicle.destroy()
+            except Exception as e:
+                logger.debug(f"Error destroying vehicle {actor_id}: {e}")
 
             # Remove from lists
             self._vehicle_adapters.pop(index)
             self._spawned_vehicles.pop(index)
 
-            logger.debug(f"Successfully removed vehicle {adapter.actor_id}")
+            logger.debug(f"Successfully removed vehicle {actor_id}")
     # --------------------------------------------------------------------- #
     # Public methods
     # --------------------------------------------------------------------- #
@@ -237,16 +279,74 @@ class MARLAgentManager:
         logger.success("MARLAgentManager reset completed")
 
     def cleanup(self):
-        """Clean up all spawned vehicles and their adapters."""
-        logger.info(
-            f"Cleaning up {len(self._vehicle_adapters)} vehicle adapters"
-            f"and {len(self._spawned_vehicles)} vehicles")
-        for _, adapter in enumerate(self._vehicle_adapters):
-            adapter.destroy()
+        """
+        Clean up all spawned vehicles and their adapters.
 
-        for _, vehicle in enumerate(self._spawned_vehicles):
-            if hasattr(vehicle, 'is_alive') and vehicle.is_alive:
-                vehicle.destroy()
+        IMPORTANT: Uses a careful cleanup sequence to prevent CARLA Signal 11 crashes:
+        1. First stop all sensor callbacks (prevents race conditions)
+        2. World tick to let CARLA process stop commands
+        3. Destroy adapters (destroys sensors and vehicle managers)
+        4. World tick to process sensor destruction
+        5. Finally destroy vehicle actors
+        """
+        import time
+
+        logger.info(
+            f"Cleaning up {len(self._vehicle_adapters)} vehicle adapters "
+            f"and {len(self._spawned_vehicles)} vehicles")
+
+        # Phase 1: Stop all sensor callbacks first to prevent race conditions
+        for adapter in self._vehicle_adapters:
+            try:
+                if adapter.vm and hasattr(adapter.vm, 'safety_manager') and adapter.vm.safety_manager:
+                    sm = adapter.vm.safety_manager
+                    # Stop collision sensor listening
+                    if hasattr(sm, 'collision_sensor') and sm.collision_sensor:
+                        if hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
+                            try:
+                                if sm.collision_sensor.sensor.is_alive:
+                                    sm.collision_sensor.sensor.stop()
+                            except Exception:
+                                pass
+                    # Stop IMU sensor listening
+                    if hasattr(sm, 'imu_sensor') and sm.imu_sensor:
+                        if hasattr(sm.imu_sensor, 'sensor') and sm.imu_sensor.sensor:
+                            try:
+                                if sm.imu_sensor.sensor.is_alive:
+                                    sm.imu_sensor.sensor.stop()
+                            except Exception:
+                                pass
+            except Exception as e:
+                logger.debug(f"Error stopping sensors for adapter: {e}")
+
+        # Phase 2: Let CARLA process the stop commands
+        try:
+            self.world.tick()
+            time.sleep(0.05)  # Small delay for sensor callbacks to complete
+        except Exception as e:
+            logger.debug(f"World tick after stopping sensors: {e}")
+
+        # Phase 3: Destroy adapters (this destroys sensors and vehicle managers)
+        for adapter in self._vehicle_adapters:
+            try:
+                adapter.destroy()
+            except Exception as e:
+                logger.debug(f"Error destroying adapter {adapter.actor_id}: {e}")
+
+        # Phase 4: Another world tick to process sensor destruction
+        try:
+            self.world.tick()
+            time.sleep(0.05)
+        except Exception as e:
+            logger.debug(f"World tick after destroying adapters: {e}")
+
+        # Phase 5: Finally destroy vehicle actors
+        for vehicle in self._spawned_vehicles:
+            try:
+                if hasattr(vehicle, 'is_alive') and vehicle.is_alive:
+                    vehicle.destroy()
+            except Exception as e:
+                logger.debug(f"Error destroying vehicle: {e}")
 
         # Clear tracking lists
         self._vehicle_adapters.clear()
