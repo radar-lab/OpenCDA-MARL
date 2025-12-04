@@ -98,13 +98,27 @@ class TrainingStateSnapshot:
                     algorithm.target_network.state_dict()
                 logger.debug("Captured DQN network weights")
 
-            # Capture TD3 networks if present
-            if hasattr(algorithm, 'actor'):
+            # Capture TD3 networks if present (has actor_target)
+            if hasattr(algorithm, 'actor') and hasattr(algorithm, 'actor_target'):
                 snapshot.model_state_dicts['actor'] = algorithm.actor.state_dict()
                 snapshot.model_state_dicts['actor_target'] = algorithm.actor_target.state_dict()
                 snapshot.model_state_dicts['critic'] = algorithm.critic.state_dict()
                 snapshot.model_state_dicts['critic_target'] = algorithm.critic_target.state_dict()
                 logger.debug("Captured TD3 network weights")
+
+            # Capture MAPPO networks if present (no target networks)
+            elif hasattr(algorithm, 'actor') and hasattr(algorithm, 'critic'):
+                snapshot.model_state_dicts['actor'] = algorithm.actor.state_dict()
+                snapshot.model_state_dicts['critic'] = algorithm.critic.state_dict()
+                # MAPPO may have separate optimizers
+                if hasattr(algorithm, 'actor_optimizer'):
+                    snapshot.model_state_dicts['actor_optimizer'] = algorithm.actor_optimizer.state_dict()
+                if hasattr(algorithm, 'critic_optimizer'):
+                    snapshot.model_state_dicts['critic_optimizer'] = algorithm.critic_optimizer.state_dict()
+                # Capture rollout buffer if present (MAPPO on-policy buffer)
+                if hasattr(algorithm, 'rollout_buffer'):
+                    snapshot.model_state_dicts['has_rollout_buffer'] = True
+                logger.debug("Captured MAPPO network weights")
 
             # Capture optimizer state
             if hasattr(algorithm, 'optimizer'):
@@ -171,13 +185,24 @@ class TrainingStateSnapshot:
                     self.model_state_dicts['target_network'])
                 logger.debug("Restored DQN network weights")
 
-            # Restore TD3 model weights
-            if 'actor' in self.model_state_dicts:
+            # Restore TD3 model weights (has target networks)
+            if 'actor_target' in self.model_state_dicts:
                 algorithm.actor.load_state_dict(self.model_state_dicts['actor'])
                 algorithm.actor_target.load_state_dict(self.model_state_dicts['actor_target'])
                 algorithm.critic.load_state_dict(self.model_state_dicts['critic'])
                 algorithm.critic_target.load_state_dict(self.model_state_dicts['critic_target'])
                 logger.debug("Restored TD3 network weights")
+
+            # Restore MAPPO model weights (no target networks)
+            elif 'actor' in self.model_state_dicts and 'actor_target' not in self.model_state_dicts:
+                algorithm.actor.load_state_dict(self.model_state_dicts['actor'])
+                algorithm.critic.load_state_dict(self.model_state_dicts['critic'])
+                # Restore separate optimizers if present
+                if 'actor_optimizer' in self.model_state_dicts and hasattr(algorithm, 'actor_optimizer'):
+                    algorithm.actor_optimizer.load_state_dict(self.model_state_dicts['actor_optimizer'])
+                if 'critic_optimizer' in self.model_state_dicts and hasattr(algorithm, 'critic_optimizer'):
+                    algorithm.critic_optimizer.load_state_dict(self.model_state_dicts['critic_optimizer'])
+                logger.debug("Restored MAPPO network weights")
 
             # Restore optimizer state
             if self.optimizer_state_dict and hasattr(algorithm, 'optimizer'):
