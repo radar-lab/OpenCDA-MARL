@@ -723,20 +723,32 @@ class MARLVehicleAdapter:
 
     def _use_marl_safety_manager(self):
         """
-        Minimal replacement - just swap the safety manager with MARL version.
+        Replace the VehicleManager's SafetyManager with MARL version.
+
+        IMPORTANT: Must properly destroy the old SafetyManager before creating
+        the new one to prevent orphaned sensors that cause "sensor went out of
+        scope" warnings.
         """
         try:
             params = self.vm_cfg.get('safety_manager', {
                 'collision_sensor': {'history_size': 4000, 'col_thresh': 50},
                 'stuck_dector': {'len_thresh': 300, 'speed_thresh': 0.05},
                 'offroad_dector': {'speed_thresh': 5},
-                'traffic_light_detector': {'speed_thresh': 20},
-                'print_message': False
+                'traffic_light_detector': {'light_dist_thresh': 20},
+                'print_message': False,
+                'queue_maxlen': 2000
             })
 
+            # CRITICAL: Destroy the old safety manager's sensors BEFORE creating new one
+            # This prevents orphaned sensors that cause "sensor went out of scope" warnings
             if self.vm.safety_manager:
-                self.vm.safety_manager.destroy()
+                old_sm = self.vm.safety_manager
+                self.vm.safety_manager = None  # Clear reference first
+                old_sm.destroy()  # Then destroy
 
+            # Now create the new MARL safety manager
+            # MARLSafetyManager is standalone (doesn't inherit from SafetyManager)
+            # so it won't create duplicate sensors
             self.vm.safety_manager = MARLSafetyManager(
                 self.cav_world,
                 self.vehicle,
@@ -746,6 +758,8 @@ class MARLVehicleAdapter:
         except Exception as e:
             logger.error(
                 f"Warning: Failed to initialize MARL safety manager for vehicle {self.actor_id}: {e}")
+            import traceback
+            traceback.print_exc()
 
     # --------------------------------------------------------------------- #
     # Helper functions
