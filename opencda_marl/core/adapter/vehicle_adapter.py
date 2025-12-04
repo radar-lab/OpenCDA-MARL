@@ -820,12 +820,17 @@ class MARLVehicleAdapter:
     # --------------------------------------------------------------------- #
 
     def destroy(self):
-        """Destroy the vehicle manager and all its sensors."""
+        """
+        Destroy the vehicle manager and all its sensors.
+
+        Note: The VehicleManager.destroy() now handles proper sensor cleanup
+        before destroying the vehicle to prevent Signal 11 crashes.
+        """
         try:
             self.cav_world.remove_vehicle_manager(self.vm)
             if self.vm:
                 self.vm.destroy()
                 self.vm = None
         except Exception as e:
-            logger.error(f"Error destroying vehicle manager: {e}")
+            logger.debug(f"Error destroying vehicle manager: {e}")
         

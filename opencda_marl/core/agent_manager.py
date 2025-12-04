@@ -111,46 +111,33 @@ class MARLAgentManager:
             vehicle = self._spawned_vehicles[index]
             actor_id = adapter.actor_id
 
-            # Phase 1: Stop sensor callbacks first
+            # Phase 1: Mark sensors as inactive to prevent callbacks during cleanup
             try:
                 if adapter.vm and hasattr(adapter.vm, 'safety_manager') and adapter.vm.safety_manager:
                     sm = adapter.vm.safety_manager
-                    # Stop collision sensor (use stop() method if available)
+                    # Mark MARL collision sensor as inactive
                     if hasattr(sm, 'collision_sensor') and sm.collision_sensor:
-                        if hasattr(sm.collision_sensor, 'stop'):
-                            sm.collision_sensor.stop()
-                        elif hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
-                            try:
-                                if sm.collision_sensor.sensor.is_alive:
-                                    sm.collision_sensor.sensor.stop()
-                            except Exception:
-                                pass
-                    # Stop other sensors in the list
-                    for sensor in sm.sensors:
-                        if sensor is not None and hasattr(sensor, 'sensor') and sensor.sensor:
-                            try:
-                                if sensor.sensor.is_alive:
-                                    sensor.sensor.stop()
-                            except Exception:
-                                pass
+                        if hasattr(sm.collision_sensor, '_active'):
+                            sm.collision_sensor._active = False
             except Exception as e:
-                logger.debug(f"Error stopping sensors for adapter {actor_id}: {e}")
+                logger.debug(f"Error marking sensors inactive for adapter {actor_id}: {e}")
 
             # Phase 2: Small delay for sensor callbacks to complete
             time.sleep(0.02)
 
-            # Phase 3: Clean up the adapter (this will destroy the VehicleManager)
+            # Phase 3: Clean up the adapter (this will destroy sensors AND vehicle via VehicleManager)
             try:
                 adapter.destroy()
             except Exception as e:
                 logger.debug(f"Error destroying adapter {actor_id}: {e}")
 
-            # Phase 4: Destroy the CARLA vehicle actor
+            # Phase 4: Safety net - destroy vehicle if still alive (should already be done by VehicleManager)
             try:
                 if vehicle.is_alive:
+                    logger.debug(f"Cleaning up orphaned vehicle {actor_id}")
                     vehicle.destroy()
             except Exception as e:
-                logger.debug(f"Error destroying vehicle {actor_id}: {e}")
+                logger.debug(f"Error destroying orphaned vehicle {actor_id}: {e}")
 
             # Remove from lists
             self._vehicle_adapters.pop(index)
@@ -299,31 +286,19 @@ class MARLAgentManager:
             f"Cleaning up {len(self._vehicle_adapters)} vehicle adapters "
             f"and {len(self._spawned_vehicles)} vehicles")
 
-        # Phase 1: Stop all sensor callbacks first to prevent race conditions
+        # Phase 1: Mark sensors as inactive to prevent callbacks during cleanup
+        # Note: VehicleManager.destroy() now handles the actual stop/destroy sequence
+        # We just need to set the active flag on MARL sensors to prevent race conditions
         for adapter in self._vehicle_adapters:
             try:
                 if adapter.vm and hasattr(adapter.vm, 'safety_manager') and adapter.vm.safety_manager:
                     sm = adapter.vm.safety_manager
-                    # Stop collision sensor listening (use stop() method if available)
+                    # Mark MARL collision sensor as inactive (prevents callback processing)
                     if hasattr(sm, 'collision_sensor') and sm.collision_sensor:
-                        if hasattr(sm.collision_sensor, 'stop'):
-                            sm.collision_sensor.stop()
-                        elif hasattr(sm.collision_sensor, 'sensor') and sm.collision_sensor.sensor:
-                            try:
-                                if sm.collision_sensor.sensor.is_alive:
-                                    sm.collision_sensor.sensor.stop()
-                            except Exception:
-                                pass
-                    # Stop other sensors in the list
-                    for sensor in sm.sensors:
-                        if sensor is not None and hasattr(sensor, 'sensor') and sensor.sensor:
-                            try:
-                                if sensor.sensor.is_alive:
-                                    sensor.sensor.stop()
-                            except Exception:
-                                pass
+                        if hasattr(sm.collision_sensor, '_active'):
+                            sm.collision_sensor._active = False
             except Exception as e:
-                logger.debug(f"Error stopping sensors for adapter: {e}")
+                logger.debug(f"Error marking sensors inactive for adapter: {e}")
 
         # Phase 2: Let CARLA process the stop commands
         try:
@@ -332,27 +307,29 @@ class MARLAgentManager:
         except Exception as e:
             logger.debug(f"World tick after stopping sensors: {e}")
 
-        # Phase 3: Destroy adapters (this destroys sensors and vehicle managers)
+        # Phase 3: Destroy adapters (this destroys sensors AND vehicles via VehicleManager.destroy())
         for adapter in self._vehicle_adapters:
             try:
                 adapter.destroy()
             except Exception as e:
                 logger.debug(f"Error destroying adapter {adapter.actor_id}: {e}")
 
-        # Phase 4: Another world tick to process sensor destruction
+        # Phase 4: World tick to process destruction
         try:
             self.world.tick()
             time.sleep(0.05)
         except Exception as e:
             logger.debug(f"World tick after destroying adapters: {e}")
 
-        # Phase 5: Finally destroy vehicle actors
+        # Phase 5: Cleanup any remaining vehicle actors (safety net)
+        # VehicleManager.destroy() should have already destroyed these
         for vehicle in self._spawned_vehicles:
             try:
                 if hasattr(vehicle, 'is_alive') and vehicle.is_alive:
+                    logger.debug(f"Cleaning up orphaned vehicle {vehicle.id}")
                     vehicle.destroy()
             except Exception as e:
-                logger.debug(f"Error destroying vehicle: {e}")
+                logger.debug(f"Error destroying orphaned vehicle: {e}")
 
         # Clear tracking lists
         self._vehicle_adapters.clear()
