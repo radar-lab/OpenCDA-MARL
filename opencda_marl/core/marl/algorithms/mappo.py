@@ -388,6 +388,9 @@ class MAPPOAlgorithm(BaseAlgorithm):
         self.max_action = config.get('max_action', 65.0)
         self.min_action = config.get('min_action', 0.0)
 
+        # Warmup configuration (NEW: random exploration before learning)
+        self.warmup_steps = config.get('warmup_steps', 0)
+
         # CTDE settings
         self.use_centralized_V = config.get('use_centralized_V', True)
         self.share_policy = config.get('share_policy', True)
@@ -474,7 +477,7 @@ class MAPPOAlgorithm(BaseAlgorithm):
         logger.info(f"MAPPO initialized: state_dim={state_dim}, action_dim={action_dim}, "
                    f"device={self.device}")
         logger.info(f"MAPPO hyperparameters: clip={self.clip_param}, epochs={self.ppo_epochs}, "
-                   f"entropy_coef={self.entropy_coef}")
+                   f"entropy_coef={self.entropy_coef}, warmup_steps={self.warmup_steps}")
 
     def select_action(self, multi_agent_obs: Dict[str, np.ndarray],
                       ego_agent_id: str, training: bool = True) -> Optional[float]:
@@ -496,6 +499,21 @@ class MAPPOAlgorithm(BaseAlgorithm):
             Target speed in km/h, or None during warmup
         """
         try:
+            # Warmup phase: random exploration before policy learning
+            if training and self.warmup_steps > 0 and self.steps_collected < self.warmup_steps:
+                # Random action during warmup for exploration
+                random_speed = np.random.uniform(self.min_action, self.max_action)
+
+                # Still need to store log_prob and value for transition
+                self.last_log_probs[ego_agent_id] = 0.0  # Placeholder
+                self.last_values[ego_agent_id] = 0.0  # Placeholder
+
+                if self.steps_collected % 200 == 0:
+                    logger.debug(f"MAPPO Warmup: step {self.steps_collected}/{self.warmup_steps}, "
+                               f"random_speed={random_speed:.1f}")
+
+                return random_speed
+
             # Prepare inputs
             ego_state, multi_agent_context = self._prepare_inputs(
                 multi_agent_obs, ego_agent_id
@@ -591,6 +609,10 @@ class MAPPOAlgorithm(BaseAlgorithm):
         metrics : Dict[str, float]
             Training metrics from update
         """
+        # Skip updates during warmup phase
+        if self.warmup_steps > 0 and self.steps_collected < self.warmup_steps:
+            return self.training_metrics
+
         # Check if enough data for update
         if len(self.rollout_buffer) < self.batch_size:
             return self.training_metrics
@@ -797,6 +819,8 @@ class MAPPOAlgorithm(BaseAlgorithm):
             'updates_performed': self.updates_performed,
             'clip_param': self.clip_param,
             'entropy_coef': self.entropy_coef,
+            'warmup_steps': self.warmup_steps,
+            'in_warmup': self.steps_collected < self.warmup_steps if self.warmup_steps > 0 else False,
             'policy_loss': self.training_metrics.get('policy_loss', 0.0),
             'value_loss': self.training_metrics.get('value_loss', 0.0),
             'entropy': self.training_metrics.get('entropy', 0.0),

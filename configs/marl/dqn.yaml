@@ -1,19 +1,37 @@
+# DQN (Deep Q-Network) Configuration
+# Reference: "Playing Atari with Deep Reinforcement Learning" - Mnih et al., 2013
+#            "Human-level control through deep reinforcement learning" - Nature, 2015
+#
+# Citation:
+# @article{mnih2015human,
+#   title={Human-level control through deep reinforcement learning},
+#   author={Mnih, Volodymyr and others},
+#   journal={Nature},
+#   volume={518},
+#   pages={529--533},
+#   year={2015}
+# }
+
 description: |-
-  DQN (Deep Q-Network) reinforcement learning agent.
-  Discrete action space with neural network approximation.
+  DQN (Deep Q-Network) for autonomous intersection management.
+  Uses discrete speed actions with neural network Q-value approximation,
+  experience replay, and target networks for stable learning.
+  Configured for 8D state space to match other algorithms for fair comparison.
 
 _extend_fields:
   - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
 
 world:
-  seed: 5 # Added to default seed (11) = 16 total
+  seed: 5  # Added to default seed (11) = 16 total
 
 agents:
   agent_type: "marl"
 
   marl:
     debug: false
-    max_speed: 65 # km/h
+    max_speed: 65  # km/h
     emergency_param: 0.4
     ignore_traffic_light: true
     collision_time_ahead: 1.5
@@ -26,37 +44,85 @@ agents:
 MARL:
   algorithm: "dqn"
 
-  state_dim: 7 # rel_x, rel_y, speed, heading_angle, dist_intersection, dist_front, lane_pos
+  # 8D state space (same as TD3/MAPPO/SAC for fair comparison)
+  state_dim: 8
 
   dqn:
-    # Discrete speed actions (km/h)
-    speed_actions: [30, 45, 60]
+    # ============ Feature Configuration (8D) ============
+    features:
+      rel_x: 1
+      rel_y: 1
+      speed: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      lane_position: 1
+      waypoint_buffer: 1
 
-    # Neural network architecture
-    hidden_dims: [64, 32]
+    # ============ Action Space ============
+    # 4 discrete speed actions (km/h)
+    # - 15: Very slow (yielding/cautious approach)
+    # - 30: Slow (moderate caution)
+    # - 45: Medium (normal driving)
+    # - 60: Fast (clear path)
+    speed_actions: [15, 30, 45, 60]
 
-    # DQN training parameters
-    epsilon: 0.2
-    epsilon_decay: 0.995
-    epsilon_min: 0.01
-    learning_rate: 0.003
-    discount_factor: 0.95
+    # ============ Network Architecture ============
+    # Larger network for 8D state space
+    hidden_dims: [256, 128]
 
-    # Experience replay
-    memory_size: 10000
-    batch_size: 128
+    # ============ Exploration Parameters ============
+    epsilon: 0.3           # Initial exploration rate
+    epsilon_decay: 0.995   # Decay per episode
+    epsilon_min: 0.05      # Minimum exploration rate
 
-    # Target network update
-    target_update_freq: 50
+    # ============ Learning Parameters ============
+    learning_rate: 0.001
+    discount_factor: 0.99
+
+    # ============ Experience Replay ============
+    memory_size: 25000
+    batch_size: 256
+
+    # ============ Target Network ============
+    target_update_freq: 100
 
   training:
     training_mode: true
-    checkpoint_dir: "checkpoints/"
+    checkpoint_dir: "checkpoints/dqn/"
     save_freq: 5
-    keep_checkpoints: 10
-    load_checkpoint: null
+    keep_checkpoints: 3
 
+  # ============ Rewards ============
   rewards:
-    collision: -130.0
-    success: 130.0
-    step_penalty: -0.5
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0
+
+    # TTC-based safety reward (DISABLED)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
+
+    # Progress reward
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0

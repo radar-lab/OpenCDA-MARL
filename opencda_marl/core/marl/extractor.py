@@ -27,6 +27,22 @@ class ObservationExtractor:
                                     config.get('td3', {}).get('features', {}))
             self.custom_features = self.features_config
             self.state_dim = self._calculate_custom_feature_dim()
+        elif algorithm == 'sac':
+            # SAC uses same feature extraction as TD3/MAPPO
+            self.sac_config = config.get('sac', {})
+            self.features_config = self.sac_config.get('features', {})
+            self.custom_features = self.features_config
+            self.state_dim = self._calculate_custom_feature_dim()
+        elif algorithm == 'dqn':
+            # DQN can use configurable features (8D) or fallback to legacy 7D
+            self.dqn_config = config.get('dqn', {})
+            self.features_config = self.dqn_config.get('features', {})
+            if self.features_config:
+                self.custom_features = self.features_config
+                self.state_dim = self._calculate_custom_feature_dim()
+            else:
+                # Fallback to legacy 7D continuous features
+                self.state_dim = 7
 
     def extract(self, observations: Dict) -> Dict[int, np.ndarray]:
         """
@@ -40,9 +56,15 @@ class ObservationExtractor:
         """
         if self.algorithm == 'q_learning':
             return self._extract_discrete(observations)
-        elif self.algorithm in ('td3', 'mappo'):
-            # Both TD3 and MAPPO use multi-agent observations
+        elif self.algorithm in ('td3', 'mappo', 'sac'):
+            # TD3, MAPPO, and SAC use multi-agent observations
             return self._extract_multi_agent(observations)
+        elif self.algorithm == 'dqn':
+            # DQN uses custom features but returns simple state arrays (not multi-agent format)
+            if hasattr(self, 'custom_features') and self.custom_features:
+                return self._extract_custom_features(observations)
+            else:
+                return self._extract_continuous(observations)
         else:
             return self._extract_continuous(observations)
 

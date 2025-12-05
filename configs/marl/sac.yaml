@@ -1,0 +1,156 @@
+# SAC (Soft Actor-Critic) Configuration
+# Reference: "Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning
+#             with a Stochastic Actor" - Haarnoja et al., ICML 2018 (arXiv:1801.01290)
+#            "Soft Actor-Critic Algorithms and Applications" - Haarnoja et al., 2018
+#             (arXiv:1812.05905)
+#
+# Citation:
+# @inproceedings{haarnoja2018soft,
+#   title={Soft Actor-Critic: Off-Policy Maximum Entropy Deep Reinforcement Learning
+#          with a Stochastic Actor},
+#   author={Haarnoja, Tuomas and Zhou, Aurick and Abbeel, Pieter and Levine, Sergey},
+#   booktitle={International Conference on Machine Learning},
+#   pages={1861--1870},
+#   year={2018}
+# }
+
+description: |-
+  SAC (Soft Actor-Critic) for autonomous intersection management.
+  Uses maximum entropy framework with auto-tuning temperature for
+  balanced exploration-exploitation. Adapts exploration based on
+  situational context (e.g., nearby vehicles require different speeds).
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5  # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65  # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "sac"
+
+  # Simplified 8D state space
+  state_dim: 8
+  action_dim: 1  # Continuous speed control
+
+  sac:
+    # ============ Feature Configuration (8D) ============
+    features:
+      rel_x: 1
+      rel_y: 1
+      speed: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      lane_position: 1
+      waypoint_buffer: 1
+
+    # ============ Network Architecture ============
+    # LSTM encoder for multi-agent context
+    lstm_hidden_size: 128
+    lstm_num_layers: 1
+
+    # Actor network (squashed Gaussian policy)
+    actor_hidden_dims: [256, 256]
+
+    # Critic network (twin Q-networks)
+    critic_hidden_dims: [256, 256]
+
+    # ============ Learning Rates ============
+    learning_rate_actor: 3e-4
+    learning_rate_critic: 3e-4
+    learning_rate_alpha: 3e-4  # For auto-tuning temperature
+
+    # ============ SAC Hyperparameters ============
+    # Soft update coefficient for target networks
+    tau: 0.005
+
+    # Discount factor
+    gamma: 0.99
+
+    # ============ Entropy Tuning ============
+    # Auto-tune alpha (temperature) - KEY SAC FEATURE
+    # This adapts exploration based on the situation:
+    # - High alpha = more exploration (when uncertain)
+    # - Low alpha = more exploitation (when confident)
+    auto_entropy_tuning: true
+
+    # Target entropy = -action_dim (standard choice)
+    # This encourages the policy to maintain a certain level of randomness
+    target_entropy: -1.0
+
+    # Initial temperature value
+    init_alpha: 0.2
+
+    # ============ Gaussian Policy Bounds ============
+    # Clamp log_std for numerical stability
+    log_std_min: -20
+    log_std_max: 2
+
+    # ============ Replay Buffer ============
+    memory_size: 25000
+    batch_size: 256
+
+    # Warmup: random exploration before learning
+    warmup_steps: 1000
+
+    # ============ Action Bounds ============
+    max_action: 65.0  # Maximum speed in km/h
+    min_action: 0.0   # Allow full stops for yielding
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/sac/"
+    save_freq: 5
+    keep_checkpoints: 3
+
+  # ============ Rewards ============
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0
+
+    # TTC-based safety reward (DISABLED)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
+
+    # Progress reward
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0
