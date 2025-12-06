@@ -15,6 +15,7 @@ from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl.core.adapter.vehicle_defaults import get_vehicle_manager_defaults
 from opencda_marl.core.adapter.exception import CollisionException
+from opencda_marl.core.safety.marl_collision_sensor import MARLCollisionSensor
 from opencda_marl.core.agents import AgentFactory
 from opencda_marl.core.agents.vanilla_agent import VanillaAgent
 
@@ -52,6 +53,10 @@ class MARLVehicleAdapter:
         self._init_nearby_vehicle_config(config)
 
         self.vm = self.get_vm()
+
+        # Replace SafetyManager with MARLSafetyManager for proper collision detection
+        if hasattr(self.vm, 'safety_manager'):
+            self._use_marl_safety_manager()
 
     def _init_nearby_vehicle_config(self, config: Dict[str, Any]):
         """Initialize nearby vehicle detection parameters from config."""
@@ -106,14 +111,15 @@ class MARLVehicleAdapter:
 
     def check_collision(self) -> bool:
         """
-        Check collision using the safety manager's collision sensor.
+        Check collision using MARLSafetyManager's check_collision method.
+
+        Note: MARLSafetyManager uses MARLCollisionSensor which has a non-resetting
+        return_status(). This allows update_info() to report collision status without
+        consuming it, and check_collision() can then check and reset the flag.
         """
         try:
-            if self.vm.safety_manager and len(self.vm.safety_manager.sensors) > 0:
-                collision_sensor = self.vm.safety_manager.sensors[0]
-                # return_status() returns {'collision': True/False} and resets flag
-                status = collision_sensor.return_status()
-                return status.get('collision', False)
+            if self.vm.safety_manager:
+                return self.vm.safety_manager.check_collision()
         except Exception as e:
             logger.debug(f"Could not check collision for vehicle {self.actor_id}: {e}")
         return False
@@ -764,7 +770,6 @@ class MARLVehicleAdapter:
                 agent=agent
             )
 
-
             return vm
         except Exception as e:
             logger.error(
@@ -772,6 +777,50 @@ class MARLVehicleAdapter:
             import traceback
             traceback.print_exc()
             return None
+
+    def _use_marl_safety_manager(self):
+        """
+        Replace collision sensor with MARLCollisionSensor in existing SafetyManager.
+
+        Instead of recreating the entire SafetyManager (which would create duplicate
+        IMUSensors), we just replace the collision sensor in-place. This avoids
+        the "streaming client: connection failed" errors from orphaned sensors.
+
+        MARLCollisionSensor has a non-resetting return_status() which allows proper
+        collision detection in the MARL training loop.
+        """
+        try:
+            safety_manager = self.vm.safety_manager
+            if not safety_manager:
+                return
+
+            # Get collision sensor params
+            safety_params = self.vm_cfg.get('safety_manager', {})
+            collision_params = safety_params.get('collision_sensor', {})
+
+            # Destroy only the collision sensor (sensors[0])
+            if len(safety_manager.sensors) > 0:
+                safety_manager.sensors[0].destroy()
+
+            # Replace with MARLCollisionSensor
+            safety_manager.sensors[0] = MARLCollisionSensor(
+                self.vehicle, collision_params)
+
+            # Add check_collision method to the existing safety manager
+            def check_collision():
+                if len(safety_manager.sensors) > 0:
+                    sensor = safety_manager.sensors[0]
+                    if isinstance(sensor, MARLCollisionSensor):
+                        return sensor.check_and_reset()
+                return False
+
+            safety_manager.check_collision = check_collision
+
+            logger.debug(f"Vehicle {self.actor_id}: Replaced CollisionSensor with MARLCollisionSensor")
+        except Exception as e:
+            logger.error(f"Error replacing collision sensor for vehicle {self.actor_id}: {e}")
+            import traceback
+            traceback.print_exc()
 
     # --------------------------------------------------------------------- #
     # Public API
