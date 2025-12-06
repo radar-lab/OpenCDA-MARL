@@ -68,32 +68,14 @@ class CollisionSensor(object):
     def tick(self, data_dict):
         pass
 
-    def stop(self) -> None:
-        """Stop the sensor callback (safe to call multiple times)."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if not getattr(self, '_stopped', False) and self.sensor.is_alive:
-                    self.sensor.stop()
-                    self._stopped = True
-        except Exception:
-            pass
-
     def destroy(self) -> None:
         """
         Clear collision sensor in Carla world.
         """
         self._history.clear()
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if self.sensor.is_alive:
-                    # Only stop if not already stopped
-                    if not getattr(self, '_stopped', False):
-                        self.sensor.stop()
-                        self._stopped = True
-                    self.sensor.destroy()
-                self.sensor = None  # Clear reference to avoid GC warning
-        except Exception as e:
-            pass  # Suppress warning - sensor may already be destroyed with vehicle
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class IMUSensor(object):
@@ -138,29 +120,10 @@ class IMUSensor(object):
     def tick(self, data_dict):
         pass
 
-    def stop(self) -> None:
-        """Stop the sensor callback (safe to call multiple times)."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if not getattr(self, '_stopped', False) and self.sensor.is_alive:
-                    self.sensor.stop()
-                    self._stopped = True
-        except Exception:
-            pass
-
     def destroy(self) -> None:
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if self.sensor.is_alive:
-                    # Only stop if not already stopped
-                    if not getattr(self, '_stopped', False):
-                        self.sensor.stop()
-                        self._stopped = True
-                    self.sensor.destroy()
-                self.sensor = None  # Clear reference to avoid GC warning
-            self.vehicle = None  # Clear vehicle reference
-        except Exception as e:
-            pass  # Suppress warning - sensor may already be destroyed with vehicle
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class StuckDetector(object):

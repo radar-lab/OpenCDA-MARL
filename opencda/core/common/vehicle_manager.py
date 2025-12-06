@@ -234,99 +234,10 @@ class VehicleManager(object):
 
     def destroy(self):
         """
-        Destroy the actor vehicle and all attached sensors.
-
-        IMPORTANT: Order matters to prevent CARLA Signal 11 crashes:
-        1. First destroy all sensors (they are attached to the vehicle)
-        2. Then destroy the vehicle itself
-        3. Finally cleanup non-sensor managers
+        Destroy the actor vehicle
         """
-        import time
-
-        # Phase 1: Stop all sensor callbacks first
-        # This prevents race conditions where callbacks access destroyed objects
-        def safe_stop_sensor(sensor_obj):
-            """Helper to safely stop a sensor, checking for custom stop tracking."""
-            if sensor_obj is None:
-                return
-            # If sensor has custom stop() method (like MARLCollisionSensor), use it
-            if hasattr(sensor_obj, 'stop') and callable(sensor_obj.stop):
-                try:
-                    sensor_obj.stop()
-                except Exception:
-                    pass
-            # Otherwise stop the underlying CARLA sensor directly
-            elif hasattr(sensor_obj, 'sensor') and sensor_obj.sensor:
-                try:
-                    # Check if already stopped (custom tracking)
-                    if getattr(sensor_obj, '_stopped', False):
-                        return
-                    if sensor_obj.sensor.is_alive:
-                        sensor_obj.sensor.stop()
-                except Exception:
-                    pass
-
-        try:
-            # Safety manager sensors (collision, IMU, etc.)
-            if hasattr(self, 'safety_manager') and self.safety_manager:
-                for sensor in getattr(self.safety_manager, 'sensors', []):
-                    safe_stop_sensor(sensor)
-                # Also stop IMU sensor if separate
-                if hasattr(self.safety_manager, 'imu_sensor'):
-                    safe_stop_sensor(self.safety_manager.imu_sensor)
-
-            # Localizer sensors (GNSS, IMU)
-            if hasattr(self, 'localizer') and self.localizer:
-                if hasattr(self.localizer, 'gnss'):
-                    safe_stop_sensor(self.localizer.gnss)
-                if hasattr(self.localizer, 'imu'):
-                    safe_stop_sensor(self.localizer.imu)
-
-            # Perception manager sensors (cameras, lidar)
-            if hasattr(self, 'perception_manager') and self.perception_manager:
-                if hasattr(self.perception_manager, 'rgb_camera') and self.perception_manager.rgb_camera:
-                    for cam in self.perception_manager.rgb_camera:
-                        safe_stop_sensor(cam)
-                if hasattr(self.perception_manager, 'lidar'):
-                    safe_stop_sensor(self.perception_manager.lidar)
-        except Exception:
-            pass
-
-        # Phase 2: Small delay for callbacks to complete
-        time.sleep(0.02)
-
-        # Phase 3: Destroy sensors via managers
-        try:
-            if hasattr(self, 'perception_manager') and self.perception_manager:
-                self.perception_manager.destroy()
-        except Exception:
-            pass
-
-        try:
-            if hasattr(self, 'localizer') and self.localizer:
-                self.localizer.destroy()
-        except Exception:
-            pass
-
-        try:
-            if hasattr(self, 'safety_manager') and self.safety_manager:
-                self.safety_manager.destroy()
-        except Exception:
-            pass
-
-        # Phase 4: Small delay after sensor destruction
-        time.sleep(0.02)
-
-        # Phase 5: Destroy the vehicle actor AFTER all sensors are destroyed
-        try:
-            if hasattr(self, 'vehicle') and self.vehicle and self.vehicle.is_alive:
-                self.vehicle.destroy()
-        except Exception:
-            pass
-
-        # Phase 6: Cleanup non-sensor managers
-        try:
-            if hasattr(self, 'map_manager') and self.map_manager:
-                self.map_manager.destroy()
-        except Exception:
-            pass
+        self.perception_manager.destroy()
+        self.localizer.destroy()
+        self.safety_manager.destroy()
+        self.vehicle.destroy()
+        self.map_manager.destroy()

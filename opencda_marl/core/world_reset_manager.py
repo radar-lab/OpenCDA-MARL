@@ -478,12 +478,7 @@ class WorldResetManager:
         """
         Cleanup existing CARLA resources before reload.
 
-        Uses a careful phased approach to prevent Signal 11 crashes:
-        1. Stop all sensor callbacks first
-        2. World tick to process stop commands
-        3. Destroy sensors
-        4. World tick to process sensor destruction
-        5. Destroy vehicles
+        Each manager handles its own sensor cleanup - no pre-stopping needed.
         """
         sm = self.coordinator.scenario_manager
 
@@ -497,57 +492,27 @@ class WorldResetManager:
             sm.traffic_manager.cleanup()
             logger.debug("Traffic manager cleaned up")
 
-        # Destroy any remaining actors in the world with safe cleanup
+        # Destroy any remaining actors in the world
         try:
             world = self.coordinator.carla_world
             if world:
                 actors = world.get_actors()
 
-                # Phase 1: Stop all sensor callbacks first
-                sensor_actors = list(actors.filter('sensor.*'))
-                for actor in sensor_actors:
-                    if actor.is_alive:
-                        try:
-                            actor.stop()
-                        except Exception:
-                            pass
-
-                # Phase 2: World tick to process stop commands
-                try:
-                    world.tick()
-                    time.sleep(0.05)
-                except Exception:
-                    pass
-
-                # Phase 3: Destroy sensors
+                # Destroy remaining sensors
                 sensor_count = 0
-                for actor in sensor_actors:
-                    try:
-                        if actor.is_alive:
-                            actor.destroy()
-                            sensor_count += 1
-                    except Exception as e:
-                        logger.debug(f"Error destroying sensor {actor.id}: {e}")
+                for actor in actors.filter('sensor.*'):
+                    if actor.is_alive:
+                        actor.destroy()
+                        sensor_count += 1
                 if sensor_count > 0:
                     logger.debug(f"Destroyed {sensor_count} remaining sensor actors")
 
-                # Phase 4: World tick to process sensor destruction
-                try:
-                    world.tick()
-                    time.sleep(0.05)
-                except Exception:
-                    pass
-
-                # Phase 5: Destroy vehicles
+                # Destroy remaining vehicles
                 vehicle_count = 0
-                vehicle_actors = list(actors.filter('vehicle.*'))
-                for actor in vehicle_actors:
-                    try:
-                        if actor.is_alive:
-                            actor.destroy()
-                            vehicle_count += 1
-                    except Exception as e:
-                        logger.debug(f"Error destroying vehicle {actor.id}: {e}")
+                for actor in actors.filter('vehicle.*'):
+                    if actor.is_alive:
+                        actor.destroy()
+                        vehicle_count += 1
                 if vehicle_count > 0:
                     logger.debug(f"Destroyed {vehicle_count} remaining vehicle actors")
 

@@ -64,8 +64,6 @@ class GnssSensor(object):
 
         # latitude and longitude at current timestamp
         self.lat, self.lon, self.alt, self.timestamp = 0.0, 0.0, 0.0, 0.0
-        # Track if sensor has been stopped to prevent double-stop warnings
-        self._stopped = False
         # create weak reference to avoid circular reference
         weak_self = weakref.ref(self)
         self.sensor.listen(
@@ -83,29 +81,11 @@ class GnssSensor(object):
         self.alt = event.altitude
         self.timestamp = event.timestamp
 
-    def stop(self):
-        """Stop the sensor callback (safe to call multiple times)."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if not self._stopped and self.sensor.is_alive:
-                    self.sensor.stop()
-                    self._stopped = True
-        except Exception:
-            pass
-
     def destroy(self):
         """Destroy the GNSS sensor."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if self.sensor.is_alive:
-                    # Only stop if not already stopped
-                    if not self._stopped:
-                        self.sensor.stop()
-                        self._stopped = True
-                    self.sensor.destroy()
-                self.sensor = None  # Clear reference to avoid GC warning
-        except Exception:
-            pass  # Suppress warning - sensor may already be destroyed with vehicle
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class ImuSensor(object):
@@ -136,8 +116,6 @@ class ImuSensor(object):
         self.sensor = world.spawn_actor(
             blueprint, carla.Transform(), attach_to=vehicle)
 
-        # Track if sensor has been stopped to prevent double-stop warnings
-        self._stopped = False
         weak_self = weakref.ref(self)
         self.sensor.listen(
             lambda sensor_data: ImuSensor._IMU_callback(
@@ -166,29 +144,11 @@ class ImuSensor(object):
             max(limits[0], min(limits[1], sensor_data.gyroscope.z)))
         self.compass = sensor_data.compass
 
-    def stop(self):
-        """Stop the sensor callback (safe to call multiple times)."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if not self._stopped and self.sensor.is_alive:
-                    self.sensor.stop()
-                    self._stopped = True
-        except Exception:
-            pass
-
     def destroy(self):
         """Destroy the IMU sensor."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor is not None:
-                if self.sensor.is_alive:
-                    # Only stop if not already stopped
-                    if not self._stopped:
-                        self.sensor.stop()
-                        self._stopped = True
-                    self.sensor.destroy()
-                self.sensor = None  # Clear reference to avoid GC warning
-        except Exception:
-            pass  # Suppress warning - sensor may already be destroyed with vehicle
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class LocalizationManager(object):

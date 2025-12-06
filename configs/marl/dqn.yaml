@@ -89,7 +89,7 @@ MARL:
 
   training:
     training_mode: true
-    checkpoint_dir: "checkpoints/dqn/"
+    checkpoint_dir: "checkpoints/"
     save_freq: 5
     keep_checkpoints: 3
 

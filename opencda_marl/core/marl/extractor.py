@@ -213,6 +213,12 @@ class ObservationExtractor:
                         # Default to middle lane (index 2)
                         state_features.extend([0.0, 0.0, 1.0, 0.0])
                 
+                elif feature_name == 'speed':
+                    if 'speed' in obs:
+                        state_features.append(obs['speed'])
+                    else:
+                        state_features.append(0.0)
+
                 elif feature_name == 'heading_angle':
                     if 'heading_angle' in obs:
                         state_features.append(obs['heading_angle'])

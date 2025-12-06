@@ -15,7 +15,6 @@ from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl.core.adapter.vehicle_defaults import get_vehicle_manager_defaults
 from opencda_marl.core.adapter.exception import CollisionException
-from opencda_marl.core.safety.marl_safety_manager import MARLSafetyManager
 from opencda_marl.core.agents import AgentFactory
 from opencda_marl.core.agents.vanilla_agent import VanillaAgent
 
@@ -53,8 +52,6 @@ class MARLVehicleAdapter:
         self._init_nearby_vehicle_config(config)
 
         self.vm = self.get_vm()
-        if hasattr(self.vm, 'safety_manager'):
-            self._use_marl_safety_manager()
 
     def _init_nearby_vehicle_config(self, config: Dict[str, Any]):
         """Initialize nearby vehicle detection parameters from config."""
@@ -109,14 +106,16 @@ class MARLVehicleAdapter:
 
     def check_collision(self) -> bool:
         """
-        Simple collision check using MARL safety manager.
+        Check collision using the safety manager's collision sensor.
         """
         try:
-            if self.vm.safety_manager:
-                return self.vm.safety_manager.check_collision()
+            if self.vm.safety_manager and len(self.vm.safety_manager.sensors) > 0:
+                collision_sensor = self.vm.safety_manager.sensors[0]
+                # return_status() returns {'collision': True/False} and resets flag
+                status = collision_sensor.return_status()
+                return status.get('collision', False)
         except Exception as e:
-            logger.error(
-                f"Warning: Could not check collision for vehicle {self.actor_id}: {e}")
+            logger.debug(f"Could not check collision for vehicle {self.actor_id}: {e}")
         return False
 
     def get_observation(self) -> Dict[str, Any]:
@@ -716,50 +715,6 @@ class MARLVehicleAdapter:
         except Exception as e:
             logger.debug(f"Error calculating distance to destination: {e}")
             return 999.0
-
-    # --------------------------------------------------------------------- #
-    # Private functions
-    # --------------------------------------------------------------------- #
-
-    def _use_marl_safety_manager(self):
-        """
-        Replace the VehicleManager's SafetyManager with MARL version.
-
-        IMPORTANT: Must properly destroy the old SafetyManager before creating
-        the new one to prevent orphaned sensors that cause "sensor went out of
-        scope" warnings.
-        """
-        try:
-            params = self.vm_cfg.get('safety_manager', {
-                'collision_sensor': {'history_size': 4000, 'col_thresh': 50},
-                'stuck_dector': {'len_thresh': 300, 'speed_thresh': 0.05},
-                'offroad_dector': {'speed_thresh': 5},
-                'traffic_light_detector': {'light_dist_thresh': 20},
-                'print_message': False,
-                'queue_maxlen': 2000
-            })
-
-            # CRITICAL: Destroy the old safety manager's sensors BEFORE creating new one
-            # This prevents orphaned sensors that cause "sensor went out of scope" warnings
-            if self.vm.safety_manager:
-                old_sm = self.vm.safety_manager
-                self.vm.safety_manager = None  # Clear reference first
-                old_sm.destroy()  # Then destroy
-
-            # Now create the new MARL safety manager
-            # MARLSafetyManager is standalone (doesn't inherit from SafetyManager)
-            # so it won't create duplicate sensors
-            self.vm.safety_manager = MARLSafetyManager(
-                self.cav_world,
-                self.vehicle,
-                params
-            )
-
-        except Exception as e:
-            logger.error(
-                f"Warning: Failed to initialize MARL safety manager for vehicle {self.actor_id}: {e}")
-            import traceback
-            traceback.print_exc()
 
     # --------------------------------------------------------------------- #
     # Helper functions

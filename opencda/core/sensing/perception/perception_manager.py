@@ -928,41 +928,24 @@ class PerceptionManager:
         """
         if self.rgb_camera:
             for rgb_camera in self.rgb_camera:
-                try:
-                    if hasattr(rgb_camera, 'sensor') and rgb_camera.sensor.is_alive:
-                        rgb_camera.sensor.stop()
-                        rgb_camera.sensor.destroy()
-                except Exception as e:
-                    print(f"Warning: Failed to destroy RGB camera sensor: {e}")
+                if hasattr(rgb_camera, 'sensor') and rgb_camera.sensor.is_alive:
+                    rgb_camera.sensor.stop()
+                    rgb_camera.sensor.destroy()
 
         if self.lidar:
-            try:
-                if hasattr(self.lidar, 'sensor') and self.lidar.sensor.is_alive:
-                    self.lidar.sensor.stop()
-                    self.lidar.sensor.destroy()
-            except Exception as e:
-                print(f"Warning: Failed to destroy LiDAR sensor: {e}")
+            if hasattr(self.lidar, 'sensor') and self.lidar.sensor.is_alive:
+                self.lidar.sensor.stop()
+                self.lidar.sensor.destroy()
 
         if self.camera_visualize:
-            try:
-                cv2.destroyAllWindows()
-            except Exception as e:
-                print(f"Warning: Failed to destroy camera windows: {e}")
+            cv2.destroyAllWindows()
 
         # <OpenCDA-MARL> Only destroy if visualizer was actually initialized
         # This prevents errors when lazy initialization never occurred
         if self.lidar_visualize and self.o3d_vis_initialized and self.o3d_vis:
-            try:
-                self.o3d_vis.destroy_window()
-            except Exception as e:
-                print(f"Warning: Failed to destroy LiDAR window: {e}")
-        elif self.lidar_visualize and not self.o3d_vis_initialized:
-            print("Info: LiDAR visualizer was never initialized, no window to destroy")
+            self.o3d_vis.destroy_window()
 
         if self.data_dump:
-            try:
-                if hasattr(self, 'semantic_lidar') and hasattr(self.semantic_lidar, 'sensor') and self.semantic_lidar.sensor.is_alive:
-                    self.semantic_lidar.sensor.stop()
-                    self.semantic_lidar.sensor.destroy()
-            except Exception as e:
-                print(f"Warning: Failed to destroy semantic LiDAR sensor: {e}")
+            if hasattr(self, 'semantic_lidar') and hasattr(self.semantic_lidar, 'sensor') and self.semantic_lidar.sensor.is_alive:
+                self.semantic_lidar.sensor.stop()
+                self.semantic_lidar.sensor.destroy()
