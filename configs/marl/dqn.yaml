@@ -88,10 +88,11 @@ MARL:
     target_update_freq: 100
 
   training:
-    training_mode: true
+    training_mode: false
     checkpoint_dir: "checkpoints/"
     save_freq: 5
     keep_checkpoints: 3
+    load_checkpoint: "checkpoints/dqn_300vph/best_checkpoint.pth"
 
   # ============ Rewards ============
   rewards:

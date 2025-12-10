@@ -81,6 +81,13 @@ class MARLCoordinator:
                 'max_episodes': simulation_cfg.get('max_episodes', 1000)
             }
 
+            # Override max_episodes for evaluation mode (training_mode: false)
+            marl_cfg = self.config.get('MARL', {})
+            training_mode = marl_cfg.get('training', {}).get('training_mode', True)
+            if not training_mode:
+                self.states['max_episodes'] = 1
+                logger.info("Evaluation mode: setting max episode to 1 (training_mode: false)")
+
             # Create Evaluation manager
             scenario_type = self.config.get("meta", {}).get("scenario_type", None)
             agent_name = self.config.get("agents", {}).get("agent_type", None)

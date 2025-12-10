@@ -255,4 +255,11 @@ class MARLAgentManager:
         self._vehicle_adapters.clear()
         self._spawned_vehicles.clear()
 
+        # IMPORTANT: Tick world to process destroy commands and release GPU memory
+        # Without this, CARLA keeps resources allocated on the GPU
+        try:
+            self.world.tick()
+        except Exception as e:
+            logger.debug(f"World tick after cleanup failed: {e}")
+
         logger.info("MARLAgentManager cleanup completed")

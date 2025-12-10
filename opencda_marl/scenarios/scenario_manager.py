@@ -88,6 +88,13 @@ class MARLScenarioManager(BaseScenarioManager):
             self.states['max_episodes'] = 1
             logger.info("Baseline agent, setting max episode to 1.")
 
+        # Override max_episodes for MARL evaluation mode (training_mode: false)
+        marl_cfg = scenario_params.get('MARL', {})
+        training_mode = marl_cfg.get('training', {}).get('training_mode', True)
+        if not training_mode and self.agent_manager.agent_type == 'marl':
+            self.states['max_episodes'] = 1
+            logger.info("Evaluation mode: setting max episode to 1 (training_mode: false)")
+
         logger.success(
             "MARLScenarioManager initialized (CARLA-only, all CAV).")
 
@@ -157,11 +164,17 @@ class MARLScenarioManager(BaseScenarioManager):
         self.states['collision'] = 0
         self.states['success'] = 0
         self.states['active_agents'] = 0
-        
+
         # Reset agent manager
         self.agent_manager.reset()
         # Reset traffic manager
         self.traffic_manager.reset()
+
+        # Tick world to ensure CARLA processes cleanup and releases GPU memory
+        try:
+            self.world.tick()
+        except Exception:
+            pass
 
     def reset(self):
         """Reset scenario manager for new episode.
@@ -178,6 +191,12 @@ class MARLScenarioManager(BaseScenarioManager):
         self.agent_manager.reset()
         # Reset traffic manager
         self.traffic_manager.reset()
+
+        # Tick world to ensure CARLA processes cleanup and releases GPU memory
+        try:
+            self.world.tick()
+        except Exception:
+            pass
 
         logger.warning("MARLScenarioManager reset completed")
 

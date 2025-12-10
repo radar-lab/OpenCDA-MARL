@@ -479,8 +479,11 @@ class WorldResetManager:
         Cleanup existing CARLA resources before reload.
 
         Each manager handles its own sensor cleanup - no pre-stopping needed.
+        IMPORTANT: world.tick() is called after each cleanup phase to ensure
+        CARLA server processes destroy commands and releases GPU memory.
         """
         sm = self.coordinator.scenario_manager
+        world = self.coordinator.carla_world
 
         # Cleanup agent manager (destroys all vehicles and sensors)
         if sm.agent_manager:
@@ -492,29 +495,61 @@ class WorldResetManager:
             sm.traffic_manager.cleanup()
             logger.debug("Traffic manager cleaned up")
 
-        # Destroy any remaining actors in the world
+        # Tick to process manager cleanups
         try:
-            world = self.coordinator.carla_world
             if world:
+                world.tick()
+        except Exception:
+            pass
+
+        # Destroy any remaining actors in the world
+        # NOTE: We must re-fetch actors list after manager cleanups since
+        # the old list contains stale references to already-destroyed actors
+        try:
+            if world:
+                # Re-fetch fresh actor list after manager cleanups
                 actors = world.get_actors()
 
-                # Destroy remaining sensors
+                # Destroy remaining sensors first (they depend on vehicles)
                 sensor_count = 0
+                sensor_errors = 0
                 for actor in actors.filter('sensor.*'):
-                    if actor.is_alive:
-                        actor.destroy()
-                        sensor_count += 1
+                    try:
+                        if actor.is_alive:
+                            actor.destroy()
+                            sensor_count += 1
+                    except RuntimeError:
+                        # Actor already destroyed, ignore
+                        sensor_errors += 1
                 if sensor_count > 0:
                     logger.debug(f"Destroyed {sensor_count} remaining sensor actors")
+                if sensor_errors > 0:
+                    logger.debug(f"Skipped {sensor_errors} already-destroyed sensors")
+
+                # Tick after sensor cleanup
+                world.tick()
+
+                # Re-fetch actors list again for vehicles
+                actors = world.get_actors()
 
                 # Destroy remaining vehicles
                 vehicle_count = 0
+                vehicle_errors = 0
                 for actor in actors.filter('vehicle.*'):
-                    if actor.is_alive:
-                        actor.destroy()
-                        vehicle_count += 1
+                    try:
+                        if actor.is_alive:
+                            actor.destroy()
+                            vehicle_count += 1
+                    except RuntimeError:
+                        # Actor already destroyed, ignore
+                        vehicle_errors += 1
                 if vehicle_count > 0:
                     logger.debug(f"Destroyed {vehicle_count} remaining vehicle actors")
+                if vehicle_errors > 0:
+                    logger.debug(f"Skipped {vehicle_errors} already-destroyed vehicles")
+
+                # Final tick to process all destroys and release GPU memory
+                world.tick()
 
         except Exception as e:
             logger.warning(f"Error during actor cleanup: {e}")
