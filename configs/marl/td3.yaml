@@ -104,12 +104,11 @@ MARL:
     warmup_steps: 0
 
   training:
-    training_mode: true
+    training_mode: false
     checkpoint_dir: "checkpoints/"
     save_freq: 1
     keep_checkpoints: 3
-    # Load well-trained backup checkpoint (Episode 462: 92.5% success, 7.5% collision)
-    load_checkpoint: "checkpoints/td3/td3_lite_best_checkpoint.pth"
+    load_checkpoint: "checkpoints/td3_44d_400vph/latest_checkpoint.pth"
 
   rewards:
     # Terminal rewards

@@ -92,7 +92,7 @@ MARL:
     checkpoint_dir: "checkpoints/"
     save_freq: 5
     keep_checkpoints: 3
-    load_checkpoint: "checkpoints/dqn_300vph/best_checkpoint.pth"
+    load_checkpoint: "checkpoints/dqn_300vph/latest_checkpoint.pth"
 
   # ============ Rewards ============
   rewards:

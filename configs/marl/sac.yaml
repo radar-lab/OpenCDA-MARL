@@ -116,10 +116,11 @@ MARL:
     min_action: 0.0   # Allow full stops for yielding
 
   training:
-    training_mode: true
+    training_mode: false
     checkpoint_dir: "checkpoints/sac/"
     save_freq: 5
     keep_checkpoints: 3
+    load_checkpoint: "checkpoints/sac_300vph/latest_checkpoint.pth"
 
   # ============ Rewards ============
   rewards:

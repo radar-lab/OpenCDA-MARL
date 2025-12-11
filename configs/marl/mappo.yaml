@@ -60,33 +60,33 @@ MARL:
       lane_position: 1
       waypoint_buffer: 1
 
-    # ============ Network Architecture (smaller for 8D) ============
+    # ============ Network Architecture ============
     # Actor network (decentralized - uses local observation)
-    actor_hidden_dims: [128, 128]
+    actor_hidden_dims: [256, 256]
 
     # Critic network (centralized - sees global state)
-    critic_hidden_dims: [128, 128]
+    critic_hidden_dims: [256, 256]
 
-    # LSTM encoder for multi-agent context (smaller)
+    # LSTM encoder for multi-agent context
     lstm_hidden_size: 128
     lstm_num_layers: 1
 
-    # Initial exploration std (Gaussian policy)
-    init_std: 0.5
+    # Initial exploration std (Gaussian policy) - lower for less noisy initial policy
+    init_std: 0.3
 
     # ============ PPO Hyperparameters ============
-    # Clipping parameter (prevents large policy updates)
-    clip_param: 0.2
+    # Clipping parameter (prevents large policy updates) - smaller for stability
+    clip_param: 0.1
 
-    # Number of epochs per update
-    ppo_epochs: 10
+    # Number of epochs per update - fewer for more conservative updates
+    ppo_epochs: 5
 
     # Mini-batches per epoch
     num_mini_batch: 4
 
     # ============ Loss Coefficients ============
-    # Entropy coefficient (encourages exploration)
-    entropy_coef: 0.01
+    # Entropy coefficient (encourages exploration) - higher for better exploration
+    entropy_coef: 0.05
 
     # Value loss coefficient
     value_loss_coef: 0.5
@@ -117,13 +117,13 @@ MARL:
     # Mini-batch size for updates
     batch_size: 32
 
-    # ============ Warmup Configuration (NEW) ============
+    # ============ Warmup Configuration ============
     # Random exploration before policy learning for better initial data
-    warmup_steps: 1000
+    warmup_steps: 2000
 
     # ============ Action Bounds ============
     max_action: 65.0  # Maximum speed in km/h
-    min_action: 0.0   # Allow full stops for yielding
+    min_action: 10.0  # Minimum speed to prevent "freeze" behavior
 
     # ============ CTDE Settings ============
     # Centralized Training, Decentralized Execution

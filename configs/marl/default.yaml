@@ -38,8 +38,8 @@ scenario:
 
   traffic:
     # Traffic mode: 'record', 'replay', or 'live'
-    mode: "replay"
-    replay_file: "recordings/traffic_300vph.json"
+    mode: "live"
+    replay_file: "recordings/traffic_100vph.json"
     base_speed: 55.0 # km/h base speed for vehicles
     active_junctions: [4]
 
@@ -74,7 +74,7 @@ scenario:
 
     flows:
       - name: "north"
-        rate_vph: 200
+        rate_vph: 300
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -86,7 +86,7 @@ scenario:
           width: 0.3
 
       - name: "south"
-        rate_vph: 200
+        rate_vph: 300
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -98,7 +98,7 @@ scenario:
           width: 0.4
 
       - name: "east"
-        rate_vph: 200
+        rate_vph: 300
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
@@ -110,7 +110,7 @@ scenario:
           width: 0.25
 
       - name: "west"
-        rate_vph: 200
+        rate_vph: 300
         lanes: [0, 1, 2]
         start_step: 0
         end_step: 2400
