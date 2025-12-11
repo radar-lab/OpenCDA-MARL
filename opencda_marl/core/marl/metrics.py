@@ -36,6 +36,7 @@ class TrainingMetrics:
             'episode_lengths': [],
             'success_counts': [],
             'collision_counts': [],
+            'timeout_counts': [],  # Track timeout vehicles
             'near_miss_counts': []  # Track near-miss events for learning analysis
         }
 
@@ -58,6 +59,7 @@ class TrainingMetrics:
         self.agent_rewards = {}
         self.collisions = 0
         self.successes = 0
+        self.timeouts = 0  # Track timeout vehicles
 
         # Track step when LAST vehicle completes (for accurate episode length)
         self.last_completion_step = 0
@@ -169,13 +171,12 @@ class TrainingMetrics:
         # Compute traffic performance metrics for current episode
         traffic_metrics = self._compute_traffic_metrics()
 
-        # Compute success/collision rates from tracked counts
-        # Note: Don't add active_agents because successes+collisions already accounts
-        # for all completed agents. agent_rewards contains ALL agents ever rewarded
-        # (including those that succeeded/collided), causing double-counting.
-        total_vehicles = self.successes + self.collisions
+        # Compute success/collision/timeout rates from tracked counts
+        # Include timeout vehicles in total to properly account for all spawned vehicles
+        total_vehicles = self.successes + self.collisions + self.timeouts
         success_rate = (self.successes / total_vehicles * 100) if total_vehicles > 0 else 0.0
         collision_rate = (self.collisions / total_vehicles * 100) if total_vehicles > 0 else 0.0
+        timeout_rate = (self.timeouts / total_vehicles * 100) if total_vehicles > 0 else 0.0
 
         if not self.episode_rewards:
             metrics = {
@@ -185,8 +186,10 @@ class TrainingMetrics:
                 'avg_reward': avg_reward,
                 'success_rate': success_rate,
                 'collision_rate': collision_rate,
+                'timeout_rate': timeout_rate,
                 'successes': self.successes,
                 'collisions': self.collisions,
+                'timeouts': self.timeouts,
             }
             metrics.update(traffic_metrics)
             return metrics
@@ -203,8 +206,10 @@ class TrainingMetrics:
             'avg_reward': avg_reward,
             'success_rate': success_rate,
             'collision_rate': collision_rate,
+            'timeout_rate': timeout_rate,
             'successes': self.successes,
             'collisions': self.collisions,
+            'timeouts': self.timeouts,
             f'mean_reward_episode_{window_size}': float(np.mean(recent_rewards)),
             f'std_reward_episode_{window_size}': float(np.std(recent_rewards)),
             'max_reward_episode': max(rewards_list),
@@ -280,13 +285,14 @@ class TrainingMetrics:
         """Finish current episode and compute metrics."""
         self._episode_counter += 1
 
-        # Update success/collision counters from episode states
-        # BUG FIX: These were never being updated from episode states
+        # Update success/collision/timeout counters from episode states
         episode_successes = states.get('success', 0)
         episode_collisions = states.get('collision', 0)
+        episode_timeouts = states.get('active_agents', 0)  # Active agents at episode end = timeouts
         episode_near_misses = states.get('near_miss_count', 0)
         self.successes += episode_successes
         self.collisions += episode_collisions
+        self.timeouts += episode_timeouts
 
         # Compute traffic metrics first
         traffic_metrics = self._compute_traffic_metrics()
@@ -319,6 +325,7 @@ class TrainingMetrics:
         self._full_history['episode_lengths'].append(effective_episode_length)
         self._full_history['success_counts'].append(episode_successes)
         self._full_history['collision_counts'].append(episode_collisions)
+        self._full_history['timeout_counts'].append(episode_timeouts)
         self._full_history['near_miss_counts'].append(episode_near_misses)
 
         # Check if it's time to export
@@ -369,6 +376,7 @@ class TrainingMetrics:
                 'episode_lengths': [],
                 'success_counts': [],
                 'collision_counts': [],
+                'timeout_counts': [],
                 'near_miss_counts': []
             }
         except Exception as e:

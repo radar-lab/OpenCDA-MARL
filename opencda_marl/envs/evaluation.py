@@ -197,10 +197,13 @@ class EvaluationManager:
                 self.last_completion_step = step
 
         # calculate current rates
+        # Calculate rates including timeout vehicles for complete accountability
         success_rate = (success / total_vehicles *
                         100) if total_vehicles > 0 else 0
         collision_rate = (collision / total_vehicles *
                           100) if total_vehicles > 0 else 0
+        timeout_rate = (active_agents / total_vehicles *
+                       100) if total_vehicles > 0 else 0
 
         # throughput: how many vehicles have completed per hour
         # Use completion step if all vehicles finished, otherwise current step
@@ -239,6 +242,7 @@ class EvaluationManager:
             'total_vehicles': total_vehicles,
             'success_rate': success_rate,
             'collision_rate': collision_rate,
+            'timeout_rate': timeout_rate,
             'throughput': throughput,
             # Episode length: step when ALL vehicles completed (for consistent reporting)
             'episode_length': effective_step,  # Same as used in throughput calc
@@ -441,9 +445,11 @@ class EvaluationManager:
             num_episodes = len(self.episode_history)
             success_rates = [ep['success_rate'] for ep in self.episode_history]
             collision_rates = [ep['collision_rate'] for ep in self.episode_history]
+            timeout_rates = [ep.get('timeout_rate', 0.0) for ep in self.episode_history]
             throughputs = [ep['throughput'] for ep in self.episode_history]
             total_successes = [ep['success'] for ep in self.episode_history]
             total_collisions = [ep['collision'] for ep in self.episode_history]
+            total_timeouts = [ep.get('active_agents', 0) for ep in self.episode_history]
             
             # Calculate comprehensive statistics
             final_stats = {
@@ -458,15 +464,21 @@ class EvaluationManager:
                 'std_collision_rate': np.std(collision_rates),
                 'best_collision_rate': np.min(collision_rates),  # Lower is better
                 'worst_collision_rate': np.max(collision_rates),
+                'avg_timeout_rate': np.mean(timeout_rates),
+                'std_timeout_rate': np.std(timeout_rates),
+                'best_timeout_rate': np.min(timeout_rates),  # Lower is better
+                'worst_timeout_rate': np.max(timeout_rates),
                 'avg_throughput': np.mean(throughputs),
                 'std_throughput': np.std(throughputs),
                 'best_throughput': np.max(throughputs),
                 'worst_throughput': np.min(throughputs),
                 'total_success': sum(total_successes),
                 'total_collision': sum(total_collisions),
-                'total_vehicles': sum(total_successes) + sum(total_collisions),
+                'total_timeout': sum(total_timeouts),
+                'total_vehicles': sum(total_successes) + sum(total_collisions) + sum(total_timeouts),
                 'final_episode_success_rate': success_rates[-1],
                 'final_episode_collision_rate': collision_rates[-1],
+                'final_episode_timeout_rate': timeout_rates[-1],
                 'final_episode_throughput': throughputs[-1]
             }
             
@@ -491,10 +503,13 @@ class EvaluationManager:
                        f"(Best: {final_stats['best_success_rate']:.1f}%)")
             logger.info(f"Collision Rate: {final_stats['avg_collision_rate']:.1f}% ± {final_stats['std_collision_rate']:.1f}% "
                        f"(Best: {final_stats['best_collision_rate']:.1f}%)")
+            logger.info(f"Timeout Rate: {final_stats['avg_timeout_rate']:.1f}% ± {final_stats['std_timeout_rate']:.1f}% "
+                       f"(Best: {final_stats['best_timeout_rate']:.1f}%)")
             logger.info(f"Throughput: {final_stats['avg_throughput']:.1f} ± {final_stats['std_throughput']:.1f} vph "
                        f"(Best: {final_stats['best_throughput']:.1f} vph)")
             logger.info(f"Total Vehicles: {final_stats['total_vehicles']} "
-                       f"({final_stats['total_success']} success, {final_stats['total_collision']} collision)")
+                       f"({final_stats['total_success']} success, {final_stats['total_collision']} collision, "
+                       f"{final_stats['total_timeout']} timeout)")
             
             if num_episodes > 1:
                 logger.info(f"Trends: Success {final_stats['success_rate_trend']:+.2f}%/ep, "
