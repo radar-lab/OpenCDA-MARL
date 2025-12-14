@@ -117,7 +117,7 @@ MARL:
 
   training:
     training_mode: false
-    checkpoint_dir: "checkpoints/sac/"
+    checkpoint_dir: "checkpoints/"
     save_freq: 5
     keep_checkpoints: 3
     load_checkpoint: "checkpoints/sac_300vph/latest_checkpoint.pth"

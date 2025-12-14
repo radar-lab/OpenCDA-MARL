@@ -131,10 +131,11 @@ MARL:
     share_policy: true        # All agents share actor parameters
 
   training:
-    training_mode: true
-    checkpoint_dir: "checkpoints/mappo/"
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
     save_freq: 10  # Save every 10 episodes
     keep_checkpoints: 3
+    load_checkpoint: "checkpoints/mappo_300vph/latest_checkpoint.pth"
 
   # ============ Rewards ============
   rewards:
