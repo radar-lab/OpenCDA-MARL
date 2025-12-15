@@ -53,40 +53,40 @@ MARL:
     conflict_encoder:
       type: "LSTM"
       input_size: 8
-      hidden_size: 64  # Reduced from 128 - prevent overfitting on small state
+      hidden_size: 256  
       num_layers: 1
 
     # Simplified motion planner architecture
     motion_planner:
       num_layers: 3
-      input_dim: [72, 128, 64]  # 8 + 64 = 72D input
-      output_dim: [128, 64, 1]
+      input_dim: [264, 512, 256]
+      output_dim: [512, 256, 1]
 
-    # Learning rates - conservative like successful SAC
-    learning_rate_actor: 3e-5  # Lower than previous 5e-5
-    learning_rate_critic: 3e-4  # Lower than previous 5e-4
+    # Learning rates
+    learning_rate_actor: 1e-4
+    learning_rate_critic: 1e-3
 
     # TD3 hyperparameters
     tau: 0.005
     discount: 0.99
-    policy_noise: 0.15  # Reduced from 0.2 for smoother exploration
-    noise_clip: 0.3     # Reduced from 0.5 for tighter action bounds
+    policy_noise: 0.2
+    noise_clip: 0.5
 
     # Conservative exploration (inspired by SAC's success)
-    exploration_noise: 0.2     # Lower initial noise
-    noise_decay: 0.9995        # Slower decay for longer exploration
-    min_exploration_noise: 0.02  # Lower minimum
+    exploration_noise: 0.3
+    noise_decay: 0.998
+    min_exploration_noise: 0.05
     policy_freq: 2
 
     # Training parameters
-    batch_size: 256  # Larger batch for stable gradients (was 128)
+    batch_size: 256
 
     # Replay buffer with PER for sample efficiency
-    memory_size: 100000  # Larger buffer
+    memory_size: 100000
     recency_ratio: 0.5
-    clear_episodes: 10   # Less aggressive clearing
-    clear_keep_ratio: 0.9  # Keep more experiences
-    use_per: true  # Enable PER for better sample efficiency
+    clear_episodes: 10
+    clear_keep_ratio: 0.9
+    use_per: true
     per_alpha: 0.6
     per_beta: 0.4
     per_beta_increment: 1.0e-4
@@ -94,11 +94,11 @@ MARL:
 
     # Action bounds (km/h)
     max_action: 65.0
-    min_action: 10.0  # Minimum speed to prevent freeze behavior
-    warmup_steps: 0   # No warmup - start learning immediately
+    min_action: 10.0
+    warmup_steps: 1000
 
   training:
-    training_mode: false
+    training_mode: true
     checkpoint_dir: "checkpoints/"
     save_freq: 5
     keep_checkpoints: 3
@@ -110,8 +110,8 @@ MARL:
     success: 400.0
 
     # Per-step rewards
-    step_penalty: -0.5  # Reduced from -0.8 to encourage more exploration
-    speed_bonus: 0.4    # Increased from 0.3 to reward movement
+    step_penalty: -0.8
+    speed_bonus: 0.3
     speed_threshold: 45.0
 
     # TTC-based safety reward (DISABLED for 8D baseline)
@@ -121,18 +121,18 @@ MARL:
     ttc_near_miss_threshold: 2.0
 
     # Clearance speed bonus
-    clearance_speed_bonus: 0.4  # Increased from 0.3
+    clearance_speed_bonus: 0.3
     clearance_threshold: 30.0
 
-    # Progress reward - encourage forward movement
-    progress_scale: 0.5  # Increased from 0.4
+    # Progress reward 
+    progress_scale: 0.4
     junction_threshold: 5.0
 
-    # Stop penalty - discourage freezing
+    # Stop penalty 
     stop_threshold: 3.0
-    stop_penalty: -2.0  # Increased penalty from -1.5
+    stop_penalty: -1.5
 
-    # Yielding bonus - cooperative behavior
-    yielding_bonus: 1.0  # Doubled from 0.5 to encourage cooperation
+    # Yielding bonus 
+    yielding_bonus: 0.5
     yielding_ttc_threshold: 3.0
     yielding_speed_drop: 5.0
