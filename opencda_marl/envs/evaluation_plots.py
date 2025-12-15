@@ -138,15 +138,17 @@ class EvaluationPlotter:
         if success and collision:
             ax4.plot(steps, success, color='green', linewidth=2, label='Cumulative Success')
             ax4.plot(steps, collision, color='red', linewidth=2, label='Cumulative Collision')
-                
-            # Add final statistics text box
+
+            # Add final statistics text box - use total_vehicles to include timeouts
             final_success = success[-1] if success else 0
             final_collision = collision[-1] if collision else 0
-            final_total = final_success + final_collision
+            final_total = total_vehicles[-1] if total_vehicles else (final_success + final_collision)
+            final_timeout = final_total - final_success - final_collision
             final_success_pct = (final_success / final_total * 100) if final_total > 0 else 0
-                
-            stats_text = f'Final Results:\n{final_success} successes ({final_success_pct:.1f}%)\n{final_collision} collisions'
-            ax4.text(0.02, 0.98, stats_text, transform=ax4.transAxes, 
+            final_collision_pct = (final_collision / final_total * 100) if final_total > 0 else 0
+
+            stats_text = f'Final Results:\n{final_success} successes ({final_success_pct:.1f}%)\n{final_collision} collisions ({final_collision_pct:.1f}%)\n{final_timeout} timeouts'
+            ax4.text(0.02, 0.98, stats_text, transform=ax4.transAxes,
                         verticalalignment='top', fontsize=10,
                         bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
             
@@ -257,15 +259,30 @@ class EvaluationPlotter:
             ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
                     f'{int(value)}', ha='center', va='bottom')
         
-        # Plot 2: Success vs Collision Rates
+        # Plot 2: Success vs Collision vs Timeout Rates
         ax2 = axes[0, 1]
-        rates = ['Success Rate', 'Collision Rate']
-        rate_values = [episode_data['success_rate'], episode_data['collision_rate']]
-        rate_colors = ['green', 'red']
-        
-        wedges, texts, autotexts = ax2.pie(rate_values, labels=rates, colors=rate_colors, 
-                                          autopct='%1.1f%%', startangle=90)
-        ax2.set_title('Success vs Collision Rates')
+        rates = ['Success', 'Collision', 'Timeout']
+        rate_values = [
+            episode_data.get('success_rate', 0),
+            episode_data.get('collision_rate', 0),
+            episode_data.get('timeout_rate', 0)
+        ]
+        rate_colors = ['green', 'red', 'orange']
+
+        # Only include non-zero rates in pie chart
+        filtered_rates = []
+        filtered_values = []
+        filtered_colors = []
+        for rate, value, color in zip(rates, rate_values, rate_colors):
+            if value > 0:
+                filtered_rates.append(rate)
+                filtered_values.append(value)
+                filtered_colors.append(color)
+
+        if filtered_values:
+            wedges, texts, autotexts = ax2.pie(filtered_values, labels=filtered_rates, colors=filtered_colors,
+                                              autopct='%1.1f%%', startangle=90)
+        ax2.set_title('Vehicle Outcome Distribution')
         
         # Plot 3: Episode Throughput
         ax3 = axes[1, 0]

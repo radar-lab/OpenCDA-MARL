@@ -89,10 +89,11 @@ MARL:
     warmup_steps: 0   # No warmup - TD3 learns well without it
 
   training:
-    training_mode: true
-    checkpoint_dir: "checkpoints/td3_simple/"
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
     save_freq: 5
     keep_checkpoints: 3
+    load_checkpoint: "checkpoints/td3_8d_300vph/latest_checkpoint.pth"
 
   rewards:
     # Terminal rewards
