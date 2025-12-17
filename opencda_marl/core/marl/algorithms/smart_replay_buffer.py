@@ -4,7 +4,7 @@ Uses numpy arrays for O(1) sampling instead of O(N) deque operations.
 """
 
 import numpy as np
-from typing import List, Tuple, Any, Optional
+from typing import List, Tuple, Optional
 from loguru import logger
 
 

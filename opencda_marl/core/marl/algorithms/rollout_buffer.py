@@ -12,7 +12,7 @@ Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 '''
 import torch
 import numpy as np
-from typing import Dict, List, Tuple, Optional, Generator
+from typing import Dict, List, Optional, Generator
 from loguru import logger
 
 

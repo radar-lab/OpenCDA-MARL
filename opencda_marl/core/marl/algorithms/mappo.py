@@ -31,7 +31,7 @@ from torch.distributions import Normal
 from loguru import logger
 
 from .base_algorithm import BaseAlgorithm
-from .rollout_buffer import RolloutBuffer, MultiAgentRolloutBuffer
+from .rollout_buffer import RolloutBuffer
 
 
 class GaussianActor(nn.Module):

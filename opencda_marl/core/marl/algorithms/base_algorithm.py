@@ -199,7 +199,7 @@ class BaseAlgorithm(ABC):
 
         # Compute learning quality metrics
         reward_ma, reward_var, reward_std = self._compute_reward_statistics()
-        length_ma = self._compute_episode_length_ma()
+        #length_ma = self._compute_episode_length_ma()
 
         # Check for convergence (MARL-aware)
         self._check_convergence()
