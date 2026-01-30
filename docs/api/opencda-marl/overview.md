@@ -39,7 +39,6 @@ opencda_marl/
 | **[Scenario System](scenario.md)**                     | ✅ Complete | Template-based scenario generation       |
 | **[Agent Manager](agent_manager.md)**                  | ✅ Complete | Multi-agent lifecycle management         |
 | **[Map Manager](map_manager.md)**                      | ✅ Complete | Junction-based spawn point generation    |
-| **[Map Adapter](adapters/map_adapter.md)**             | ✅ Complete | OpenCDA-MARL map integration bridge      |
 | **[Vehicle Adapter](adapters/vehicle_adapter.md)**     | ✅ Complete | RL-OpenCDA vehicle bridge                |
 | **[Environment Interface](environment.md)**            | ✅ Complete | Custom MARL environment (non-Gym)        |
 | **[Training Infrastructure](training.md)**             | ✅ Complete | Algorithms, checkpoints, metrics         |
