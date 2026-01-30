@@ -213,7 +213,7 @@ pixi run start -t <scenario_name> [--apply_ml] [--record]
 
 **Tips**:
 
-- Check `configs/opencda/scenario_testing/config_yaml/` for configuration examples
+- Check `configs/opencda/{config_yaml}.yaml` for configuration examples
 - Use `opencda/customize/` for custom implementations
 - See [YAML Configuration Guide](opencda/yaml_define.md) for all options
 
@@ -223,8 +223,6 @@ pixi run start -t <scenario_name> [--apply_ml] [--record]
 
 **What it provides**: Multi-Agent Reinforcement Learning capabilities for cooperative driving research
 
-!!! info "Development Status"
-    OpenCDA-MARL is currently in active development. Current version: **0.1.0-alpha**. See [MARL Architecture](marl/architecture.md) for detailed development status.
 
 ### Quick Test
 
@@ -308,7 +306,7 @@ pixi run marl-quick-test-gui
 === "Q-Learning"
     ```bash
     # Q-table based learning (balanced configuration)
-    pixi run marl-quick-test -t intersection_qbalanced
+    pixi run marl-quick-test -t qbalanced
     ```
 
     **Configuration**:
@@ -332,7 +330,7 @@ pixi run marl-quick-test-gui
 === "Deep Q-Network (DQN)"
     ```bash
     # Neural network Q-learning
-    pixi run marl-quick-test -t intersection_dqn
+    pixi run marl-quick-test -t dqn
     ```
 
     **Configuration**:
@@ -350,10 +348,10 @@ pixi run marl-quick-test-gui
         batch_size: 32
     ```
 
-=== "TD3 (Twin Delayed DDPG)"
+=== "MATD3 (Twin Delayed DDPG)"
     ```bash
     # Continuous control with TD3
-    pixi run marl-quick-test -t intersection_td3
+    pixi run marl-quick-test -t td3_simple
     ```
 
     **Configuration**:
@@ -371,7 +369,44 @@ pixi run marl-quick-test-gui
         exploration_noise: 0.5
     ```
 
----
+=== "MASAC (Soft Actor Critic)"
+    ```bash
+    # Soft Actor Critic with auto-tuning entropy
+    pixi run marl-quick-test -t sac
+    ```
+
+    **Configuration**:
+    ```yaml
+    agents:
+      agent_type: "marl"
+      marl:
+        algorithm: "sac"
+        sac:
+          learning_rate_actor: 0.001
+          learning_rate_critic: 0.001
+          learning_rate_alpha: 0.001
+          auto_entropy_tuning: true
+          target_entropy: -1.0
+          init_alpha: 0.2
+    ```
+
+=== "MAPPO (Multi-Agent PPO)"
+    ```bash
+    # Multi-Agent PPO with CTDE
+    pixi run marl-quick-test -t mappo
+    ```
+    
+    **Configuration**:
+    ```yaml
+    agents:
+      agent_type: "marl"
+      marl:
+        algorithm: "mappo"
+        mappo:
+          learning_rate: 0.001
+          tau: 0.005
+          alpha: 0.2
+    ```
 
 ### Configuration & Customization
 
@@ -416,7 +451,7 @@ pixi run marl-quick-test-gui
     # Fine-tune RL algorithm parameters
     agents:
       agent_type: "marl"
-      
+
     MARL:
       algorithm: "dqn"
       dqn:
