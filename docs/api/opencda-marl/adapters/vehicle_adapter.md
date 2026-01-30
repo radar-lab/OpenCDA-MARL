@@ -1,6 +1,6 @@
 # Vehicle Adapter API
 
-!!! info "Implementation Status"
+!!! success "Implementation Status"
     The Vehicle Adapter is **fully implemented** and provides the core bridge between OpenCDA's VehicleManager and MARL multi-agent control systems.
 
 The MARLVehicleAdapter is the central component that enables individual vehicles to be controlled by different agent types while preserving OpenCDA's proven autonomous driving capabilities. It supports multiple controller types and provides seamless integration for reinforcement learning agents.
@@ -39,33 +39,30 @@ MARLVehicleAdapter
     ```python
     def __init__(
         self,
-        blueprint: carla.ActorBlueprint,
-        transform: carla.Transform, 
-        world: carla.World,
-        config: Dict,
-        cav_world: CavWorld,
-        destination: carla.Transform = None,
-        marl_id: str = None
+        config: Dict[str, Any],
+        vehicle: carla.Actor,
+        carla_map,
+        cav_world,
+        dump_data: bool = False,
+        agent_type: str = "behavior"
     ):
         """
         Initialize MARL vehicle adapter.
-        
+
         Parameters
         ----------
-        blueprint : carla.ActorBlueprint
-            Vehicle blueprint for CARLA spawning
-        transform : carla.Transform
-            Initial spawn transform
-        world : carla.World
-            CARLA world instance
         config : dict
-            Vehicle configuration
+            Vehicle and agent configuration
+        vehicle : carla.Actor
+            Spawned CARLA vehicle actor
+        carla_map : carla.Map
+            CARLA map instance
         cav_world : CavWorld
             CAV world for coordination
-        destination : carla.Transform, optional
-            Vehicle destination (for route planning)
-        marl_id : str, optional
-            Unique MARL agent identifier
+        dump_data : bool
+            Whether to dump data for debugging
+        agent_type : str
+            Agent type: "behavior", "vanilla", "rule_based", "marl"
         """
     ```
 
@@ -80,7 +77,7 @@ The adapter supports multiple controller types for different use cases:
         'behavior': "OpenCDA BehaviorAgent (standard autonomous driving)", 
         'vanilla': "VanillaAgent (enhanced collision avoidance)",
         'rule_based': "RuleBasedAgent (3-stage intersection rules)",
-        'marl': "MARL-controlled agent (PPO/SAC/TD3 - Planned)"
+        'marl': "MARL-controlled agent (TD3/DQN/Q-Learning/MAPPO/SAC)"
     }
     ```
 
@@ -149,7 +146,7 @@ The adapter supports multiple controller types for different use cases:
             - rotation: Vehicle orientation (yaw, pitch, roll)
             - speed: Speed magnitude in m/s
             - acceleration: Current acceleration
-            - nearby_vehicles: Surrounding vehicle information (planned)
+            - nearby_vehicles: Surrounding vehicle information
             
         Example
         -------
@@ -204,7 +201,7 @@ The adapter supports multiple controller types for different use cases:
 === "Basic Adapter Setup"
 
     ```python
-    from opencda_marl.core.adapters.vehicle_adapter import MARLVehicleAdapter
+    from opencda_marl.core.adapter.vehicle_adapter import MARLVehicleAdapter
     from opencda.core.common.cav_world import CavWorld
     import carla
     
@@ -464,4 +461,4 @@ The adapter supports multiple controller types for different use cases:
 
 ---
 
-**Location**: `opencda_marl/core/adapters/vehicle_adapter.py`
+**Location**: `opencda_marl/core/adapter/vehicle_adapter.py`

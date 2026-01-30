@@ -2,22 +2,29 @@
 authors = ["AXIBA <leolihao@arizona.edu>"]
 channels = ["conda-forge", "pytorch", "nvidia"]
 name = "OpenCDA"
-platforms = ["win-64"]
+platforms = ["win-64","linux-64"]
 version = "0.1.0-alpha"
 
 [system-requirements]
 cuda = "12.8"
 
+[activation.env]
+SUMO_HOME = "D:\\IDKs\\Eclipse\\Sumo"
+
 [tasks]
 start = "python opencda.py"
+
+# TensorBoard for training visualization
+fix-tensorboard = "python scripts/fix_tensorboard_open3d.py"  # Fix Open3D plugin issue
+tensorboard = "tensorboard --logdir=runs"
+tb = "tensorboard --logdir=runs"  # Short alias
 
 # MARL tests
 marl-intersection-build = "python test/marl/test_intersection_build.py"
 
 # MARL integrated with opencda.py
-marl-dev = "python opencda.py -t intersection --marl"
-marl-quick-test = "python opencda.py -t intersection_rule_based --marl"
-marl-quick-test-gui = "python opencda.py -t intersection_rule_based --marl --gui"
+marl-quick-test = "python opencda.py -t rule_based --marl"
+marl-quick-test-gui = "python opencda.py -t rule_based --marl --gui"
 marl-eval-agents = "python opencda_marl/envs/cross_agent_evaluator.py"
 
 
@@ -35,9 +42,10 @@ mkdocs-material = ">=9.5.0,<10"
 mkdocs-mermaid2-plugin = ">=1.2.1, <2"
 mkdocs-git-revision-date-localized-plugin = ">=1.4.7, <2"
 pymdown-extensions = ">=10.12.0,<11"
+click = "*"
 
 [feature.docs.tasks]
-docs-serve = "mkdocs serve"
+docs-serve = "mkdocs serve --livereload"
 docs-build = "mkdocs build"
 docs-deploy = "mkdocs gh-deploy"
 
@@ -70,10 +78,21 @@ loguru = ">=0.7.3,<0.8"
 pyyaml = ">=6.0.2,<7"
 h5py = ">=3.14.0,<4"
 pyside6 = ">=6.9.1,<7"
+typing_extensions = ">=4.15.0,<5"
+tensorboard = ">=2.20.0,<3"
+pyclean = ">=3.4.0,<4"
 
 [pypi-dependencies]
+gitpython = ">=3.1.30"
+sumolib = ">=1.24.0, <2"
+
+
+[target.win-64.pypi-dependencies]
 torch = { index = "https://download.pytorch.org/whl/nightly/cu128" }
 torchvision = { index = "https://download.pytorch.org/whl/nightly/cu128" }
 carla = { path = "./dependencies/whl/carla-0.9.15-cp310-cp310-win_amd64.whl" }
-gitpython = ">=3.1.30"
-sumolib = ">=1.24.0, <2"
+
+[target.linux-64.pypi-dependencies]
+torch = { index = "https://download.pytorch.org/whl/cu130" }
+torchvision = { index = "https://download.pytorch.org/whl/cu130" }
+carla = { path = "./dependencies/whl/carla-0.9.15-cp310-cp310-manylinux_2_27_x86_64.whl" }

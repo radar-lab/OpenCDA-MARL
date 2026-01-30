@@ -20,6 +20,10 @@ from opencda.scenario_testing.utils.yaml_utils import add_current_time
 
 
 def run_scenario(opt, scenario_params):
+    scenario_manager = None
+    eval_manager = None
+    single_cav_list = []
+
     try:
         scenario_params = add_current_time(scenario_params)
 
@@ -38,6 +42,7 @@ def run_scenario(opt, scenario_params):
         scenario_manager = \
             sim_api.CoScenarioManager(scenario_params,
                                       opt.apply_ml,
+                                      carla_version='0.9.15',
                                       xodr_path=xodr_path,
                                       cav_world=cav_world,
                                       sumo_file_parent_path=sumo_cfg)
@@ -69,7 +74,11 @@ def run_scenario(opt, scenario_params):
                 single_cav.vehicle.apply_control(control)
 
     finally:
-        eval_manager.evaluate()
-        scenario_manager.close()
+        if eval_manager is not None:
+            eval_manager.evaluate()
+
+        if scenario_manager is not None:
+            scenario_manager.close()
+
         for v in single_cav_list:
             v.destroy()

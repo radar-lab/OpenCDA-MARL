@@ -11,6 +11,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 import random
+import gc
 from collections import deque
 from typing import Dict, Any, List, Tuple
 from loguru import logger
@@ -79,7 +80,7 @@ class Actor(nn.Module):
     """Actor network for TD3 based on AdvRAIM architecture"""
 
     def __init__(self, state_dim: int, lstm_hidden_dim: int, action_dim: int,
-                 max_action: float = 1.0, min_action: float = 0.0, motion_planner_config: dict = None, 
+                 max_action: float = 1.0, min_action: float = 0.0, motion_planner_config: dict = None,
                  is_target: bool = False):
         super(Actor, self).__init__()
 
@@ -87,6 +88,7 @@ class Actor(nn.Module):
         self.min_action = min_action
         self.is_target = is_target
         self.forward_count = 0  # Counter for logging frequency
+        self.action_dim = action_dim  # Store for LayerNorm
 
         # Use configurable motion planner architecture
         if motion_planner_config is None:
@@ -112,20 +114,24 @@ class Actor(nn.Module):
                 # Config case - properly pair input_dim[i] -> output_dim[i]
                 in_dim = layer_dims[i]
                 out_dim = output_dims[i]
-            
+
             motion_planner_layers.append(nn.Linear(in_dim, out_dim))
             # Add ReLU for all layers except the last one
             if i < num_layers - 1:
                 motion_planner_layers.append(nn.ReLU())
-        
+
         self.motion_planner = nn.Sequential(*motion_planner_layers)
-        
+
         # Final output layer (if the last layer doesn't output action_dim directly)
         if output_dim != action_dim:
             self.output_layer = nn.Linear(output_dim, action_dim)
         else:
             # Motion planner already outputs the right dimension
             self.output_layer = None
+
+        # LayerNorm before tanh to prevent gradient vanishing from tanh saturation
+        # This normalizes pre-tanh values to prevent |x| >> 3 where tanh'(x) ≈ 0
+        self.pre_tanh_norm = nn.LayerNorm(action_dim)
 
         # Initialize weights properly (only log for non-target networks)
         self._initialize_weights()
@@ -146,22 +152,29 @@ class Actor(nn.Module):
 
         # Forward through motion planner
         x = self.motion_planner(combined_input)
-        
-        # Output layer with sigmoid activation (if separate output layer exists)
+
+        # Output layer (if separate output layer exists)
         if self.output_layer is not None:
             x = self.output_layer(x)
-        
-        # Apply tanh activation for better gradient flow and exploration
+
+        # CRITICAL FIX: Apply LayerNorm before tanh to prevent gradient vanishing
+        # Problem: When |x| > 3, tanh saturates at ±1 and gradient ≈ 0
+        # Solution: LayerNorm keeps pre-tanh values in [-2, 2] range where tanh has healthy gradients
+        x_normalized = self.pre_tanh_norm(x)
+
+        # Apply tanh activation for bounded output
         # tanh outputs in [-1, 1], then scale to [min_action, max_action]
-        tanh_out = torch.tanh(x)
+        tanh_out = torch.tanh(x_normalized)
         # Scale from [-1, 1] to [0, 1] then to [min_action, max_action]
         action = self.min_action + (self.max_action - self.min_action) * (tanh_out + 1) * 0.5
         self.forward_count = (self.forward_count + 1) % 100000
-        
+
         # Debug logging for network outputs (periodic)
         if not self.is_target and self.forward_count % 5000 == 0:
-            logger.info(f"Actor Debug (batch mean) - Pre-tanh: {x.mean().item():.3f}, Tanh: {tanh_out.mean().item():.3f}, Action: {action.mean().item():.1f} km/h")
-        
+            logger.debug(f"Actor Debug (batch mean) - Pre-norm: {x.mean().item():.3f}, "
+                       f"Normalized: {x_normalized.mean().item():.3f}, "
+                       f"Tanh: {tanh_out.mean().item():.3f}, Action: {action.mean().item():.1f} km/h")
+
         return action
 
     def _initialize_weights(self):
@@ -323,7 +336,12 @@ class TD3Algorithm(BaseAlgorithm):
         self.noise_clip = config.get('noise_clip', 0.3)
         self.exploration_noise = config.get('exploration_noise', 0.1)
         self.policy_freq = config.get('policy_freq', 2)
-        self.max_action = config.get('max_action', 60.0)  # Maximum speed in km/h
+
+        # Exploration noise decay parameters
+        self.initial_exploration_noise = self.exploration_noise  # Store initial value
+        self.noise_decay = config.get('noise_decay', 0.995)  # Decay rate per episode
+        self.min_exploration_noise = config.get('min_exploration_noise', 0.05)  # Minimum noise floor
+        self.max_action = config.get('max_action', 65.0)  # Maximum speed in km/h
         self.min_action = config.get('min_action', 0.0)   # Minimum speed in km/h
         
         # Warmup configuration
@@ -332,9 +350,9 @@ class TD3Algorithm(BaseAlgorithm):
         # Legacy network architecture (for compatibility)
         critic_hidden_dims = config.get('critic_hidden_dims', [256, 256])
 
-        # Learning rates
-        self.actor_lr = config.get('learning_rate_actor', 1e-5)
-        self.critic_lr = config.get('learning_rate_critic', 1e-4)
+        # Learning rates (increased defaults for faster learning with LayerNorm fix)
+        self.actor_lr = config.get('learning_rate_actor', 1e-4)  # Was 1e-5, now 1e-4
+        self.critic_lr = config.get('learning_rate_critic', 1e-3)  # Was 1e-4, now 1e-3
 
         # Device configuration
         self.device = torch.device(
@@ -404,6 +422,8 @@ class TD3Algorithm(BaseAlgorithm):
                                            recency_ratio=self.recency_ratio)
 
         # Training metrics
+        # Note: actor_grad_norm values are None when actor hasn't updated yet
+        # This prevents logging 0 values when actor update is delayed
         self.training_metrics = {
             'actor_loss': 0.0,
             'critic_loss': 0.0,
@@ -411,14 +431,22 @@ class TD3Algorithm(BaseAlgorithm):
             'q2_mean': 0.0,
             # Delayed policy updates (actor updates every policy_freq steps)
             'target_updates': 0,
-            'memory_size': 0
+            'memory_size': 0,
+            'actor_grad_norm_pre': None,  # None until first actor update
+            'actor_grad_norm_post': None  # None until first actor update
         }
 
         self.training = True
         self.training_step = 0  # Required for delayed policy updates
+        self._pretrained = False  # Flag to indicate if loaded from pretrained checkpoint
+
+        # TensorBoard logging is handled by BaseAlgorithm
+        # Config options: tensorboard.enabled, tensorboard.log_dir, tensorboard.metrics
 
         logger.info(
             f"TD3 initialized with {state_dim}D states, LSTM hidden: {self.lstm_hidden_size}, device: {self.device}")
+        logger.info(
+            f"TD3 Learning rates: actor_lr={self.actor_lr}, critic_lr={self.critic_lr}")
 
     def select_action(self, multi_agent_obs: Dict[str, np.ndarray], ego_agent_id: str, training: bool = True) -> float:
         """
@@ -434,7 +462,8 @@ class TD3Algorithm(BaseAlgorithm):
         """
         try:
             # During warmup phase, return None to use vanilla agent
-            if len(self.memory) < self.warmup_steps:
+            # Skip warmup if model was loaded from checkpoint (_pretrained=True)
+            if len(self.memory) < self.warmup_steps and not self._pretrained:
                 # Log warmup progress only every 2000 samples to reduce verbosity
                 if len(self.memory) % 2000 == 0:
                     logger.info(f"TD3: Warmup phase {len(self.memory)}/{self.warmup_steps}, using vanilla agent")
@@ -450,10 +479,29 @@ class TD3Algorithm(BaseAlgorithm):
 
                 # Add exploration noise during training
                 if training:
-                    noise = torch.randn_like(
-                        raw_action) * self.exploration_noise
-                    action = torch.clamp(
-                        raw_action + noise, self.min_action, self.max_action)
+                    # SMART EXPLORATION: Scale noise by distance to intersection
+                    # ego_state shape: [1, state_dim], index 6 = dist_to_intersection
+                    dist_to_intersection = ego_state[0, 6].item()
+
+                    # Distance-based noise scaling and speed bias
+                    # Thresholds scaled for ~35m spawn-to-intersection distance
+                    if dist_to_intersection > 25.0:
+                        # FAR (25-35m): Initial approach - encourage faster exploration
+                        noise_scale = 1.3
+                        speed_bias = 5.0
+                    elif dist_to_intersection > 10.0:
+                        # MID (10-25m): Decision zone - balanced exploration
+                        noise_scale = 1.0
+                        speed_bias = 0.0
+                    else:
+                        # NEAR (<10m): Intersection entry - slight caution
+                        noise_scale = 0.8
+                        speed_bias = -3.0
+
+                    # Apply scaled noise with position-based bias
+                    noise = torch.randn_like(raw_action) * self.exploration_noise * noise_scale
+                    action = raw_action + noise + speed_bias
+                    action = torch.clamp(action, self.min_action, self.max_action)
                 else:
                     action = raw_action
 
@@ -462,17 +510,12 @@ class TD3Algorithm(BaseAlgorithm):
 
                 if final_speed > self.max_action:
                     final_speed = self.max_action
-                
+
                 # Debug logging for action selection (periodic)
                 if len(self.memory) % 2000 == 0:
                     raw_val = raw_action.squeeze().item()
-                    logger.info(f"TD3 Action Debug - Raw: {raw_val:.1f}, +Noise: {final_speed:.1f}, Episode: {self.episode_count}")
-                
-                # Force exploration in early episodes to break out of 30 km/h trap
-                if self.episode_count < 3 and training and not self._pretrained:
-                    forced_speed = np.random.uniform(35, 60)  # Force higher speeds
-                    logger.debug(f"Forced exploration Episode {self.episode_count}: {forced_speed:.1f} km/h (was {final_speed:.1f})")
-                    return forced_speed
+                    dist_info = f", dist={dist_to_intersection:.0f}m" if training else ""
+                    logger.debug(f"TD3 Action Debug - Raw: {raw_val:.1f}, +Noise: {final_speed:.1f}, Episode: {self.episode_count}{dist_info}")
 
                 return final_speed
 
@@ -577,23 +620,32 @@ class TD3Algorithm(BaseAlgorithm):
                 indices = None
                 importance_weights = None
 
-            # Unpack batch - squeeze the stored [1, dim] arrays to [dim]
-            # Create tensors with gradient tracking for critic learning
-            ego_states = torch.FloatTensor(
-                np.stack([t[0].squeeze(0) for t in transitions])).to(self.device).requires_grad_(True)
-            multi_agent_contexts = torch.FloatTensor(
-                np.stack([t[1].squeeze(0) for t in transitions])).to(self.device).requires_grad_(True)
-            # Actions: collect scalar actions and reshape to [batch_size, 1] for critic
-            actions = torch.FloatTensor(
-                np.array([t[2] for t in transitions])).unsqueeze(1).to(self.device).requires_grad_(False)
-            rewards = torch.FloatTensor(
-                np.array([t[3] for t in transitions])).to(self.device)
-            next_ego_states = torch.FloatTensor(
-                np.stack([t[4].squeeze(0) for t in transitions])).to(self.device)
-            next_multi_agent_contexts = torch.FloatTensor(
-                np.stack([t[5].squeeze(0) for t in transitions])).to(self.device)
-            dones = torch.BoolTensor(
-                np.array([t[6] for t in transitions])).to(self.device)
+            # Unpack batch - optimized: stack first, then squeeze once (not per-element)
+            # Use torch.from_numpy for efficiency (avoids data copy)
+            batch_size = len(transitions)
+
+            # Stack arrays first (shape: [batch, 1, dim]), then squeeze to [batch, dim]
+            ego_states_np = np.stack([t[0] for t in transitions]).squeeze(1).astype(np.float32)
+            ego_states = torch.from_numpy(ego_states_np).to(self.device).requires_grad_(True)
+
+            multi_contexts_np = np.stack([t[1] for t in transitions]).squeeze(1).astype(np.float32)
+            multi_agent_contexts = torch.from_numpy(multi_contexts_np).to(self.device).requires_grad_(True)
+
+            # Actions: collect scalars and reshape to [batch_size, 1]
+            actions_np = np.array([t[2] for t in transitions], dtype=np.float32).reshape(-1, 1)
+            actions = torch.from_numpy(actions_np).to(self.device)
+
+            rewards_np = np.array([t[3] for t in transitions], dtype=np.float32)
+            rewards = torch.from_numpy(rewards_np).to(self.device)
+
+            next_ego_np = np.stack([t[4] for t in transitions]).squeeze(1).astype(np.float32)
+            next_ego_states = torch.from_numpy(next_ego_np).to(self.device)
+
+            next_contexts_np = np.stack([t[5] for t in transitions]).squeeze(1).astype(np.float32)
+            next_multi_agent_contexts = torch.from_numpy(next_contexts_np).to(self.device)
+
+            dones_np = np.array([t[6] for t in transitions], dtype=np.bool_)
+            dones = torch.from_numpy(dones_np).to(self.device)
             
             # Debug logging for tensor shapes (only every 1000 updates)
             if self.training_step % 1000 == 0:
@@ -629,6 +681,16 @@ class TD3Algorithm(BaseAlgorithm):
                 'memory_size': len(self.memory)
             })
 
+            # TensorBoard logging (using base class methods)
+            self.log_scalar('Loss/critic', critic_loss, category='losses')
+            if self.training_step % self.policy_freq == 0:
+                self.log_scalar('Loss/actor', self.training_metrics.get('actor_loss', 0.0), category='losses')
+            self.log_scalar('Buffer/size', len(self.memory), category='buffer')
+            # Log Q-values if available
+            if 'q1_mean' in self.training_metrics:
+                self.log_scalar('Q_values/Q1_mean', self.training_metrics['q1_mean'], category='q_values')
+                self.log_scalar('Q_values/Q2_mean', self.training_metrics['q2_mean'], category='q_values')
+
             # Log training progress periodically (every 200 steps)
             if self.training_step % 200 == 0:
                 current_actor_loss = self.training_metrics.get('actor_loss', 0.0)
@@ -637,12 +699,32 @@ class TD3Algorithm(BaseAlgorithm):
                     f"TD3 Step {self.training_step}: critic_loss={critic_loss:.4f}, actor_loss={current_actor_loss:.4f}, policy_updates={target_updates}, memory={len(self.memory)}")
 
             self.training_step += 1
+
+            # Explicit cleanup to prevent memory leaks
+            del ego_states, multi_agent_contexts, actions, rewards
+            del next_ego_states, next_multi_agent_contexts, dones
+            del ego_states_np, multi_contexts_np, actions_np, rewards_np
+            del next_ego_np, next_contexts_np, dones_np
+            del transitions
+            if self.use_per:
+                del importance_weights
+
+            # Periodic deep cleanup to prevent CUDA memory fragmentation
+            # More aggressive: every 50 steps instead of 500 to prevent slowdown
+            if self.training_step % 50 == 0 and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                gc.collect()
+
             return self.training_metrics.copy()
 
         except Exception as e:
             logger.error(f"Error in TD3 update (step {self.training_step}): {e}")
             import traceback
             logger.error(f"TD3 update traceback:\n{traceback.format_exc()}")
+            # Cleanup even on error
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            gc.collect()
             return self.training_metrics.copy()
 
     def _prepare_inputs(self, multi_agent_obs: Dict[str, np.ndarray], ego_agent_id: str) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -755,7 +837,15 @@ class TD3Algorithm(BaseAlgorithm):
         # Optimize critic
         self.critic_optimizer.zero_grad()
         critic_loss.backward()
+
+        # Compute gradient norm BEFORE clipping (for monitoring)
+        critic_grad_norm_pre = self._compute_grad_norm(self.critic.parameters())
+
         torch.nn.utils.clip_grad_norm_(self.critic.parameters(), max_norm=1.0)
+
+        # Compute gradient norm AFTER clipping
+        critic_grad_norm_post = self._compute_grad_norm(self.critic.parameters())
+
         self.critic_optimizer.step()
 
         # Log loss values after backward pass (safe to call .item() now)
@@ -763,12 +853,21 @@ class TD3Algorithm(BaseAlgorithm):
             loss_value = critic_loss.item()
             loss1_value = critic_loss_1.item()
             loss2_value = critic_loss_2.item()
-            
+
+            # Store gradient norms in metrics
+            self.training_metrics['critic_grad_norm_pre'] = critic_grad_norm_pre
+            self.training_metrics['critic_grad_norm_post'] = critic_grad_norm_post
+
+            # Log to TensorBoard
+            self.log_scalar('Gradients/critic_pre_clip', critic_grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/critic_post_clip', critic_grad_norm_post, category='losses')
+
             # Log every 100 updates or when loss is significantly high/low
             should_log_loss = (self.training_step % 100 == 0) or (loss_value > 5.0) or (loss_value < 0.01)
             if should_log_loss:
-                logger.info(f"TD3 Critic Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, total={loss_value:.4f}")
-            
+                logger.info(f"TD3 Critic Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
+                           f"total={loss_value:.4f}, grad_norm={critic_grad_norm_pre:.4f}->{critic_grad_norm_post:.4f}")
+
         return loss_value
     
     def _update_critic_with_per(self, ego_states, multi_agent_contexts, actions, rewards,
@@ -818,16 +917,24 @@ class TD3Algorithm(BaseAlgorithm):
         # Optimize critic
         self.critic_optimizer.zero_grad()
         total_loss.backward()
+
+        # Compute gradient norm BEFORE clipping (for monitoring)
+        critic_grad_norm_pre = self._compute_grad_norm(self.critic.parameters())
+
         torch.nn.utils.clip_grad_norm_(self.critic.parameters(), max_norm=1.0)
+
+        # Compute gradient norm AFTER clipping
+        critic_grad_norm_post = self._compute_grad_norm(self.critic.parameters())
+
         self.critic_optimizer.step()
-        
+
         # Store loss values for metrics
         loss_value = total_loss.item()
-        
+
         with torch.no_grad():
             loss1_value = weighted_loss1.item()
             loss2_value = weighted_loss2.item()
-            
+
             # Update training metrics
             self.training_metrics.update({
                 'critic_loss1': loss1_value,
@@ -836,15 +943,21 @@ class TD3Algorithm(BaseAlgorithm):
                 'q2_mean': current_q2.mean().item(),
                 'target_q_mean': target_q_values.mean().item(),
                 'td_error_mean': td_errors.mean().item(),
-                'importance_weights_mean': importance_weights.mean().item()
+                'importance_weights_mean': importance_weights.mean().item(),
+                'critic_grad_norm_pre': critic_grad_norm_pre,
+                'critic_grad_norm_post': critic_grad_norm_post
             })
-            
+
+            # Log gradient norms to TensorBoard
+            self.log_scalar('Gradients/critic_pre_clip', critic_grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/critic_post_clip', critic_grad_norm_post, category='losses')
+
             # Log every 100 updates or when loss is significantly high/low
             should_log_loss = (self.training_step % 100 == 0) or (loss_value > 5.0) or (loss_value < 0.01)
             if should_log_loss:
-                logger.info(f"TD3 PER Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
-                           f"td_error_avg={td_errors.mean().item():.4f}, weights_avg={importance_weights.mean().item():.3f}")
-            
+                logger.debug(f"TD3 PER Step {self.training_step}: loss1={loss1_value:.4f}, loss2={loss2_value:.4f}, "
+                           f"td_error_avg={td_errors.mean().item():.4f}, grad_norm={critic_grad_norm_pre:.4f}->{critic_grad_norm_post:.4f}")
+
         return loss_value, td_errors
 
     def _update_actor(self, ego_states, multi_agent_contexts):
@@ -861,12 +974,30 @@ class TD3Algorithm(BaseAlgorithm):
         # Optimize actor
         self.actor_optimizer.zero_grad()
         actor_loss.backward()
+
+        # Compute gradient norm BEFORE clipping (for monitoring)
+        actor_grad_norm_pre = self._compute_grad_norm(self.actor.parameters())
+
         torch.nn.utils.clip_grad_norm_(self.actor.parameters(), max_norm=1.0)
+
+        # Compute gradient norm AFTER clipping
+        actor_grad_norm_post = self._compute_grad_norm(self.actor.parameters())
+
         self.actor_optimizer.step()
 
         # Unfreeze critic parameters
         for param in self.critic.parameters():
             param.requires_grad = True
+
+        # Store gradient norms in metrics (only when actor actually updates)
+        self.training_metrics['actor_grad_norm_pre'] = actor_grad_norm_pre
+        self.training_metrics['actor_grad_norm_post'] = actor_grad_norm_post
+
+        # Log gradient norms to TensorBoard only when actor updates
+        # This prevents logging 0 values during delayed policy updates
+        if actor_grad_norm_pre > 0:  # Only log when there are actual gradients
+            self.log_scalar('Gradients/actor_pre_clip', actor_grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/actor_post_clip', actor_grad_norm_post, category='losses')
 
         return actor_loss.item()
 
@@ -882,10 +1013,45 @@ class TD3Algorithm(BaseAlgorithm):
             target_param.data.copy_(
                 self.tau * param.data + (1 - self.tau) * target_param.data)
 
+    def _compute_grad_norm(self, parameters) -> float:
+        """
+        Compute the L2 norm of gradients for monitoring training stability.
+        Optimized: Single GPU-CPU sync instead of per-parameter sync.
+
+        Args:
+            parameters: Iterator of model parameters
+
+        Returns:
+            Total gradient norm (float)
+        """
+        # Collect all gradients - avoid multiple .item() calls
+        grads = [p.grad.flatten() for p in parameters if p.grad is not None]
+        if not grads:
+            return 0.0
+        # Single concatenation and norm computation on GPU, then one .item()
+        return torch.cat(grads).norm(2).item()
+
     def reset_episode(self):
         """Reset for new episode"""
         self.episode_count += 1
-        
+
+        # Decay exploration noise each episode
+        old_noise = self.exploration_noise
+        self.exploration_noise = max(
+            self.min_exploration_noise,
+            self.exploration_noise * self.noise_decay
+        )
+
+        # Log noise decay to TensorBoard
+        if self.writer is not None:
+            self.writer.add_scalar('TD3/exploration_noise', self.exploration_noise, self.episode_count)
+            self.writer.add_scalar('TD3/noise_decay_ratio', self.exploration_noise / self.initial_exploration_noise, self.episode_count)
+
+        # Log noise decay periodically
+        if self.episode_count % 10 == 0:
+            logger.info(f"Episode {self.episode_count}: Exploration noise decayed {old_noise:.4f} → {self.exploration_noise:.4f} "
+                       f"(min: {self.min_exploration_noise}, decay: {self.noise_decay})")
+
         # Auto-clear buffer every N episodes to prevent stale experiences
         if self.clear_episodes and self.episode_count > 0:
             if self.episode_count % self.clear_episodes == 0:
@@ -895,6 +1061,22 @@ class TD3Algorithm(BaseAlgorithm):
                     new_size = len(self.memory)
                     logger.info(f"Episode {self.episode_count}: Cleared old experiences: "
                                f"{old_size} → {new_size} (kept {self.clear_keep_ratio*100:.0f}% newest)")
+
+        # GPU memory cleanup to prevent slowdown over episodes
+        if torch.cuda.is_available():
+            # Clear CUDA cache every episode to prevent memory fragmentation
+            torch.cuda.empty_cache()
+
+            # Log GPU memory usage periodically for debugging
+            if self.episode_count % 5 == 0:
+                allocated = torch.cuda.memory_allocated(self.device) / 1024**2  # MB
+                cached = torch.cuda.memory_reserved(self.device) / 1024**2  # MB
+                logger.debug(f"Episode {self.episode_count} GPU memory: "
+                           f"allocated={allocated:.1f}MB, cached={cached:.1f}MB")
+
+        # Force garbage collection every few episodes to prevent memory leaks
+        if self.episode_count % 3 == 0:
+            gc.collect()
 
     def get_training_info(self) -> Dict[str, Any]:
         """Get training information"""
@@ -911,13 +1093,36 @@ class TD3Algorithm(BaseAlgorithm):
             'clear_episodes': self.clear_episodes,
             'clear_keep_ratio': self.clear_keep_ratio,
             'target_updates': self.training_metrics.get('target_updates', 0),
-            # TD3 uses exploration noise instead of epsilon
-            'epsilon': self.exploration_noise,
+            # TD3 exploration noise parameters
+            'epsilon': self.exploration_noise,  # Current noise level (for GUI compatibility)
+            'exploration_noise': self.exploration_noise,
+            'initial_exploration_noise': self.initial_exploration_noise,
+            'min_exploration_noise': self.min_exploration_noise,
+            'noise_decay': self.noise_decay,
             'actor_loss': self.training_metrics.get('actor_loss', 0.0),
             'critic_loss': self.training_metrics.get('critic_loss', 0.0),
             'device': str(self.device),
             'max_action': self.max_action
         }
+
+    def log_episode_metrics(self, episode_reward: float, episode_length: int,
+                           success_rate: float = 0.0, collision_rate: float = 0.0,
+                           near_miss_count: int = 0,
+                           ttc_violation_rate: float = 0.0,
+                           additional_metrics: Dict[str, float] = None,
+                           traffic_metrics: Dict[str, float] = None):
+        """Log episode-level metrics to TensorBoard (extends base class)"""
+        # Add TD3-specific metrics
+        td3_metrics = {'buffer_size': len(self.memory)}
+        if additional_metrics:
+            td3_metrics.update(additional_metrics)
+        # Call base class method
+        super().log_episode_metrics(
+            episode_reward, episode_length, success_rate, collision_rate,
+            near_miss_count=near_miss_count,
+            ttc_violation_rate=ttc_violation_rate,
+            additional_metrics=td3_metrics, traffic_metrics=traffic_metrics
+        )
 
     def save(self, path: str):
         """Save TD3 model"""
@@ -963,7 +1168,9 @@ class TD3Algorithm(BaseAlgorithm):
             if 'training_metrics' in save_data:
                 self.training_metrics = save_data['training_metrics']
 
-            logger.info(f"TD3 model loaded from {path}")
+            # Mark as pretrained to skip warmup phase
+            self._pretrained = True
+            logger.info(f"TD3 model loaded from {path} (skipping warmup)")
 
         except Exception as e:
             logger.error(f"Error loading TD3 model: {e}")

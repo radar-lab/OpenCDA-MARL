@@ -1,0 +1,149 @@
+description: |-
+  TD3 (Twin Delayed DDPG) deep reinforcement learning agent.
+  Continuous action space with LSTM conflict encoder.
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5 # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65 # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "td3"
+
+  # State/Action dimensions
+  state_dim: 44 # 9D ego + 35D nearby vehicles
+  action_dim: 1 # Continuous speed control
+
+  td3:
+    # Feature configuration (44D total)
+    features:
+      rel_x: 1
+      rel_y: 1
+      position_x: 1
+      position_y: 1
+      lane_position: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      waypoint_buffer: 1
+      nearby_vehicles: 35 # 5 vehicles x 7 features
+
+    # Nearby vehicle detection
+    nearby_vehicle_config:
+      detection_radius: 30.0   # Reduced from 50m - focus on immediate threats
+      max_vehicles: 5
+      features_per_vehicle: 7
+      include_ttc: true
+      max_relative_velocity: 40.0
+      max_ttc: 10.0
+
+    # LSTM conflict encoder
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 44
+      hidden_size: 256
+      num_layers: 1
+
+    # Motion planner architecture
+    motion_planner:
+      num_layers: 5
+      input_dim: [300, 1024, 1024, 512, 256]
+      output_dim: [1024, 1024, 512, 256, 1]
+
+    # Learning rates
+    learning_rate_actor: 1e-3
+    learning_rate_critic: 1e-3
+
+    # TD3 hyperparameters
+    tau: 0.01
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.3
+    # Position-aware exploration: base noise scaled by distance to intersection
+    exploration_noise: 0.5        # Higher initial (was 0.3)
+    noise_decay: 0.998            # Slower decay (was 0.995)
+    min_exploration_noise: 0.15   # Higher floor (was 0.05)
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 256
+
+    # Replay buffer
+    memory_size: 50000         # Increased from 25000 - more diverse experiences
+    recency_ratio: 0.5
+    clear_episodes: 1
+    clear_keep_ratio: 0.6
+
+    # Prioritized Experience Replay
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 0.001
+
+    # Action bounds (km/h)
+    max_action: 65.0
+    min_action: 0.0   # Allow full stops for yielding (was 10.0)
+    warmup_steps: 0
+
+  training:
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
+    save_freq: 1
+    keep_checkpoints: 3
+    load_checkpoint: "checkpoints/td3_44d_400vph/latest_checkpoint.pth"
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    # Reduced step_penalty to avoid incentivizing unsafe speeding
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0  # Lower threshold for speed bonus
+
+    # TTC-based safety reward - DISABLED (collision penalty is sufficient)
+    # TTC penalty was causing overly conservative driving behavior
+    # Keep these params for metrics tracking only
+    ttc_safe_threshold: 4.0       # seconds - for metrics tracking
+    ttc_max_penalty: 0.0          # DISABLED - set to 0 (was 10.0)
+    ttc_decay_rate: 1.5           # kept for reference
+    ttc_near_miss_threshold: 2.0  # TTC below this counts as near-miss for metrics
+
+    # Clearance speed bonus - NEW: reward for going fast when path is clear
+    # This teaches: "go fast when safe, collision penalty teaches when to slow"
+    clearance_speed_bonus: 0.3    # max bonus when at max speed with clear path
+    clearance_threshold: 30.0     # distance (m) to consider path "clear"
+
+    # Progress reward - slightly reduced to balance with safety
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty - reduced to not overly punish cautious stopping
+    stop_threshold: 3.0   # km/h - more lenient threshold
+    stop_penalty: -1.5    # reduced penalty (was -3.0)
+
+    # Yielding bonus - reward for slowing when nearby vehicle has low TTC
+    # Encourages cooperative behavior: slow down to let others pass safely
+    yielding_bonus: 0.5           # bonus when yielding successfully
+    yielding_ttc_threshold: 3.0   # TTC below this triggers yielding check
+    yielding_speed_drop: 5.0      # speed reduction (km/h) to qualify as yielding (reduced from 10.0)

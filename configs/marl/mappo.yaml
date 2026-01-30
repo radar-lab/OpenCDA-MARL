@@ -1,0 +1,172 @@
+# MAPPO (Multi-Agent Proximal Policy Optimization) Configuration
+# Reference: "The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games"
+#            Yu et al., NeurIPS 2021
+# GitHub: https://github.com/marlbenchmark/on-policy
+#
+# Citation:
+# @article{yu2022surprising,
+#   title={The Surprising Effectiveness of PPO in Cooperative Multi-Agent Games},
+#   author={Yu, Chao and Velu, Akash and Vinitsky, Eugene and others},
+#   journal={Advances in Neural Information Processing Systems},
+#   volume={35},
+#   pages={24611--24624},
+#   year={2022}
+# }
+
+description: |-
+  MAPPO (Multi-Agent Proximal Policy Optimization) for cooperative autonomous
+  intersection management. Uses CTDE paradigm with centralized critic and
+  decentralized actors. Simplified 8D state with warmup for stable learning.
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5  # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65  # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "mappo"
+
+  # Simplified 8D state space (no nearby vehicles for simpler learning)
+  state_dim: 8
+  action_dim: 1  # Continuous speed control
+
+  mappo:
+    # ============ Feature Configuration (8D simplified) ============
+    features:
+      rel_x: 1
+      rel_y: 1
+      speed: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      lane_position: 1
+      waypoint_buffer: 1
+
+    # ============ Network Architecture ============
+    # Actor network (decentralized - uses local observation)
+    actor_hidden_dims: [256, 256]
+
+    # Critic network (centralized - sees global state)
+    critic_hidden_dims: [256, 256]
+
+    # LSTM encoder for multi-agent context
+    lstm_hidden_size: 128
+    lstm_num_layers: 1
+
+    # Initial exploration std (Gaussian policy) - lower for less noisy initial policy
+    init_std: 0.3
+
+    # ============ PPO Hyperparameters ============
+    # Clipping parameter (prevents large policy updates) - smaller for stability
+    clip_param: 0.1
+
+    # Number of epochs per update - fewer for more conservative updates
+    ppo_epochs: 5
+
+    # Mini-batches per epoch
+    num_mini_batch: 4
+
+    # ============ Loss Coefficients ============
+    # Entropy coefficient (encourages exploration) - higher for better exploration
+    entropy_coef: 0.05
+
+    # Value loss coefficient
+    value_loss_coef: 0.5
+
+    # Gradient clipping (prevents gradient explosion)
+    max_grad_norm: 0.5
+
+    # ============ GAE Parameters ============
+    # Discount factor
+    gamma: 0.99
+
+    # GAE lambda (bias-variance tradeoff)
+    gae_lambda: 0.95
+
+    # Whether to use GAE (recommended)
+    use_gae: true
+
+    # ============ Learning Rate ============
+    learning_rate: 3e-4
+
+    # Optional: Linear LR decay
+    use_lr_decay: false
+
+    # ============ Rollout Settings ============
+    # Steps to collect before each update
+    n_steps: 128
+
+    # Mini-batch size for updates
+    batch_size: 32
+
+    # ============ Warmup Configuration ============
+    # Random exploration before policy learning for better initial data
+    warmup_steps: 2000
+
+    # ============ Action Bounds ============
+    max_action: 65.0  # Maximum speed in km/h
+    min_action: 10.0  # Minimum speed to prevent "freeze" behavior
+
+    # ============ CTDE Settings ============
+    # Centralized Training, Decentralized Execution
+    use_centralized_V: true   # Critic sees global state
+    share_policy: true        # All agents share actor parameters
+
+  training:
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
+    save_freq: 10  # Save every 10 episodes
+    keep_checkpoints: 3
+    load_checkpoint: "checkpoints/mappo_300vph/latest_checkpoint.pth"
+
+  # ============ Rewards ============
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0
+
+    # TTC-based safety reward (DISABLED)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
+
+    # Progress reward
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0

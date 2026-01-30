@@ -80,15 +80,12 @@ class GnssSensor(object):
         self.lon = event.longitude
         self.alt = event.altitude
         self.timestamp = event.timestamp
-    
+
     def destroy(self):
         """Destroy the GNSS sensor."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
-        except Exception as e:
-            print(f"Warning: Failed to destroy GNSS sensor: {e}")
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class ImuSensor(object):
@@ -146,15 +143,12 @@ class ImuSensor(object):
             max(limits[0], min(limits[1], sensor_data.gyroscope.y)),
             max(limits[0], min(limits[1], sensor_data.gyroscope.z)))
         self.compass = sensor_data.compass
-    
+
     def destroy(self):
         """Destroy the IMU sensor."""
-        try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
-        except Exception as e:
-            print(f"Warning: Failed to destroy IMU sensor: {e}")
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class LocalizationManager(object):
@@ -360,11 +354,13 @@ class LocalizationManager(object):
         try:
             if hasattr(self, 'gnss') and self.gnss:
                 self.gnss.destroy()
+                self.gnss = None
         except Exception as e:
-            print(f"Warning: Failed to destroy GNSS sensor: {e}")
-        
+            pass  # Suppress warning - sensor may already be destroyed
+
         try:
             if hasattr(self, 'imu') and self.imu:
                 self.imu.destroy()
+                self.imu = None
         except Exception as e:
-            print(f"Warning: Failed to destroy IMU sensor: {e}")
+            pass  # Suppress warning - sensor may already be destroyed

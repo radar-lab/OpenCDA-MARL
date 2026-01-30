@@ -1,0 +1,41 @@
+description: |-
+  Rule-based 3-stage agent for intersection scenario.
+  Traditional agent with JAIR enhancements - no training required.
+
+agents:
+  agent_type: "rule_based"
+
+  rule_based:
+    debug: false
+    debug_rules: false
+    max_speed: 65 # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+    # Stage 1: Junction Management
+    junction_approach_distance: 70.0 # meters
+    junction_conflict_distance: 50.0 # meters
+    junction_speed_factor: 0.6
+    junction_min_reduction: 30.0 # km/h
+
+    # Trajectory-based conflict detection
+    trajectory_lookahead_time: 8.0 # seconds
+    ttc_threshold: 5.0 # seconds
+    trajectory_step_size: 3.0 # meters
+
+    # Stage 2: Car Following
+    following_speed_buffer: 8.0 # km/h
+    time_headway: 3.0 # seconds
+    following_gain: 0.5
+    minimum_distance_buffer: 5.0 # meters
+    same_lane_tolerance_deg: 30
+    front_cone_angle_deg: 45
+
+    # Stage 3: Cruising
+    cruising_speed_factor: 1.0

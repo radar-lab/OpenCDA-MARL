@@ -121,18 +121,20 @@ class Controller:
 
         """
         error = target_speed - self.current_speed
-        self._lat_ebuffer.append(error)
+        # FIXED: Use _lon_ebuffer instead of _lat_ebuffer for longitudinal control
+        self._lon_ebuffer.append(error)
 
-        if len(self._lat_ebuffer) >= 2:
-            _de = (self._lat_ebuffer[-1] - self._lat_ebuffer[-2]) / self.dt
-            _ie = sum(self._lat_ebuffer) * self.dt
+        if len(self._lon_ebuffer) >= 2:
+            _de = (self._lon_ebuffer[-1] - self._lon_ebuffer[-2]) / self.dt
+            _ie = sum(self._lon_ebuffer) * self.dt
         else:
             _de = 0.0
             _ie = 0.0
 
-        return np.clip((self._lat_k_p * error) +
-                       (self._lat_k_d * _de) +
-                       (self._lat_k_i * _ie),
+        # FIXED: Use _lon_k_* gains instead of _lat_k_* for longitudinal control
+        return np.clip((self._lon_k_p * error) +
+                       (self._lon_k_d * _de) +
+                       (self._lon_k_i * _ie),
                        -1.0, 1.0)
 
     def lat_run_step(self, target_location):
@@ -170,10 +172,11 @@ class Controller:
         if _cross[2] < 0:
             _dot *= -1.0
 
-        self._lon_ebuffer.append(_dot)
-        if len(self._lon_ebuffer) >= 2:
-            _de = (self._lon_ebuffer[-1] - self._lon_ebuffer[-2]) / self.dt
-            _ie = sum(self._lon_ebuffer) * self.dt
+        # FIXED: Use _lat_ebuffer instead of _lon_ebuffer for lateral control
+        self._lat_ebuffer.append(_dot)
+        if len(self._lat_ebuffer) >= 2:
+            _de = (self._lat_ebuffer[-1] - self._lat_ebuffer[-2]) / self.dt
+            _ie = sum(self._lat_ebuffer) * self.dt
         else:
             _de = 0.0
             _ie = 0.0

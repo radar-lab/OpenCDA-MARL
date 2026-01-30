@@ -1,6 +1,6 @@
 # Benchmark Comparison API
 
-!!! info "Implementation Status"
+!!! success "Implementation Status"
     The Benchmark Comparison System is **fully implemented** and provides comprehensive automated testing for comparing agent performance across different traffic scenarios.
 
 The BenchmarkComparator provides a unified system for benchmarking different agent types (behavior, vanilla, rule_based) across standardized traffic scenarios (safe, balanced, aggressive) with comprehensive performance metrics.

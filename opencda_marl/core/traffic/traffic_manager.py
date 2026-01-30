@@ -141,14 +141,22 @@ class MARLTrafficManager:
                 logger.success(f"Events saved successfully to {save_path}")
 
     def _generate_events(self):
+        logger.debug(f"Generating events for {len(self.active_junctions)} junctions and {len(self.flows)} flows")
+        logger.debug(f"Active junctions: {self.active_junctions}")
+        logger.debug(f"Flows: {[f.name for f in self.flows]}")
+
         for j_id in self.active_junctions:
+            logger.debug(f"Processing junction {j_id}")
             for flow in self.flows:
-                events = flow._generate_events(self.vbp, self.planner, 
+                logger.debug(f"Generating events for flow '{flow.name}' at junction {j_id}")
+                events = flow._generate_events(self.vbp, self.planner,
                                                j_id, fix_dlt=self.fix_dlt,
                                                base_speed=self.base_speed)
+                logger.debug(f"Generated {len(events)} events for flow '{flow.name}'")
                 self._events.extend(events)
         # sort events by spawn_step
         self._events.sort(key=lambda x: x.spawn_step)
+        logger.debug(f"Total events generated: {len(self._events)}")
 
     def _parse_flows(self) -> List[Dict[str, Any]]:
         flow_dicts = self.config.get('flows', [])

@@ -152,5 +152,10 @@ ready*
 
 !/recordings/*.json
 /checkpoints/*/*episode_*.*
-/checkpoints/*/latest_checkpoint.*
+checkpoints/**/best_checkpoint.*
+!/checkpoints/**/latest_checkpoint.*
 /archived_docs
+/.spec-workflow
+/runs
+/metrics_history
+/.pixi

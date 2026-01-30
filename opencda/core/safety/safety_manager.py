@@ -55,3 +55,6 @@ class SafetyManager:
     def destroy(self):
         for sensor in self.sensors:
             sensor.destroy()
+        self.sensors.clear()  # Clear references to avoid GC warnings
+        self.imu_sensor = None
+        self.vehicle = None

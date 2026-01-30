@@ -106,11 +106,12 @@ nav:
           - FAQ: faq.md
   - MARL Framework:
       - Architecture: marl/architecture.md
+      - SUMO Training: marl/sumo_training.md
       #- Algorithms: marl/algorithms.md
       #- Training: marl/training.md
       - Updates: marl/updates.md
       - Changelog-MARL:
-          - v0.1.0-alpha: marl/changelog/v0.1.0-alpha.md
+          - v1.0.0: marl/changelog/v1.0.0.md
       - Contributing: contributing.md
   - OpenCDA Integration:
       - Core Components: opencda/core.md
@@ -140,9 +141,7 @@ nav:
           - Overview: api/opencda-marl/overview.md
           - Coordinator: api/opencda-marl/coordinator.md
           - Scenario: api/opencda-marl/scenario.md
-          - Adapters:
-              - Map Adapter: api/opencda-marl/adapters/map_adapter.md
-              - Vehicle Adapter: api/opencda-marl/adapters/vehicle_adapter.md
+          - Vehicle Adapter: api/opencda-marl/adapters/vehicle_adapter.md
           - Core Components:
               - Agent Manager: api/opencda-marl/agent_manager.md
               - Map Manager: api/opencda-marl/map_manager.md
@@ -153,7 +152,7 @@ nav:
   - About Us: about.md
 
 extra:
-  homepage: https://lgcyaxi.github.io/opencda-marl
+  homepage: https://github.com/radar-lab/opencda-marl
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/radar-lab/opencda-marl
@@ -162,10 +161,10 @@ extra:
       link: https://opencda-documentation.readthedocs.io/en/latest/
       name: OpenCDA Documentation
     - icon: fontawesome/solid/university
-      link: https://github.com/radar-lab
+      link: https://radar.ece.arizona.edu/
       name: UA Radar Lab
-  version:
-    provider: mike
+  # version:
+  #   provider: mike  # Enable when using mike for versioned docs deployment
   analytics:
     feedback:
       title: Was this page helpful?

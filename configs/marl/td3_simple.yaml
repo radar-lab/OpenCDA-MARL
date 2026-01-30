@@ -1,0 +1,129 @@
+description: |-
+  TD3 Simple - Lightweight TD3 with 8D state space for comparison testing.
+  Uses existing TD3 algorithm with simplified state features (no nearby vehicles).
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5  # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65  # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "td3"
+
+  # Simplified 8D state space (no nearby vehicles)
+  state_dim: 8
+  action_dim: 1  # Continuous speed control
+
+  td3:
+    # 8D Feature configuration (simplified - no nearby_vehicles)
+    features:
+      rel_x: 1
+      rel_y: 1
+      speed: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      lane_position: 1
+      waypoint_buffer: 1
+
+    # LSTM conflict encoder (smaller for 8D input)
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 8
+      hidden_size: 128  # Reduced from 256
+      num_layers: 1
+
+    # Simplified motion planner architecture
+    motion_planner:
+      num_layers: 3
+      input_dim: [136, 256, 128]  # 8 + 128 = 136D input
+      output_dim: [256, 128, 1]
+
+    # Learning rates - lower for stability
+    learning_rate_actor: 5e-5
+    learning_rate_critic: 5e-4
+
+    # TD3 hyperparameters
+    tau: 0.005
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.5
+
+    # Simplified exploration (no distance-aware noise)
+    exploration_noise: 0.3
+    noise_decay: 0.999  # Slower decay for longer exploration
+    min_exploration_noise: 0.05
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 128  # Smaller batch
+
+    # Replay buffer (no PER for simplicity)
+    memory_size: 50000  # Larger buffer for stability
+    recency_ratio: 0.5
+    clear_episodes: 5   # Less aggressive clearing
+    clear_keep_ratio: 0.8  # Keep more experiences
+    use_per: false  # Disable PER for simplicity
+
+    # Action bounds (km/h)
+    max_action: 65.0
+    min_action: 10.0  # Minimum speed to prevent freeze behavior
+    warmup_steps: 0   # No warmup - TD3 learns well without it
+
+  training:
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
+    save_freq: 5
+    keep_checkpoints: 3
+    load_checkpoint: "checkpoints/td3_8d_300vph/latest_checkpoint.pth"
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0
+
+    # TTC-based safety reward (DISABLED)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
+
+    # Progress reward
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0

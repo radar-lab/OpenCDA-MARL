@@ -11,7 +11,7 @@ from typing import Dict, List, Any, Callable
 import traceback
 
 from opencda.core.common.cav_world import CavWorld
-from opencda_marl.envs import CarlaMonitor, CarlaSpectator, MARLEnv, EvaluationManager
+from opencda_marl.envs import CarlaMonitor, CarlaSpectator, MARLEnv, SumoMARLEnv, EvaluationManager
 from opencda_marl.scenarios import ScenarioBuilder
 
 
@@ -40,6 +40,7 @@ class MARLCoordinator:
         self.carla_client = None
         self.carla_world = None
         self.carla_monitor = None
+        self.world_reset_manager = None
 
         # Callbacks for external control (GUI, etc.)
         self.pre_step_callbacks: List[Callable] = []
@@ -55,51 +56,119 @@ class MARLCoordinator:
         2. Monitor the CARLA simulation?
 
         """
-        # 1. Create CAV world
-        self.cav_world = CavWorld(apply_ml=self.config.opt.apply_ml)
+        # Check if using SUMO-only mode
+        simulator = self.config.get('meta', {}).get('simulator', 'carla')
 
-        # 2. Create Scenario Manager
-        self.scenario_manager = ScenarioBuilder.build_from_config(
-            config=self.config,
-            cav_world=self.cav_world,
-        )
-        self.states = self.scenario_manager.states
-        self.carla_client = self.scenario_manager.client
-        self.carla_world = self.scenario_manager.world
+        if simulator == 'sumo':
+            # SUMO-only mode (no CARLA, no CAV world needed)
+            logger.info("Initializing SUMO-only MARL environment")
 
-        # 3. Create Spectator for GUI
-        spectator_config = self.config.get('spectator', {})
-        self.carla_spectator = CarlaSpectator(
-            self.carla_world, spectator_config)
+            # Create SUMO MARL environment directly
+            self.marl_env = SumoMARLEnv(config=self.config)
 
-        # 4. Create MARL environment
-        Marl_cfg = self.config.get('MARL', {})
-        self.marl_env = MARLEnv(self.scenario_manager,
-                                config=Marl_cfg)
+            # Set placeholders for CARLA components (not used in SUMO mode)
+            self.cav_world = None
+            self.scenario_manager = None
+            self.carla_client = None
+            self.carla_world = None
+            self.carla_spectator = None
+            self.carla_monitor = None
 
-        # 5. Create CARLA monitor
-        marl_tm = self.scenario_manager.traffic_manager
-        self.carla_monitor = CarlaMonitor(self.carla_world,
-                                          marl_tm=marl_tm)
+            # Populate states from config for SUMO mode
+            simulation_cfg = self.config.get('scenario', {}).get('simulation', {})
+            self.states = {
+                'max_steps': simulation_cfg.get('max_steps', 2400),
+                'max_episodes': simulation_cfg.get('max_episodes', 1000)
+            }
 
-        # 6. Create Evaluation manager
-        scenario_type = self.config.get("meta", {}).get("scenario_type", None)
-        agent_name = self.config.get("agents", {}).get("agent_type", None)
-        eval_cfg = self.config.get('evaluation', {})
-        self.evaluation_manager = EvaluationManager(config=eval_cfg,
-                                                    scenario_name=scenario_type,
-                                                    agent_name=agent_name)
+            # Override max_episodes for evaluation mode (training_mode: false)
+            marl_cfg = self.config.get('MARL', {})
+            training_mode = marl_cfg.get('training', {}).get('training_mode', True)
+            if not training_mode:
+                self.states['max_episodes'] = 1
+                logger.info("Evaluation mode: setting max episode to 1 (training_mode: false)")
+
+            # Create Evaluation manager
+            scenario_type = self.config.get("meta", {}).get("scenario_type", None)
+            agent_name = self.config.get("agents", {}).get("agent_type", None)
+            eval_cfg = self.config.get('evaluation', {})
+            self.evaluation_manager = EvaluationManager(config=eval_cfg,
+                                                        scenario_name=scenario_type,
+                                                        agent_name=agent_name)
+        else:
+            # CARLA mode (standard)
+            logger.info("Initializing CARLA MARL environment")
+
+            # 1. Create CAV world
+            self.cav_world = CavWorld(apply_ml=self.config.opt.apply_ml)
+
+            # 2. Create Scenario Manager
+            self.scenario_manager = ScenarioBuilder.build_from_config(
+                config=self.config,
+                cav_world=self.cav_world,
+            )
+            self.states = self.scenario_manager.states
+            self.carla_client = self.scenario_manager.client
+            self.carla_world = self.scenario_manager.world
+
+            # 3. Create Spectator for GUI
+            spectator_config = self.config.get('spectator', {})
+            self.carla_spectator = CarlaSpectator(
+                self.carla_world, spectator_config)
+
+            # 4. Create MARL environment
+            Marl_cfg = self.config.get('MARL', {})
+            self.marl_env = MARLEnv(self.scenario_manager,
+                                    config=Marl_cfg)
+
+            # 5. Create CARLA monitor
+            marl_tm = self.scenario_manager.traffic_manager
+            self.carla_monitor = CarlaMonitor(self.carla_world,
+                                              marl_tm=marl_tm)
+
+            # 6. Create Evaluation manager
+            scenario_type = self.config.get("meta", {}).get("scenario_type", None)
+            agent_name = self.config.get("agents", {}).get("agent_type", None)
+            eval_cfg = self.config.get('evaluation', {})
+            self.evaluation_manager = EvaluationManager(config=eval_cfg,
+                                                        scenario_name=scenario_type,
+                                                        agent_name=agent_name)
+
+            # 7. Initialize world reset manager if configured
+            world_reset_cfg = self.config.get('world_reset', {})
+            if (world_reset_cfg.get('reset_frequency', 0) > 0 or
+                world_reset_cfg.get('auto_reset', {}).get('enabled', False)):
+                from opencda_marl.core.world_reset_manager import WorldResetManager
+                self.world_reset_manager = WorldResetManager(world_reset_cfg, self)
+                logger.info("WorldResetManager initialized for CARLA memory management")
 
     # --------------------------------------------------------------------- #
     # main thread
     # --------------------------------------------------------------------- #
     def get_metrics(self):
-        metrics = self.states.copy()
-        if self.marl_env:
-            metrics.update(self.marl_env.get_episode_metrics())
-        return metrics
+        simulator = self.config.get('meta', {}).get('simulator', 'carla')
+
+        if simulator == 'sumo':
+            # SUMO mode: get metrics directly from environment
+            metrics = {}
+            if self.marl_env:
+                metrics.update(self.marl_env.get_episode_metrics())
+            return metrics
+        else:
+            # CARLA mode: combine scenario states and environment metrics
+            metrics = self.states.copy()
+            if self.marl_env:
+                metrics.update(self.marl_env.get_episode_metrics())
+            # Add pending spawns from traffic manager for accurate throughput calculation
+            if self.scenario_manager:
+                traffic_info = self.scenario_manager.get_traffic_info()
+                metrics['pending_spawns'] = traffic_info.get('pending_spawns', 0)
+            return metrics
 
     def step(self):
+        import time
+        step_start = time.perf_counter()
+
         # Call pre-step callbacks
         for callback in self.pre_step_callbacks:
             callback()
@@ -121,7 +190,10 @@ class MARLCoordinator:
             rewards = self.marl_env.get_current_step_rewards()
         self.evaluation_manager.update_step(metrics, rewards)
 
-        #print(f"states: {self.states}, rewards: {rewards}, metrics: {metrics}")
+        # Record step time for world reset manager performance monitoring
+        step_duration = time.perf_counter() - step_start
+        if self.world_reset_manager:
+            self.world_reset_manager.record_step_time(step_duration)
         
     def run(self):
         """
@@ -150,8 +222,9 @@ class MARLCoordinator:
                 episode_metrics = self.marl_env.reset_episode()
                 logger.info(f"Episode metrics: {episode_metrics}")
 
-            # Reset scenario manager
-            self.scenario_manager.reset_episode()
+            # Reset scenario manager (only in CARLA mode)
+            if self.scenario_manager is not None:
+                self.scenario_manager.reset_episode()
 
             # Call episode callbacks
             for callback in self.episode_callbacks:
@@ -164,6 +237,11 @@ class MARLCoordinator:
 
         import gc
         gc.collect()
+
+        # Check for world reset AFTER episode completes (safe timing)
+        # This prevents CARLA server-side memory accumulation slowdown
+        if self.world_reset_manager:
+            self.world_reset_manager.on_episode_end()
 
     def run_gui_mode(self):
         """

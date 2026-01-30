@@ -171,6 +171,9 @@ class VanillaAgent(BasicAgent):
         """
         Execute one step of navigation.
         Returns OpenCDA-compatible format: (target_speed, target_location)
+
+        IMPORTANT: If target_speed is provided (from RL algorithm), it is used directly
+        for the controller. This ensures RL actually controls vehicle speed.
         """
         # Check if agent is properly initialized
         if not self._ego_pos:
@@ -182,6 +185,31 @@ class VanillaAgent(BasicAgent):
             # Signal completion without forceful exit - let the scenario manager handle cleanup
             raise StopIteration("Destination reached - simulation complete")
 
+        # Get local planner
+        local_planner = self.get_local_planner()
+
+        # CRITICAL FIX: If RL provides target_speed, still call local_planner.run_step()
+        # to advance waypoints along the route. Otherwise vehicle won't follow the route.
+        if target_speed is not None:
+            if local_planner:
+                # Call run_step to advance waypoints (no parameters needed for this LocalPlanner)
+                local_planner.run_step()
+                # Get target location from updated waypoint
+                target_location = local_planner.target_waypoint.transform.location if local_planner.target_waypoint else None
+            else:
+                target_location = self._ego_pos.location if self._ego_pos else None
+
+            # Clamp to safe range [0, max_speed]
+            clamped_speed = max(0.0, min(target_speed, self.max_speed))
+            return clamped_speed, target_location
+
+        # Fallback behavior: only used when no RL target_speed provided (warmup phase)
+        # Get target location from local planner for fallback path
+        if local_planner and hasattr(local_planner, 'target_waypoint') and local_planner.target_waypoint:
+            target_location = local_planner.target_waypoint.transform.location
+        else:
+            target_location = self._ego_pos.location if self._ego_pos else None
+
         try:
             # Get control from BasicAgent's CARLA implementation
             control = super().run_step()
@@ -189,12 +217,10 @@ class VanillaAgent(BasicAgent):
             # Extract target speed from control (convert from throttle/brake to speed)
             if control.throttle > 0:
                 # Use configured max_speed when accelerating
-                calculated_target_speed = min(
-                    self.max_speed, target_speed if target_speed else self.max_speed)
+                calculated_target_speed = self.max_speed
             elif control.brake > 0:
                 # Reduce speed when braking
-                calculated_target_speed = max(
-                    0, self._ego_speed - 10)  # Gradual brake
+                calculated_target_speed = max(0, self._ego_speed - 10)  # Gradual brake
             else:
                 # Maintain current speed
                 calculated_target_speed = self._ego_speed
@@ -202,16 +228,7 @@ class VanillaAgent(BasicAgent):
         except Exception as e:
             print(f"VanillaAgent: Error in BasicAgent.run_step(): {e}")
             # Fallback to conservative behavior
-            calculated_target_speed = min(
-                5.0, self._ego_speed)  # Slow down safely
-
-        # Get target location from local planner
-        local_planner = self.get_local_planner()
-        if local_planner and hasattr(local_planner, 'target_waypoint') and local_planner.target_waypoint:
-            target_location = local_planner.target_waypoint.transform.location
-        else:
-            # Fallback: use current position if no waypoint available
-            target_location = self._ego_pos.location if self._ego_pos else None
+            calculated_target_speed = min(5.0, self._ego_speed)  # Slow down safely
 
         return calculated_target_speed, target_location
 
@@ -219,7 +236,7 @@ class VanillaAgent(BasicAgent):
     # Public getter methods for state information
     # --------------------------------------------------------------------- #
     def get_speed(self) -> float:
-        """Get current ego vehicle speed in m/s."""
+        """Get current ego vehicle speed in km/h."""
         return self._ego_speed
     
     def get_position(self) -> tuple:

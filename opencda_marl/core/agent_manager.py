@@ -55,8 +55,13 @@ class MARLAgentManager:
 
         for i, adapter in enumerate(self._vehicle_adapters):
             try:
-                if adapter.actor_id in target_speed.keys():
-                    agent_target_speed = target_speed[adapter.actor_id]
+                # Handle both int and string keys from MARL manager
+                # CARLA uses int actor IDs, but observation extractor may use string keys
+                actor_id = adapter.actor_id
+                if actor_id in target_speed:
+                    agent_target_speed = target_speed[actor_id]
+                elif str(actor_id) in target_speed:
+                    agent_target_speed = target_speed[str(actor_id)]
                 else:
                     agent_target_speed = None
                 adapter.step(agent_target_speed)
@@ -86,18 +91,20 @@ class MARLAgentManager:
                 traceback.print_exc()
                 raise e
 
+        # Remove completed/collided vehicles in reverse order
         for i in reversed(remove_indices):
             self._remove_adapter_by_index(i)
 
     def _remove_adapter_by_index(self, index: int):
+        """Remove a single vehicle adapter."""
         if 0 <= index < len(self._vehicle_adapters):
             adapter = self._vehicle_adapters[index]
             vehicle = self._spawned_vehicles[index]
 
-            # Clean up the adapter (this will destroy the VehicleManager)
+            # Destroy adapter (handles VehicleManager cleanup)
             adapter.destroy()
 
-            # Destroy the CARLA vehicle actor
+            # Destroy vehicle if still alive
             if vehicle.is_alive:
                 vehicle.destroy()
 
@@ -234,17 +241,25 @@ class MARLAgentManager:
     def cleanup(self):
         """Clean up all spawned vehicles and their adapters."""
         logger.info(
-            f"Cleaning up {len(self._vehicle_adapters)} vehicle adapters"
+            f"Cleaning up {len(self._vehicle_adapters)} vehicle adapters "
             f"and {len(self._spawned_vehicles)} vehicles")
-        for _, adapter in enumerate(self._vehicle_adapters):
+
+        for adapter in self._vehicle_adapters:
             adapter.destroy()
 
-        for _, vehicle in enumerate(self._spawned_vehicles):
+        for vehicle in self._spawned_vehicles:
             if hasattr(vehicle, 'is_alive') and vehicle.is_alive:
                 vehicle.destroy()
 
         # Clear tracking lists
         self._vehicle_adapters.clear()
         self._spawned_vehicles.clear()
+
+        # IMPORTANT: Tick world to process destroy commands and release GPU memory
+        # Without this, CARLA keeps resources allocated on the GPU
+        try:
+            self.world.tick()
+        except Exception as e:
+            logger.debug(f"World tick after cleanup failed: {e}")
 
         logger.info("MARLAgentManager cleanup completed")

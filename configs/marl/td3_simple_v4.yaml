@@ -1,0 +1,132 @@
+description: |-
+  TD3 Simple V4 - Addresses slow speed issue in V3 by rebalancing rewards.
+  Key changes:
+  - Stronger speed incentives (higher bonus, lower threshold)
+  - Reduced step penalty to encourage movement
+  - Velocity-proportional progress reward
+  - Maintained large network architecture
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "td3"
+
+  state_dim: 8
+  action_dim: 1
+
+  td3:
+    # 8D features (same as v3)
+    features:
+      rel_x: 1
+      rel_y: 1
+      speed: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      lane_position: 1
+      waypoint_buffer: 1
+
+    # Network architecture (keep v3's larger network)
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 8
+      hidden_size: 256
+      num_layers: 1
+
+    motion_planner:
+      num_layers: 3
+      input_dim: [264, 512, 256]  # 8 + 256 = 264
+      output_dim: [512, 256, 1]
+
+    # Learning rates (keep v3's rates)
+    learning_rate_actor: 1e-4
+    learning_rate_critic: 1e-3
+
+    # TD3 hyperparameters
+    tau: 0.005
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.5
+
+    # Exploration (keep v3's settings)
+    exploration_noise: 0.3
+    noise_decay: 0.998
+    min_exploration_noise: 0.05
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 256
+    memory_size: 100000
+    recency_ratio: 0.5
+    clear_episodes: 10
+    clear_keep_ratio: 0.9
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 1.0e-4
+    per_epsilon: 1.0e-6
+
+    max_action: 65.0
+    min_action: 10.0
+    warmup_steps: 1000
+
+  training:
+    training_mode: true
+    checkpoint_dir: "checkpoints/"
+    save_freq: 5
+    keep_checkpoints: 3
+    load_checkpoint: ""
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards - REBALANCED FOR SPEED
+    step_penalty: -0.5          
+    speed_bonus: 1.0            
+    speed_threshold: 35.0       
+
+    # TTC-based safety (disabled)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus 
+    clearance_speed_bonus: 1.0 
+    clearance_threshold: 30.0
+
+    # Progress reward 
+    progress_scale: 1.0 
+    junction_threshold: 5.0
+
+    # Stop penalty 
+    stop_threshold: 3.0
+    stop_penalty: -3.0          
+
+    # Yielding bonus 
+    yielding_bonus: 1.0         
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0

@@ -1,0 +1,18 @@
+description: |-
+  Vanilla agent baseline for intersection scenario.
+  Traditional agent - no training required.
+
+agents:
+  agent_type: "vanilla"
+
+  vanilla:
+    debug: false
+    max_speed: 45 # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 9
+      debug: false
+      debug_trajectory: true

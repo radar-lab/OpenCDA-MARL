@@ -24,7 +24,11 @@ class MARLSafetyManager(SafetyManager):
         """
         super().__init__(cav_world, vehicle, params)
 
-        # Only replace the collision sensor (first sensor) with our version
+        # Destroy the original CollisionSensor before replacing
+        # to prevent orphaned sensors
+        self.sensors[0].destroy()
+
+        # Replace with our MARL version
         self.sensors[0] = MARLCollisionSensor(
             vehicle, params['collision_sensor'])
 

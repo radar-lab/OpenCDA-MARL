@@ -1,0 +1,138 @@
+description: |-
+  TD3 Simple V3 - Improved lightweight TD3 inspired by successful SAC/DQN 8D configurations.
+  Key improvements over td3_simple:
+  - Conservative exploration with gradual noise decay (like SAC)
+  - Lower learning rates for stability
+  - Smaller LSTM hidden size to prevent overfitting on 8D input
+  - Increased batch size for more stable gradients
+  - Enhanced reward shaping with cooperative yielding
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5  # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65  # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "td3"
+
+  # Simplified 8D state space (no nearby vehicles)
+  state_dim: 8
+  action_dim: 1  # Continuous speed control
+
+  td3:
+    # 8D Feature configuration (simplified - no nearby_vehicles)
+    features:
+      rel_x: 1
+      rel_y: 1
+      speed: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      lane_position: 1
+      waypoint_buffer: 1
+
+    # LSTM conflict encoder (smaller to match 8D input)
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 8
+      hidden_size: 256  
+      num_layers: 1
+
+    # Simplified motion planner architecture
+    motion_planner:
+      num_layers: 3
+      input_dim: [264, 512, 256]
+      output_dim: [512, 256, 1]
+
+    # Learning rates
+    learning_rate_actor: 1e-4
+    learning_rate_critic: 1e-3
+
+    # TD3 hyperparameters
+    tau: 0.005
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.5
+
+    # Conservative exploration (inspired by SAC's success)
+    exploration_noise: 0.3
+    noise_decay: 0.998
+    min_exploration_noise: 0.05
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 256
+
+    # Replay buffer with PER for sample efficiency
+    memory_size: 100000
+    recency_ratio: 0.5
+    clear_episodes: 10
+    clear_keep_ratio: 0.9
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 1.0e-4
+    per_epsilon: 1.0e-6
+
+    # Action bounds (km/h)
+    max_action: 65.0
+    min_action: 10.0
+    warmup_steps: 1000
+
+  training:
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
+    save_freq: 5
+    keep_checkpoints: 3
+    load_checkpoint: "checkpoints/td3_8d_300vph_v3/latest_checkpoint.pth"
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0
+
+    # TTC-based safety reward (DISABLED for 8D baseline)
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: 0.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
+
+    # Progress reward 
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty 
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus 
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0

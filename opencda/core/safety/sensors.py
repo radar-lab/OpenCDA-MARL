@@ -73,12 +73,9 @@ class CollisionSensor(object):
         Clear collision sensor in Carla world.
         """
         self._history.clear()
-        try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
-        except Exception as e:
-            print(f"Warning: Failed to destroy collision sensor: {e}")
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class IMUSensor(object):
@@ -124,12 +121,9 @@ class IMUSensor(object):
         pass
 
     def destroy(self) -> None:
-        try:
-            if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
-                self.sensor.stop()
-                self.sensor.destroy()
-        except Exception as e:
-            print(f"Warning: Failed to destroy IMU sensor: {e}")
+        if hasattr(self, 'sensor') and self.sensor and self.sensor.is_alive:
+            self.sensor.stop()
+            self.sensor.destroy()
 
 
 class StuckDetector(object):

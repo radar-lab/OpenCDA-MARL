@@ -6,9 +6,20 @@ Description  : Base class for all reinforcement learning algorithms
 Copyright (c) 2025 by AXIBA (leolihao@arizona.edu), All Rights Reserved.
 '''
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+from collections import deque
+import os
+from datetime import datetime
 import numpy as np
 from loguru import logger
+
+# TensorBoard for training visualization
+try:
+    from torch.utils.tensorboard import SummaryWriter
+    TENSORBOARD_AVAILABLE = True
+except ImportError:
+    TENSORBOARD_AVAILABLE = False
+    logger.warning("TensorBoard not available. Install with: pip install tensorboard")
 
 
 class BaseAlgorithm(ABC):
@@ -40,8 +51,462 @@ class BaseAlgorithm(ABC):
         self.training_step = 0
         self.episode_count = 0
 
+        # Reward tracking for convergence analysis
+        self.reward_window_size = config.get('reward_window_size', 10)
+        self.reward_history: deque = deque(maxlen=100)  # Full history (last 100 episodes)
+        self.episode_length_history: deque = deque(maxlen=100)
+
+        # Success/collision tracking for MARL traffic convergence
+        self.success_rate_history: deque = deque(maxlen=100)
+        self.collision_rate_history: deque = deque(maxlen=100)
+
+        # Convergence detection parameters (more lenient for MARL traffic scenarios)
+        self.convergence_threshold = config.get('convergence_threshold', 0.15)  # 15% CV threshold (was 5%)
+        self.convergence_window = config.get('convergence_window', 10)  # Episodes to check
+        self.min_episodes_for_convergence = config.get('min_episodes_for_convergence', 20)  # Need at least 20 episodes
+        self.is_converged = False
+        self.convergence_episode = None  # Episode when convergence was detected
+
+        # Initialize TensorBoard logging
+        self._init_tensorboard(config)
+
         logger.success(
             f"Initialized {self.__class__.__name__} with state_dim={state_dim}, action_dim={action_dim}")
+
+    def _init_tensorboard(self, config: Dict[str, Any]):
+        """Initialize TensorBoard logging based on configuration."""
+        # Get tensorboard config (can be nested under algorithm or at root level)
+        tb_config = config.get('tensorboard', {})
+        if isinstance(tb_config, bool):
+            # Handle simple boolean config
+            tb_config = {'enabled': tb_config}
+
+        self.tb_enabled = tb_config.get('enabled', True) and TENSORBOARD_AVAILABLE
+        self.writer: Optional[SummaryWriter] = None
+
+        if self.tb_enabled:
+            # Configurable log directory
+            base_dir = tb_config.get('log_dir', 'runs')
+            algo_name = self.__class__.__name__.lower().replace('algorithm', '')
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+
+            # Allow custom run name
+            run_name = tb_config.get('run_name', timestamp)
+            self.tensorboard_dir = os.path.join(base_dir, algo_name, run_name)
+
+            self.writer = SummaryWriter(log_dir=self.tensorboard_dir)
+            logger.info(f"TensorBoard logging enabled: {self.tensorboard_dir}")
+            logger.info(f"View with: tensorboard --logdir={base_dir}")
+
+            # Configurable metrics to log
+            self.tb_log_frequency = tb_config.get('log_frequency', 1)  # Log every N steps
+            self.tb_metrics = tb_config.get('metrics', {
+                'losses': True,
+                'q_values': True,
+                'buffer': True,
+                'episode': True,
+                'rewards': True
+            })
+
+    def log_scalar(self, tag: str, value: float, step: int = None, category: str = None):
+        """
+        Log a scalar value to TensorBoard.
+
+        Args:
+            tag: Metric name
+            value: Scalar value
+            step: Global step (defaults to training_step)
+            category: Optional category to check if logging is enabled
+        """
+        if self.writer is None:
+            return
+
+        # Check if this category of metrics should be logged
+        if category and not self.tb_metrics.get(category, True):
+            return
+
+        # Use training_step if step not provided
+        if step is None:
+            step = self.training_step
+
+        # Respect log frequency
+        if step % self.tb_log_frequency != 0:
+            return
+
+        self.writer.add_scalar(tag, value, step)
+
+    def log_scalars(self, main_tag: str, tag_scalar_dict: Dict[str, float],
+                    step: int = None, category: str = None):
+        """
+        Log multiple scalars under a main tag.
+
+        Args:
+            main_tag: Main category tag
+            tag_scalar_dict: Dictionary of {tag: value}
+            step: Global step
+            category: Optional category to check if logging is enabled
+        """
+        if self.writer is None:
+            return
+
+        if category and not self.tb_metrics.get(category, True):
+            return
+
+        if step is None:
+            step = self.training_step
+
+        if step % self.tb_log_frequency != 0:
+            return
+
+        self.writer.add_scalars(main_tag, tag_scalar_dict, step)
+
+    def log_histogram(self, tag: str, values: np.ndarray, step: int = None):
+        """Log a histogram of values."""
+        if self.writer is None:
+            return
+
+        if step is None:
+            step = self.training_step
+
+        self.writer.add_histogram(tag, values, step)
+
+    def log_episode_metrics(self, episode_reward: float, episode_length: int,
+                           success_rate: float = 0.0, collision_rate: float = 0.0,
+                           near_miss_count: int = 0,
+                           ttc_violation_rate: float = 0.0,
+                           additional_metrics: Dict[str, float] = None,
+                           traffic_metrics: Dict[str, float] = None):
+        """
+        Log episode-level metrics to TensorBoard with learning quality analysis.
+
+        Args:
+            episode_reward: Total episode reward
+            episode_length: Number of steps in episode
+            success_rate: Success rate (0-1)
+            collision_rate: Collision rate (0-1)
+            near_miss_count: Number of near-miss events (TTC < threshold without collision)
+            ttc_violation_rate: Percentage of TTC checks that were below safe threshold
+            additional_metrics: Additional custom metrics to log
+            traffic_metrics: Traffic performance metrics (avg_speed, speed_variance, etc.)
+        """
+        # Track reward and episode length history (always track, even without TensorBoard)
+        self.reward_history.append(episode_reward)
+        self.episode_length_history.append(episode_length)
+
+        # Track success/collision rates for MARL traffic convergence analysis
+        self.success_rate_history.append(success_rate)
+        self.collision_rate_history.append(collision_rate)
+
+        # Compute learning quality metrics
+        reward_ma, reward_var, reward_std = self._compute_reward_statistics()
+        #length_ma = self._compute_episode_length_ma()
+
+        # Check for convergence (MARL-aware)
+        self._check_convergence()
+
+        if self.writer is None or not self.tb_metrics.get('episode', True):
+            return
+
+        # Core episode metrics
+        self.writer.add_scalar('Episode/reward', episode_reward, self.episode_count)
+        self.writer.add_scalar('Episode/success_rate', success_rate, self.episode_count)
+        self.writer.add_scalar('Episode/collision_rate', collision_rate, self.episode_count)
+        self.writer.add_scalar('Episode/length', episode_length, self.episode_count)
+
+        # Safety metrics: Near-miss count and TTC violation rate
+        # Decreasing near-misses = agent learning to avoid dangerous situations
+        self.writer.add_scalar('Safety/near_miss_count', near_miss_count, self.episode_count)
+        # TTC violation rate: % of TTC checks with TTC < safe threshold (lower = safer)
+        self.writer.add_scalar('Safety/ttc_violation_rate', ttc_violation_rate, self.episode_count)
+
+        # Learning quality metrics (MARL paper-ready)
+        # Note: episode_length_ma removed - not useful for fixed simulation length
+        self.writer.add_scalar('Learning/reward_moving_avg', reward_ma, self.episode_count)
+        self.writer.add_scalar('Learning/reward_variance', reward_var, self.episode_count)
+        self.writer.add_scalar('Learning/reward_std', reward_std, self.episode_count)
+        self.writer.add_scalar('Learning/converged', 1.0 if self.is_converged else 0.0, self.episode_count)
+
+        # Normalized coefficient of variation (for convergence visualization)
+        if reward_ma != 0:
+            cv = reward_std / abs(reward_ma)  # Coefficient of variation
+            self.writer.add_scalar('Learning/reward_cv', cv, self.episode_count)
+
+        # Traffic performance metrics (RA-L paper-ready)
+        if traffic_metrics:
+            # ============ KEY METRICS (most important for monitoring) ============
+            # avg_speed: Actual average vehicle speed from CARLA (km/h)
+            if 'avg_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/avg_speed', traffic_metrics['avg_speed'], self.episode_count)
+
+            # target_speed_mean: What RL algorithm commanded vehicles to do (km/h)
+            if 'target_speed_mean' in traffic_metrics:
+                self.writer.add_scalar('Traffic/target_speed_mean', traffic_metrics['target_speed_mean'], self.episode_count)
+
+            # speed_gap: Difference between commanded and actual speed (target - actual)
+            # Positive = vehicles slower than commanded, Negative = vehicles faster
+            avg_speed = traffic_metrics.get('avg_speed', 0)
+            target_speed = traffic_metrics.get('target_speed_mean', 0)
+            if target_speed > 0 and avg_speed > 0:
+                speed_gap = target_speed - avg_speed
+                self.writer.add_scalar('Traffic/speed_gap', speed_gap, self.episode_count)
+
+            # ============ SECONDARY METRICS (for detailed analysis) ============
+            # max_speed: Fastest actual vehicle speed in episode (km/h)
+            if 'max_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/max_speed', traffic_metrics['max_speed'], self.episode_count)
+            # min_speed: Slowest actual vehicle speed in episode (km/h)
+            if 'min_speed' in traffic_metrics:
+                self.writer.add_scalar('Traffic/min_speed', traffic_metrics['min_speed'], self.episode_count)
+            # speed_std: Standard deviation of actual speeds (lower = more uniform)
+            if 'speed_std' in traffic_metrics:
+                self.writer.add_scalar('Traffic/speed_std', traffic_metrics['speed_std'], self.episode_count)
+
+            # target_speed_max/min: Range of RL commanded speeds
+            if 'target_speed_max' in traffic_metrics:
+                self.writer.add_scalar('Traffic/target_speed_max', traffic_metrics['target_speed_max'], self.episode_count)
+            if 'target_speed_min' in traffic_metrics:
+                self.writer.add_scalar('Traffic/target_speed_min', traffic_metrics['target_speed_min'], self.episode_count)
+            # throughput: Vehicles completing per hour (success rate efficiency)
+            if 'throughput' in traffic_metrics:
+                self.writer.add_scalar('Traffic/throughput', traffic_metrics['throughput'], self.episode_count)
+
+        # Log additional custom metrics
+        if additional_metrics:
+            for name, value in additional_metrics.items():
+                self.writer.add_scalar(f'Episode/{name}', value, self.episode_count)
+
+        # ============ IMPROVEMENT METRICS (for paper-ready visualization) ============
+        # These show relative improvement over training, better for long training runs
+        self._log_improvement_metrics(success_rate, collision_rate, traffic_metrics)
+
+        # Flush periodically (every 10 episodes) instead of every episode
+        # Reduces I/O blocking during training
+        if self.episode_count % 10 == 0:
+            self.writer.flush()
+
+    def flush_tensorboard(self):
+        """Flush TensorBoard writer to ensure all metrics are written."""
+        if self.writer is not None:
+            self.writer.flush()
+
+    def close(self):
+        """Close TensorBoard writer and cleanup resources."""
+        if self.writer is not None:
+            self.writer.close()
+            logger.info("TensorBoard writer closed")
+
+    # ------------------------------------------------------------------ #
+    # Learning Quality Analysis Methods (for RA-L paper metrics)
+    # ------------------------------------------------------------------ #
+
+    def _compute_reward_statistics(self) -> tuple:
+        """
+        Compute reward moving average, variance, and standard deviation.
+
+        Returns:
+            (moving_average, variance, std_deviation)
+        """
+        if len(self.reward_history) == 0:
+            return 0.0, 0.0, 0.0
+
+        # Use last N episodes for moving average
+        window = list(self.reward_history)[-self.reward_window_size:]
+        reward_ma = float(np.mean(window))
+        reward_var = float(np.var(window))
+        reward_std = float(np.std(window))
+
+        return reward_ma, reward_var, reward_std
+
+    def _compute_episode_length_ma(self) -> float:
+        """Compute moving average of episode lengths."""
+        if len(self.episode_length_history) == 0:
+            return 0.0
+
+        window = list(self.episode_length_history)[-self.reward_window_size:]
+        return float(np.mean(window))
+
+    def _check_convergence(self):
+        """
+        Check if training has converged based on reward and performance stability.
+
+        MARL Traffic Convergence Criteria:
+        1. Minimum episodes reached (default: 20)
+        2. Reward CV (coefficient of variation) below threshold (default: 15%)
+        3. Success rate stabilized (CV < 20%)
+        4. Collision rate decreasing or stable
+
+        This approach is more suitable for MARL traffic scenarios where:
+        - Early episodes have high variance due to exploration
+        - Success/collision rates are key performance indicators
+        """
+        if self.is_converged:
+            return  # Already converged
+
+        # Need minimum episodes before checking convergence
+        if self.episode_count < self.min_episodes_for_convergence:
+            return
+
+        if len(self.reward_history) < self.convergence_window:
+            return  # Not enough data
+
+        # Get recent metrics
+        recent_rewards = list(self.reward_history)[-self.convergence_window:]
+        mean_reward = np.mean(recent_rewards)
+        std_reward = np.std(recent_rewards)
+
+        # Avoid division by zero
+        if abs(mean_reward) < 1e-8:
+            return
+
+        # Coefficient of variation for rewards
+        reward_cv = std_reward / abs(mean_reward)
+
+        # Check success rate stability (if tracked)
+        success_rate_stable = True
+        if len(self.success_rate_history) >= self.convergence_window:
+            recent_success = list(self.success_rate_history)[-self.convergence_window:]
+            mean_success = np.mean(recent_success)
+            if mean_success > 0.01:  # Only check if there are meaningful successes
+                success_cv = np.std(recent_success) / mean_success
+                success_rate_stable = success_cv < 0.20  # 20% CV for success rate
+
+        # Check collision rate trend (should be decreasing or stable)
+        collision_improving = True
+        if len(self.collision_rate_history) >= self.convergence_window:
+            recent_collision = list(self.collision_rate_history)[-self.convergence_window:]
+            # Compare first half to second half
+            first_half = np.mean(recent_collision[:self.convergence_window//2])
+            second_half = np.mean(recent_collision[self.convergence_window//2:])
+            collision_improving = second_half <= first_half * 1.1  # Allow 10% tolerance
+
+        # Check convergence condition
+        reward_converged = reward_cv < self.convergence_threshold
+        if reward_converged and success_rate_stable and collision_improving:
+            self.is_converged = True
+            self.convergence_episode = self.episode_count
+            logger.success(f"Convergence detected at episode {self.episode_count}! "
+                         f"Reward CV={reward_cv:.4f}, Success stable={success_rate_stable}, "
+                         f"Collision improving={collision_improving}")
+
+    def get_learning_statistics(self) -> Dict[str, Any]:
+        """
+        Get comprehensive learning statistics for paper reporting.
+
+        Returns:
+            Dictionary with learning quality metrics
+        """
+        reward_ma, reward_var, reward_std = self._compute_reward_statistics()
+        length_ma = self._compute_episode_length_ma()
+
+        stats = {
+            'episode_count': self.episode_count,
+            'reward_moving_avg': reward_ma,
+            'reward_variance': reward_var,
+            'reward_std': reward_std,
+            'episode_length_ma': length_ma,
+            'is_converged': self.is_converged,
+            'convergence_episode': self.convergence_episode,
+            'reward_history_size': len(self.reward_history),
+        }
+
+        # Add coefficient of variation if mean is non-zero
+        if reward_ma != 0:
+            stats['coefficient_of_variation'] = reward_std / abs(reward_ma)
+
+        # Add full reward history for plotting
+        if len(self.reward_history) > 0:
+            stats['reward_history'] = list(self.reward_history)
+            stats['episode_length_history'] = list(self.episode_length_history)
+
+        return stats
+
+    def _log_improvement_metrics(self, success_rate: float, collision_rate: float,
+                                  traffic_metrics: Dict[str, float] = None):
+        """
+        Log improvement metrics for paper-ready visualization.
+
+        These metrics show relative improvement over training, which is more meaningful
+        than raw values for long training runs (100K+ episodes).
+
+        Metrics logged:
+        - Windowed moving averages (100-episode window)
+        - Delta from baseline (improvement from first 100 episodes)
+        - Percentage improvement from baseline
+        - Time-to-target tracking (episodes to reach X% success rate)
+        """
+        if self.writer is None:
+            return
+
+        window_size = 100  # Use 100-episode windows for smoother curves
+
+        # Track success/collision rate moving averages with larger window
+        if len(self.success_rate_history) >= window_size:
+            # 100-episode moving average (smoother than 10-episode)
+            recent_success = list(self.success_rate_history)[-window_size:]
+            recent_collision = list(self.collision_rate_history)[-window_size:]
+
+            success_ma_100 = float(np.mean(recent_success))
+            collision_ma_100 = float(np.mean(recent_collision))
+
+            self.writer.add_scalar('Improvement/success_rate_ma100', success_ma_100, self.episode_count)
+            self.writer.add_scalar('Improvement/collision_rate_ma100', collision_ma_100, self.episode_count)
+
+            # Calculate baseline from first 100 episodes
+            baseline_success = list(self.success_rate_history)[:window_size]
+            baseline_collision = list(self.collision_rate_history)[:window_size]
+
+            baseline_success_avg = float(np.mean(baseline_success))
+            baseline_collision_avg = float(np.mean(baseline_collision))
+
+            # Absolute improvement (delta from baseline)
+            success_delta = success_ma_100 - baseline_success_avg
+            collision_delta = collision_ma_100 - baseline_collision_avg
+
+            self.writer.add_scalar('Improvement/success_rate_delta', success_delta, self.episode_count)
+            self.writer.add_scalar('Improvement/collision_rate_delta', collision_delta, self.episode_count)
+
+            # Percentage improvement from baseline
+            # Formula: (current - baseline) / baseline * 100
+            if baseline_success_avg > 1.0:  # Avoid division by near-zero
+                success_improvement_pct = (success_ma_100 - baseline_success_avg) / baseline_success_avg * 100
+                self.writer.add_scalar('Improvement/success_improvement_pct', success_improvement_pct, self.episode_count)
+
+            if baseline_collision_avg > 1.0:
+                # For collision, negative improvement is good (reduction)
+                collision_reduction_pct = (baseline_collision_avg - collision_ma_100) / baseline_collision_avg * 100
+                self.writer.add_scalar('Improvement/collision_reduction_pct', collision_reduction_pct, self.episode_count)
+
+        # Track throughput improvement
+        if traffic_metrics and 'throughput' in traffic_metrics:
+            # Store throughput history for improvement calculation
+            if not hasattr(self, 'throughput_history'):
+                self.throughput_history = []
+            self.throughput_history.append(traffic_metrics['throughput'])
+
+            if len(self.throughput_history) >= window_size:
+                recent_throughput = self.throughput_history[-window_size:]
+                baseline_throughput = self.throughput_history[:window_size]
+
+                throughput_ma_100 = float(np.mean(recent_throughput))
+                baseline_throughput_avg = float(np.mean(baseline_throughput))
+
+                self.writer.add_scalar('Improvement/throughput_ma100', throughput_ma_100, self.episode_count)
+
+                if baseline_throughput_avg > 0:
+                    throughput_improvement_pct = (throughput_ma_100 - baseline_throughput_avg) / baseline_throughput_avg * 100
+                    self.writer.add_scalar('Improvement/throughput_improvement_pct', throughput_improvement_pct, self.episode_count)
+
+        # Time-to-target tracking: log when key milestones are reached
+        # Track first episode to reach 70%, 80%, 90% success rate
+        if not hasattr(self, '_milestone_episodes'):
+            self._milestone_episodes = {70: None, 80: None, 90: None, 95: None}
+
+        for target_pct, first_episode in self._milestone_episodes.items():
+            if first_episode is None and success_rate >= target_pct:
+                self._milestone_episodes[target_pct] = self.episode_count
+                self.writer.add_scalar(f'Milestone/episodes_to_{target_pct}pct_success',
+                                      self.episode_count, self.episode_count)
+                logger.info(f"Milestone reached: {target_pct}% success rate at episode {self.episode_count}")
 
     @abstractmethod
     def select_action(self, state: np.ndarray, training: bool = True) -> Any:

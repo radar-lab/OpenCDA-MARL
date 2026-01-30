@@ -11,6 +11,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 import random
+import gc
 from collections import deque
 from typing import Dict, Any
 from loguru import logger
@@ -206,7 +207,7 @@ class DQNAlgorithm(BaseAlgorithm):
     def update(self) -> Dict[str, float]:
         """
         Update Q-network using experience replay.
-        
+
         Returns:
             Training metrics
         """
@@ -214,64 +215,132 @@ class DQNAlgorithm(BaseAlgorithm):
             # Only update if we have enough samples
             if len(self.memory) < self.batch_size:
                 return self.training_metrics
-            
+
             # Sample batch
             transitions = self.memory.sample(self.batch_size)
-            
+
             # Unpack batch
             states = torch.stack([t[0] for t in transitions]).to(self.device)
             actions = torch.LongTensor([t[1] for t in transitions]).to(self.device)
             rewards = torch.FloatTensor([t[2] for t in transitions]).to(self.device)
             next_states = torch.stack([t[3] for t in transitions]).to(self.device)
             dones = torch.BoolTensor([t[4] for t in transitions]).to(self.device)
-            
+
             # Current Q values
             current_q_values = self.q_network(states).gather(1, actions.unsqueeze(1))
-            
+
             # Next Q values from target network
             with torch.no_grad():
                 next_q_values = self.target_network(next_states).max(1)[0]
                 target_q_values = rewards + (self.discount_factor * next_q_values * ~dones)
-            
+
             # Compute loss
             loss = F.mse_loss(current_q_values.squeeze(), target_q_values)
-            
-            # Optimize
+
+            # Optimize with gradient clipping for stability
             self.optimizer.zero_grad()
             loss.backward()
+
+            # Compute gradient norm BEFORE clipping (for monitoring)
+            grad_norm_pre = self._compute_grad_norm(self.q_network.parameters())
+
+            torch.nn.utils.clip_grad_norm_(self.q_network.parameters(), max_norm=1.0)
+
+            # Compute gradient norm AFTER clipping
+            grad_norm_post = self._compute_grad_norm(self.q_network.parameters())
+
             self.optimizer.step()
-            
+
             # Update target network periodically
             if self.training_step % self.target_update_freq == 0:
                 self.target_network.load_state_dict(self.q_network.state_dict())
                 self.training_metrics['target_updates'] += 1
-            
+
             # Update epsilon
             self.epsilon = max(self.epsilon_min, self.epsilon * self.epsilon_decay)
-            
-            # Update metrics
+
+            # Update metrics (compute before deleting tensors)
             with torch.no_grad():
                 q_mean = self.q_network(states).mean().item()
-                
+            loss_value = loss.item()
+
             self.training_metrics.update({
-                'loss': loss.item(),
+                'loss': loss_value,
                 'q_values_mean': q_mean,
                 'epsilon': self.epsilon,
-                'memory_size': len(self.memory)
+                'memory_size': len(self.memory),
+                'grad_norm_pre': grad_norm_pre,
+                'grad_norm_post': grad_norm_post
             })
-            
+
+            # TensorBoard logging (using base class methods)
+            self.log_scalar('Loss/dqn', loss_value, category='losses')
+            self.log_scalar('Q_values/mean', q_mean, category='q_values')
+            self.log_scalar('Exploration/epsilon', self.epsilon, category='episode')
+            self.log_scalar('Buffer/size', len(self.memory), category='buffer')
+            self.log_scalar('Gradients/q_network_pre_clip', grad_norm_pre, category='losses')
+            self.log_scalar('Gradients/q_network_post_clip', grad_norm_post, category='losses')
+
+            # Explicit cleanup to prevent memory leaks (do this AFTER using tensors for metrics)
+            del states, actions, rewards, next_states, dones
+            del current_q_values, next_q_values, target_q_values
+            del transitions, loss
+
             self.training_step += 1
-            
+
+            # Periodic deep cleanup to prevent CUDA memory fragmentation
+            # More aggressive: every 50 steps instead of 500 to prevent slowdown
+            if self.training_step % 50 == 0 and torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                gc.collect()
+
             return self.training_metrics.copy()
-            
+
         except Exception as e:
             logger.error(f"Error in DQN update: {e}")
+            # Cleanup even on error
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            gc.collect()
             return self.training_metrics.copy()
     
     def reset_episode(self):
         """Reset for new episode"""
         self.episode_count += 1
-    
+
+        # GPU memory cleanup to prevent slowdown over episodes
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+            # Log GPU memory usage periodically for debugging
+            if self.episode_count % 5 == 0:
+                allocated = torch.cuda.memory_allocated(self.device) / 1024**2  # MB
+                cached = torch.cuda.memory_reserved(self.device) / 1024**2  # MB
+                logger.debug(f"DQN Episode {self.episode_count} GPU memory: "
+                           f"allocated={allocated:.1f}MB, cached={cached:.1f}MB")
+
+        # Force garbage collection every few episodes to prevent memory leaks
+        if self.episode_count % 3 == 0:
+            gc.collect()
+
+    def _compute_grad_norm(self, parameters) -> float:
+        """
+        Compute the L2 norm of gradients for monitoring training stability.
+        Optimized: Single GPU-CPU sync instead of per-parameter sync.
+
+        Args:
+            parameters: Iterator of model parameters
+
+        Returns:
+            Total gradient norm (float)
+        """
+        # Collect all gradients - avoid multiple .item() calls
+        grads = [p.grad.flatten() for p in parameters if p.grad is not None]
+        if not grads:
+            return 0.0
+        # Single concatenation and norm computation on GPU, then one .item()
+        return torch.cat(grads).norm(2).item()
+
     def get_training_info(self) -> Dict[str, Any]:
         """Get training information"""
         return {

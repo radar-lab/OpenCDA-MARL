@@ -42,7 +42,7 @@ Traffic Configuration Architecture
         
         # Flow-based traffic generation
         # NOTE: Flow names are just identifiers - actual spawn locations are determined
-        # by the 'strategy' parameter and MARLMapAdapter.get_marl_spawn_points()
+        # by the 'strategy' parameter and MARLMapManager spawn point generation
         flows:
         - name: "initial_buildup"          # Flow identifier (name does NOT control spawn location)
             rate_vph: 600                   # Vehicles per hour for this flow
@@ -85,7 +85,7 @@ Traffic Configuration Architecture
     **Flow names do NOT control where vehicles spawn**. The actual spawn locations are determined by:
     
     - **`strategy` parameter**: Controls spawn point selection algorithm
-    - **MARLMapAdapter**: Provides available spawn points based on map topology
+    - **MARLMapManager**: Provides available spawn points based on map topology
     - **Junction approach detection**: Automatically identifies intersection entry points
     
     Available strategies:
@@ -318,14 +318,14 @@ The density config files contain **only parameters that override** the base conf
         - Benchmark integration for record/replay
         """
         
-        def __init__(self, map_adapter, traffic_cfg: Dict, world: carla.World = None):
+        def __init__(self, world: carla.World, traffic_cfg: Dict, state: Dict):
             """
             Initialize traffic manager.
-            
+
             Parameters
             ----------
-            map_adapter : MARLMapAdapter
-                Map adapter for spawn point generation
+            world : carla.World
+                CARLA world instance
             traffic_cfg : dict
                 Traffic configuration with 'flows' array
             world : carla.World

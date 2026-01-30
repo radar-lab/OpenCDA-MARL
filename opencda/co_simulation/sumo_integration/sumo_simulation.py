@@ -294,14 +294,14 @@ def _get_sumo_net(cfg_file):
     cfg_file = os.path.join(os.getcwd(), cfg_file)
 
     tree = ET.parse(cfg_file)
-    tag = tree.find('//net-file')
+    tag = tree.find('.//net-file')  # Fixed FutureWarning
     if tag is None:
         return None
 
     net_file = os.path.join(os.path.dirname(cfg_file), tag.get('value'))
     logging.debug('Reading net file: %s', net_file)
 
-    sumo_net = traci.sumolib.net.readNet(net_file)
+    sumo_net = sumolib.net.readNet(net_file)  # Fixed: sumolib is imported directly
     return sumo_net
 
 class SumoSimulation(object):
@@ -317,13 +317,21 @@ class SumoSimulation(object):
         if host is None or port is None:
             logging.info('Starting new sumo server...')
             if sumo_gui is True:
-                logging.info('Remember to press the play button to start the simulation')
+                logging.info('SUMO GUI will auto-start (non-blocking)')
 
-            traci.start([sumo_binary,
+            # Build command arguments
+            cmd_args = [
+                sumo_binary,
                 '--configuration-file', cfg_file,
                 '--step-length', str(step_length),
                 '--collision.check-junctions'
-            ])
+            ]
+
+            # Add auto-start flag for GUI to prevent blocking
+            if sumo_gui is True:
+                cmd_args.append('--start')
+
+            traci.start(cmd_args)
 
         else:
             logging.info('Connection to sumo server. Host: %s Port: %s', host, port)

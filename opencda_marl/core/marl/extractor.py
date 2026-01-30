@@ -19,6 +19,30 @@ class ObservationExtractor:
             self.features_config = self.td3_config.get('features', {})
             self.custom_features = self.features_config  # Direct access to features
             self.state_dim = self._calculate_custom_feature_dim()
+        elif algorithm == 'mappo':
+            # MAPPO uses same feature config as TD3 for fair comparison
+            self.mappo_config = config.get('mappo', {})
+            # Try to get features from mappo config, fallback to td3 config
+            self.features_config = self.mappo_config.get('features',
+                                    config.get('td3', {}).get('features', {}))
+            self.custom_features = self.features_config
+            self.state_dim = self._calculate_custom_feature_dim()
+        elif algorithm == 'sac':
+            # SAC uses same feature extraction as TD3/MAPPO
+            self.sac_config = config.get('sac', {})
+            self.features_config = self.sac_config.get('features', {})
+            self.custom_features = self.features_config
+            self.state_dim = self._calculate_custom_feature_dim()
+        elif algorithm == 'dqn':
+            # DQN can use configurable features (8D) or fallback to legacy 7D
+            self.dqn_config = config.get('dqn', {})
+            self.features_config = self.dqn_config.get('features', {})
+            if self.features_config:
+                self.custom_features = self.features_config
+                self.state_dim = self._calculate_custom_feature_dim()
+            else:
+                # Fallback to legacy 7D continuous features
+                self.state_dim = 7
 
     def extract(self, observations: Dict) -> Dict[int, np.ndarray]:
         """
@@ -32,8 +56,15 @@ class ObservationExtractor:
         """
         if self.algorithm == 'q_learning':
             return self._extract_discrete(observations)
-        elif self.algorithm == 'td3':
+        elif self.algorithm in ('td3', 'mappo', 'sac'):
+            # TD3, MAPPO, and SAC use multi-agent observations
             return self._extract_multi_agent(observations)
+        elif self.algorithm == 'dqn':
+            # DQN uses custom features but returns simple state arrays (not multi-agent format)
+            if hasattr(self, 'custom_features') and self.custom_features:
+                return self._extract_custom_features(observations)
+            else:
+                return self._extract_continuous(observations)
         else:
             return self._extract_continuous(observations)
 
@@ -182,6 +213,12 @@ class ObservationExtractor:
                         # Default to middle lane (index 2)
                         state_features.extend([0.0, 0.0, 1.0, 0.0])
                 
+                elif feature_name == 'speed':
+                    if 'speed' in obs:
+                        state_features.append(obs['speed'])
+                    else:
+                        state_features.append(0.0)
+
                 elif feature_name == 'heading_angle':
                     if 'heading_angle' in obs:
                         state_features.append(obs['heading_angle'])
@@ -211,7 +248,19 @@ class ObservationExtractor:
                         # Rough estimate: ~2m per waypoint
                         estimated_waypoints = min(50.0, max(0.0, dist_to_int / 2.0))
                         state_features.append(estimated_waypoints)
-                
+
+                elif feature_name == 'nearby_vehicles':
+                    # Nearby vehicle features: 35D = 5 vehicles × 7 features each
+                    # Features per vehicle: rel_x, rel_y, rel_vx, rel_vy, heading_diff, distance, ttc
+                    if 'nearby_vehicles' in obs:
+                        nearby_features = obs['nearby_vehicles']
+                        state_features.extend(nearby_features)
+                    else:
+                        # Default: 5 slots × 7 features with safe values
+                        # Empty slots have zeros except distance=1.0, ttc=1.0 (safe/far away)
+                        for _ in range(5):
+                            state_features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+
                 else:
                     logger.warning(f"Unknown custom feature: {feature_name}")
                     state_features.extend([0.0] * feature_dim)

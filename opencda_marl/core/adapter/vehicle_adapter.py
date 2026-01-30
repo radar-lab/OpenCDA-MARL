@@ -15,9 +15,16 @@ from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl.core.adapter.vehicle_defaults import get_vehicle_manager_defaults
 from opencda_marl.core.adapter.exception import CollisionException
-from opencda_marl.core.safety.marl_safety_manager import MARLSafetyManager
+from opencda_marl.core.safety.marl_collision_sensor import MARLCollisionSensor
 from opencda_marl.core.agents import AgentFactory
 from opencda_marl.core.agents.vanilla_agent import VanillaAgent
+
+# Default nearby vehicle detection constants (can be overridden by config)
+DEFAULT_NEARBY_DETECTION_RADIUS = 50.0  # meters - detection radius for nearby vehicles
+DEFAULT_MAX_NEARBY_VEHICLES = 5  # Maximum number of nearby vehicles to track (K slots)
+DEFAULT_FEATURES_PER_VEHICLE = 7  # Features per vehicle: rel_x, rel_y, rel_vx, rel_vy, heading_diff, distance, ttc
+DEFAULT_MAX_RELATIVE_VELOCITY = 40.0  # m/s (~144 km/h) - for normalization
+DEFAULT_MAX_TTC = 10.0  # seconds - TTC values clamped to this maximum
 
 
 class MARLVehicleAdapter:
@@ -38,13 +45,32 @@ class MARLVehicleAdapter:
         self.world = vehicle.get_world()
         self.dump_data = dump_data
         self.agent_type = agent_type
-        
+
         # Store target speed for monitoring
         self.target_speed = 0.0
-        
+
+        # Load nearby vehicle config from MARL config (or use defaults)
+        self._init_nearby_vehicle_config(config)
+
         self.vm = self.get_vm()
+
+        # Replace SafetyManager with MARLSafetyManager for proper collision detection
         if hasattr(self.vm, 'safety_manager'):
             self._use_marl_safety_manager()
+
+    def _init_nearby_vehicle_config(self, config: Dict[str, Any]):
+        """Initialize nearby vehicle detection parameters from config."""
+        # Try to get config from MARL.td3.nearby_vehicle_config
+        marl_config = config.get('MARL', {})
+        td3_config = marl_config.get('td3', {})
+        nearby_config = td3_config.get('nearby_vehicle_config', {})
+
+        # Load values from config with defaults
+        self.nearby_detection_radius = nearby_config.get('detection_radius', DEFAULT_NEARBY_DETECTION_RADIUS)
+        self.max_nearby_vehicles = nearby_config.get('max_vehicles', DEFAULT_MAX_NEARBY_VEHICLES)
+        self.features_per_vehicle = nearby_config.get('features_per_vehicle', DEFAULT_FEATURES_PER_VEHICLE)
+        self.max_relative_velocity = nearby_config.get('max_relative_velocity', DEFAULT_MAX_RELATIVE_VELOCITY)
+        self.max_ttc = nearby_config.get('max_ttc', DEFAULT_MAX_TTC)
     # --------------------------------------------------------------------- #
     # Public control API
     # --------------------------------------------------------------------- #
@@ -53,7 +79,16 @@ class MARLVehicleAdapter:
         # Store target speed for monitoring
         if target_speed is not None:
             self.target_speed = target_speed
-        
+        else:
+            # During warmup (target_speed=None): use current vehicle speed as "target"
+            # This reflects what vanilla agent is commanding, for TensorBoard tracking
+            try:
+                velocity = self.vm.vehicle.get_velocity()
+                current_speed = 3.6 * (velocity.x**2 + velocity.y**2 + velocity.z**2)**0.5
+                self.target_speed = current_speed
+            except Exception:
+                pass  # Keep previous value if velocity unavailable
+
         self.vm.update_info()
 
         if self.check_collision():
@@ -76,14 +111,17 @@ class MARLVehicleAdapter:
 
     def check_collision(self) -> bool:
         """
-        Simple collision check using MARL safety manager.
+        Check collision using MARLSafetyManager's check_collision method.
+
+        Note: MARLSafetyManager uses MARLCollisionSensor which has a non-resetting
+        return_status(). This allows update_info() to report collision status without
+        consuming it, and check_collision() can then check and reset the flag.
         """
         try:
             if self.vm.safety_manager:
                 return self.vm.safety_manager.check_collision()
         except Exception as e:
-            logger.error(
-                f"Warning: Could not check collision for vehicle {self.actor_id}: {e}")
+            logger.debug(f"Could not check collision for vehicle {self.actor_id}: {e}")
         return False
 
     def get_observation(self) -> Dict[str, Any]:
@@ -104,7 +142,7 @@ class MARLVehicleAdapter:
             if hasattr(self.vm, 'agent'):
                 agent = self.vm.agent
 
-                # Get speed using getter method
+                # Get speed (already in km/h from agent)
                 if hasattr(agent, 'get_speed'):
                     obs['speed'] = round(agent.get_speed(), 2)
                 elif hasattr(agent, '_ego_speed'):
@@ -155,6 +193,12 @@ class MARLVehicleAdapter:
             obs['distance_to_intersection'] = self._calculate_distance_to_intersection()
             obs['distance_to_front_vehicle'] = self._calculate_distance_to_front_vehicle()
             obs['lane_position'] = self._classify_lane_position()
+
+            # Add nearby vehicle features for Phase 3 enhancement (35D)
+            nearby_features, min_ttc = self._compute_nearby_vehicle_features()
+            obs['nearby_vehicles'] = nearby_features  # 35D list (5 vehicles × 7 features)
+            obs['min_ttc'] = min_ttc  # For TTC-based reward calculation
+            obs['distance_to_destination'] = self._calculate_distance_to_destination()  # For progress reward
 
             # Add new enhanced DQN features (9D feature set)
             # 1. Relative position to intersection (replaces absolute position)
@@ -463,51 +507,220 @@ class MARLVehicleAdapter:
             # CARLA uses degrees, convert to radians and normalize to [-π, π]
             yaw_degrees = vehicle_transform.rotation.yaw
             yaw_radians = np.radians(yaw_degrees)
-            
+
             # Normalize to [-π, π]
             while yaw_radians > np.pi:
                 yaw_radians -= 2 * np.pi
             while yaw_radians < -np.pi:
                 yaw_radians += 2 * np.pi
-                
+
             return yaw_radians
-            
+
         except Exception as e:
             logger.debug(f"Error getting vehicle heading angle: {e}")
             return 0.0
 
-
-
-
     # --------------------------------------------------------------------- #
-    # Private functions
+    # Nearby vehicle detection for MARL
     # --------------------------------------------------------------------- #
 
-    def _use_marl_safety_manager(self):
+    def _get_nearby_vehicles(self) -> list:
         """
-        Minimal replacement - just swap the safety manager with MARL version.
+        Get nearby vehicles within detection radius, sorted by distance.
+        Uses bounding box pre-filter for efficiency.
+
+        Returns:
+            List of tuples: [(vehicle, distance), ...] sorted by distance, max K vehicles
         """
         try:
-            params = self.vm_cfg.get('safety_manager', {
-                'collision_sensor': {'history_size': 4000, 'col_thresh': 50},
-                'stuck_dector': {'len_thresh': 300, 'speed_thresh': 0.05},
-                'offroad_dector': {'speed_thresh': 5},
-                'traffic_light_detector': {'speed_thresh': 20},
-                'print_message': False
-            })
+            current_location = self.vehicle.get_location()
+            all_vehicles = self.world.get_actors().filter('vehicle.*')
 
-            if self.vm.safety_manager:
-                self.vm.safety_manager.destroy()
+            nearby = []
+            for vehicle in all_vehicles:
+                if vehicle.id == self.vehicle.id:
+                    continue  # Skip self
 
-            self.vm.safety_manager = MARLSafetyManager(
-                self.cav_world,
-                self.vehicle,
-                params
-            )
+                if not vehicle.is_alive:
+                    continue
+
+                other_loc = vehicle.get_location()
+
+                # Quick bounding box check (faster than full distance calculation)
+                if (abs(other_loc.x - current_location.x) > self.nearby_detection_radius or
+                    abs(other_loc.y - current_location.y) > self.nearby_detection_radius):
+                    continue
+
+                distance = current_location.distance(other_loc)
+                if distance <= self.nearby_detection_radius:
+                    nearby.append((vehicle, distance))
+
+            # Sort by distance and return top K
+            nearby.sort(key=lambda x: x[1])
+            return nearby[:self.max_nearby_vehicles]
 
         except Exception as e:
-            logger.error(
-                f"Warning: Failed to initialize MARL safety manager for vehicle {self.actor_id}: {e}")
+            logger.debug(f"Error getting nearby vehicles for {self.actor_id}: {e}")
+            return []
+
+    def _calculate_ttc_to_vehicle(self, other_vehicle: carla.Actor) -> float:
+        """
+        Calculate Time-to-Collision (TTC) to another vehicle using constant velocity assumption.
+
+        Uses quadratic equation: |rel_pos + t*rel_vel|² = collision_radius²
+
+        Args:
+            other_vehicle: The other CARLA vehicle actor
+
+        Returns:
+            float: TTC in seconds (inf if no collision predicted within horizon)
+        """
+        try:
+            ego_loc = self.vehicle.get_location()
+            ego_vel = self.vehicle.get_velocity()
+            other_loc = other_vehicle.get_location()
+            other_vel = other_vehicle.get_velocity()
+
+            # Relative position and velocity
+            rel_x = other_loc.x - ego_loc.x
+            rel_y = other_loc.y - ego_loc.y
+            rel_vx = other_vel.x - ego_vel.x
+            rel_vy = other_vel.y - ego_vel.y
+
+            collision_radius = 4.0  # Combined vehicle radii (meters)
+
+            # Quadratic equation coefficients: at² + bt + c = 0
+            a = rel_vx**2 + rel_vy**2
+            b = 2 * (rel_x * rel_vx + rel_y * rel_vy)
+            c = rel_x**2 + rel_y**2 - collision_radius**2
+
+            # No relative motion - check if already colliding
+            if abs(a) < 1e-6:
+                return float('inf')
+
+            discriminant = b**2 - 4 * a * c
+
+            # No collision trajectory
+            if discriminant < 0:
+                return float('inf')
+
+            # Find smallest positive root
+            sqrt_disc = np.sqrt(discriminant)
+            t1 = (-b - sqrt_disc) / (2 * a)
+            t2 = (-b + sqrt_disc) / (2 * a)
+
+            if t1 > 0:
+                return t1
+            elif t2 > 0:
+                return t2
+            else:
+                return float('inf')  # Collision in past
+
+        except Exception as e:
+            logger.debug(f"Error calculating TTC: {e}")
+            return float('inf')
+
+    def _compute_nearby_vehicle_features(self) -> tuple:
+        """
+        Compute normalized features for nearby vehicles (35D total = 5 slots × 7 features).
+
+        Per-vehicle features (7D):
+        - rel_x: Relative X position (normalized to [-1, 1])
+        - rel_y: Relative Y position (normalized to [-1, 1])
+        - rel_vx: Relative velocity X (normalized to [-1, 1])
+        - rel_vy: Relative velocity Y (normalized to [-1, 1])
+        - heading_diff: Heading difference (normalized to [-1, 1])
+        - distance: Euclidean distance (normalized to [0, 1])
+        - ttc: Time-to-collision (normalized to [0, 1])
+
+        Empty slots are filled with safe defaults (distance=1.0, ttc=1.0).
+
+        Returns:
+            Tuple[List[float], float]: (35D feature vector, minimum TTC across all vehicles)
+        """
+        try:
+            nearby_vehicles = self._get_nearby_vehicles()
+
+            ego_loc = self.vehicle.get_location()
+            ego_vel = self.vehicle.get_velocity()
+            ego_heading = np.radians(self.vehicle.get_transform().rotation.yaw)
+
+            features = []
+            min_ttc = float('inf')
+
+            for i in range(self.max_nearby_vehicles):
+                if i < len(nearby_vehicles):
+                    vehicle, distance = nearby_vehicles[i]
+                    other_loc = vehicle.get_location()
+                    other_vel = vehicle.get_velocity()
+                    other_heading = np.radians(vehicle.get_transform().rotation.yaw)
+
+                    # Relative position (normalized by detection radius)
+                    rel_x = (other_loc.x - ego_loc.x) / self.nearby_detection_radius
+                    rel_y = (other_loc.y - ego_loc.y) / self.nearby_detection_radius
+
+                    # Relative velocity (normalized by max velocity)
+                    rel_vx = (other_vel.x - ego_vel.x) / self.max_relative_velocity
+                    rel_vy = (other_vel.y - ego_vel.y) / self.max_relative_velocity
+
+                    # Heading difference (normalized by π)
+                    heading_diff = other_heading - ego_heading
+                    # Wrap to [-π, π]
+                    while heading_diff > np.pi:
+                        heading_diff -= 2 * np.pi
+                    while heading_diff < -np.pi:
+                        heading_diff += 2 * np.pi
+                    heading_diff_norm = heading_diff / np.pi
+
+                    # Distance (normalized by detection radius)
+                    distance_norm = distance / self.nearby_detection_radius
+
+                    # TTC (normalized by max TTC, clamped)
+                    ttc = self._calculate_ttc_to_vehicle(vehicle)
+                    min_ttc = min(min_ttc, ttc)
+                    ttc_norm = min(ttc, self.max_ttc) / self.max_ttc
+
+                    features.extend([
+                        np.clip(rel_x, -1.0, 1.0),
+                        np.clip(rel_y, -1.0, 1.0),
+                        np.clip(rel_vx, -1.0, 1.0),
+                        np.clip(rel_vy, -1.0, 1.0),
+                        np.clip(heading_diff_norm, -1.0, 1.0),
+                        np.clip(distance_norm, 0.0, 1.0),
+                        np.clip(ttc_norm, 0.0, 1.0)
+                    ])
+                else:
+                    # Empty slot: zeros except distance and TTC = 1.0 (safe/far away)
+                    features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+
+            return features, min_ttc
+
+        except Exception as e:
+            logger.debug(f"Error computing nearby vehicle features: {e}")
+            # Return safe defaults: K slots × 7 features with safe values
+            default_features = []
+            for _ in range(self.max_nearby_vehicles):
+                default_features.extend([0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+            return default_features, float('inf')
+
+    def _calculate_distance_to_destination(self) -> float:
+        """
+        Calculate distance to destination for progress reward calculation.
+
+        Returns:
+            float: Distance to destination in meters (999.0 if not available)
+        """
+        try:
+            if hasattr(self.vm, 'agent') and hasattr(self.vm.agent, '_local_planner'):
+                planner = self.vm.agent._local_planner
+                if hasattr(planner, '_destination') and planner._destination:
+                    current_loc = self.vehicle.get_location()
+                    dest_loc = planner._destination
+                    return current_loc.distance(dest_loc)
+            return 999.0
+        except Exception as e:
+            logger.debug(f"Error calculating distance to destination: {e}")
+            return 999.0
 
     # --------------------------------------------------------------------- #
     # Helper functions
@@ -548,7 +761,7 @@ class MARLVehicleAdapter:
             agent = AgentFactory.get_agent(self.agent_type,
                                            self.vehicle, self.carla_map,
                                            self.config)
-            return VehicleManager(
+            vm = VehicleManager(
                 vehicle=self.vehicle,
                 config_yaml=self.vm_cfg,
                 application=['single'],
@@ -556,12 +769,58 @@ class MARLVehicleAdapter:
                 cav_world=self.cav_world,
                 agent=agent
             )
+
+            return vm
         except Exception as e:
             logger.error(
                 f"Error getting agent for vehicle {self.actor_id}: {e}")
             import traceback
             traceback.print_exc()
             return None
+
+    def _use_marl_safety_manager(self):
+        """
+        Replace collision sensor with MARLCollisionSensor in existing SafetyManager.
+
+        Instead of recreating the entire SafetyManager (which would create duplicate
+        IMUSensors), we just replace the collision sensor in-place. This avoids
+        the "streaming client: connection failed" errors from orphaned sensors.
+
+        MARLCollisionSensor has a non-resetting return_status() which allows proper
+        collision detection in the MARL training loop.
+        """
+        try:
+            safety_manager = self.vm.safety_manager
+            if not safety_manager:
+                return
+
+            # Get collision sensor params
+            safety_params = self.vm_cfg.get('safety_manager', {})
+            collision_params = safety_params.get('collision_sensor', {})
+
+            # Destroy only the collision sensor (sensors[0])
+            if len(safety_manager.sensors) > 0:
+                safety_manager.sensors[0].destroy()
+
+            # Replace with MARLCollisionSensor
+            safety_manager.sensors[0] = MARLCollisionSensor(
+                self.vehicle, collision_params)
+
+            # Add check_collision method to the existing safety manager
+            def check_collision():
+                if len(safety_manager.sensors) > 0:
+                    sensor = safety_manager.sensors[0]
+                    if isinstance(sensor, MARLCollisionSensor):
+                        return sensor.check_and_reset()
+                return False
+
+            safety_manager.check_collision = check_collision
+
+            logger.debug(f"Vehicle {self.actor_id}: Replaced CollisionSensor with MARLCollisionSensor")
+        except Exception as e:
+            logger.error(f"Error replacing collision sensor for vehicle {self.actor_id}: {e}")
+            import traceback
+            traceback.print_exc()
 
     # --------------------------------------------------------------------- #
     # Public API
@@ -579,12 +838,17 @@ class MARLVehicleAdapter:
     # --------------------------------------------------------------------- #
 
     def destroy(self):
-        """Destroy the vehicle manager and all its sensors."""
+        """
+        Destroy the vehicle manager and all its sensors.
+
+        Note: The VehicleManager.destroy() now handles proper sensor cleanup
+        before destroying the vehicle to prevent Signal 11 crashes.
+        """
         try:
             self.cav_world.remove_vehicle_manager(self.vm)
             if self.vm:
                 self.vm.destroy()
                 self.vm = None
         except Exception as e:
-            logger.error(f"Error destroying vehicle manager: {e}")
+            logger.debug(f"Error destroying vehicle manager: {e}")
         

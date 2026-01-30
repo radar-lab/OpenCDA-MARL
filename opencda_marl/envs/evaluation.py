@@ -87,6 +87,8 @@ class EvaluationManager:
         # Initialize reward tracking
         self.cumulative_reward = 0.0
         self.agent_cumulative_rewards = {}
+        # Track when all vehicles complete for accurate throughput calculation
+        self.last_completion_step = None
         
         if not self.is_enabled():    
             logger.info("Evaluation disabled - no history tracking")
@@ -165,6 +167,7 @@ class EvaluationManager:
             # Reset reward tracking for new episode
             self.cumulative_reward = 0.0
             self.agent_cumulative_rewards.clear()
+            self.last_completion_step = None  # Reset for next episode
 
         self._mem_management()
         self._data_management()
@@ -183,17 +186,30 @@ class EvaluationManager:
         success = metrics.get('success', 0)
         collision = metrics.get('collision', 0)
         active_agents = metrics.get('active_agents', 0)
+        pending_spawns = metrics.get('pending_spawns', 0)
         total_vehicles = success + collision + active_agents
 
+        # Track the step when ALL vehicles complete:
+        # - No pending spawns (all vehicles have been spawned)
+        # - No active agents (all spawned vehicles have finished)
+        if pending_spawns == 0 and active_agents == 0 and (success > 0 or collision > 0):
+            if self.last_completion_step is None:
+                self.last_completion_step = step
+
         # calculate current rates
+        # Calculate rates including timeout vehicles for complete accountability
         success_rate = (success / total_vehicles *
                         100) if total_vehicles > 0 else 0
         collision_rate = (collision / total_vehicles *
                           100) if total_vehicles > 0 else 0
+        timeout_rate = (active_agents / total_vehicles *
+                       100) if total_vehicles > 0 else 0
 
         # throughput: how many vehicles have completed per hour
-        if step > 0:
-            vps = success / step / self.fixed_dt
+        # Use completion step if all vehicles finished, otherwise current step
+        effective_step = self.last_completion_step if self.last_completion_step else step
+        if effective_step > 0:
+            vps = success / effective_step / self.fixed_dt
             throughput = vps * 3600
         else:
             throughput = 0.0
@@ -226,7 +242,11 @@ class EvaluationManager:
             'total_vehicles': total_vehicles,
             'success_rate': success_rate,
             'collision_rate': collision_rate,
+            'timeout_rate': timeout_rate,
             'throughput': throughput,
+            # Episode length: step when ALL vehicles completed (for consistent reporting)
+            'episode_length': effective_step,  # Same as used in throughput calc
+            'total_simulation_steps': step,    # Total steps for reference
             'step_reward': step_reward,
             'cumulative_reward': self.cumulative_reward,
             'avg_reward_per_agent': avg_reward_per_agent,
@@ -425,9 +445,11 @@ class EvaluationManager:
             num_episodes = len(self.episode_history)
             success_rates = [ep['success_rate'] for ep in self.episode_history]
             collision_rates = [ep['collision_rate'] for ep in self.episode_history]
+            timeout_rates = [ep.get('timeout_rate', 0.0) for ep in self.episode_history]
             throughputs = [ep['throughput'] for ep in self.episode_history]
             total_successes = [ep['success'] for ep in self.episode_history]
             total_collisions = [ep['collision'] for ep in self.episode_history]
+            total_timeouts = [ep.get('active_agents', 0) for ep in self.episode_history]
             
             # Calculate comprehensive statistics
             final_stats = {
@@ -442,15 +464,21 @@ class EvaluationManager:
                 'std_collision_rate': np.std(collision_rates),
                 'best_collision_rate': np.min(collision_rates),  # Lower is better
                 'worst_collision_rate': np.max(collision_rates),
+                'avg_timeout_rate': np.mean(timeout_rates),
+                'std_timeout_rate': np.std(timeout_rates),
+                'best_timeout_rate': np.min(timeout_rates),  # Lower is better
+                'worst_timeout_rate': np.max(timeout_rates),
                 'avg_throughput': np.mean(throughputs),
                 'std_throughput': np.std(throughputs),
                 'best_throughput': np.max(throughputs),
                 'worst_throughput': np.min(throughputs),
                 'total_success': sum(total_successes),
                 'total_collision': sum(total_collisions),
-                'total_vehicles': sum(total_successes) + sum(total_collisions),
+                'total_timeout': sum(total_timeouts),
+                'total_vehicles': sum(total_successes) + sum(total_collisions) + sum(total_timeouts),
                 'final_episode_success_rate': success_rates[-1],
                 'final_episode_collision_rate': collision_rates[-1],
+                'final_episode_timeout_rate': timeout_rates[-1],
                 'final_episode_throughput': throughputs[-1]
             }
             
@@ -475,10 +503,13 @@ class EvaluationManager:
                        f"(Best: {final_stats['best_success_rate']:.1f}%)")
             logger.info(f"Collision Rate: {final_stats['avg_collision_rate']:.1f}% ± {final_stats['std_collision_rate']:.1f}% "
                        f"(Best: {final_stats['best_collision_rate']:.1f}%)")
+            logger.info(f"Timeout Rate: {final_stats['avg_timeout_rate']:.1f}% ± {final_stats['std_timeout_rate']:.1f}% "
+                       f"(Best: {final_stats['best_timeout_rate']:.1f}%)")
             logger.info(f"Throughput: {final_stats['avg_throughput']:.1f} ± {final_stats['std_throughput']:.1f} vph "
                        f"(Best: {final_stats['best_throughput']:.1f} vph)")
             logger.info(f"Total Vehicles: {final_stats['total_vehicles']} "
-                       f"({final_stats['total_success']} success, {final_stats['total_collision']} collision)")
+                       f"({final_stats['total_success']} success, {final_stats['total_collision']} collision, "
+                       f"{final_stats['total_timeout']} timeout)")
             
             if num_episodes > 1:
                 logger.info(f"Trends: Success {final_stats['success_rate_trend']:+.2f}%/ep, "
@@ -488,11 +519,34 @@ class EvaluationManager:
             
             # Save summary to JSON file
             self._save_final_summary(final_stats)
-            
+
             # Generate final comparison plot if we have multiple episodes
             if num_episodes > 1:
                 self.plot_episode_comparison()
-            
+
+            # Generate learning progress visualization with improvement metrics
+            # This is the paper-ready plot with tables and statistics
+            if num_episodes >= 100 and self.plotter:
+                logger.info("Generating learning progress analysis...")
+                self.plotter.plot_learning_progress(self.episode_history, window_size=100)
+
+                # Generate and save improvement report
+                improvement_report = self.plotter.generate_improvement_report(
+                    self.episode_history, window_size=100)
+                self._save_improvement_report(improvement_report)
+
+                # Log key improvement metrics
+                if 'summary' in improvement_report:
+                    summary = improvement_report['summary']
+                    logger.info(f"=== IMPROVEMENT SUMMARY ===")
+                    logger.info(f"Success Rate: {summary['success_improvement_pct']:+.1f}% improvement")
+                    logger.info(f"Collision Rate: {summary['collision_reduction_pct']:+.1f}% reduction")
+                    logger.info(f"Throughput: {summary['throughput_improvement_pct']:+.1f}% improvement")
+                    if summary.get('episodes_to_80pct_success'):
+                        logger.info(f"Reached 80% success at episode {summary['episodes_to_80pct_success']}")
+                    if summary.get('episodes_to_90pct_success'):
+                        logger.info(f"Reached 90% success at episode {summary['episodes_to_90pct_success']}")
+
             logger.info("=== EVALUATION COMPLETE ===")
             
         except Exception as e:
@@ -500,11 +554,41 @@ class EvaluationManager:
             import traceback
             logger.debug(traceback.format_exc())
     
+    def _save_improvement_report(self, report: dict):
+        """Save improvement report to JSON file"""
+        try:
+            # Add timestamp
+            report['generated_at'] = datetime.now().isoformat()
+
+            # Convert numpy types to Python types for JSON serialization
+            def convert_numpy(obj):
+                if isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, dict):
+                    return {k: convert_numpy(v) for k, v in obj.items()}
+                elif isinstance(obj, list):
+                    return [convert_numpy(item) for item in obj]
+                return obj
+
+            report = convert_numpy(report)
+
+            # Save to JSON
+            json_path = self.data_dir / "improvement_report.json"
+            with open(json_path, 'w') as f:
+                json.dump(report, f, indent=2)
+
+            logger.info(f"Improvement report saved: {json_path}")
+
+        except Exception as e:
+            logger.warning(f"Failed to save improvement report: {e}")
+
     def _save_final_summary(self, summary_stats: dict):
         """Save final summary statistics to file"""
         try:
 
-            
+
             # Add timestamp
             summary_stats['generated_at'] = datetime.now().isoformat()
             

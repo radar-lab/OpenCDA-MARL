@@ -9,7 +9,7 @@ from typing import Dict, Any
 from loguru import logger
 
 from .extractor import ObservationExtractor
-from .algorithms import QLearningAlgorithm, DQNAlgorithm, TD3Algorithm
+from .algorithms import QLearningAlgorithm, DQNAlgorithm, TD3Algorithm, MAPPOAlgorithm, SACAlgorithm
 
 
 class MARLManager:
@@ -26,12 +26,41 @@ class MARLManager:
         
         logger.success(f"MARLManager initialized with {algorithm}")
 
+    def _merge_shared_config(self, algo_config: Dict) -> Dict:
+        """Merge shared config (tensorboard, training mode, etc.) with algorithm-specific config."""
+        merged = algo_config.copy()
+
+        # Pass training_mode to algorithm (affects TensorBoard and learning)
+        training_config = self.config.get('training', {})
+        merged['training_mode'] = training_config.get('training_mode', True)
+
+        # Merge tensorboard config (algorithm can override)
+        tb_config = self.config.get('tensorboard', {})
+        if 'tensorboard' not in merged:
+            merged['tensorboard'] = tb_config
+        elif isinstance(merged['tensorboard'], dict):
+            # Algorithm-specific overrides shared config
+            base_tb = tb_config.copy() if isinstance(tb_config, dict) else {}
+            base_tb.update(merged['tensorboard'])
+            merged['tensorboard'] = base_tb
+
+        # Disable TensorBoard in evaluation mode (training_mode: false)
+        # This prevents recording non-training metrics during checkpoint testing
+        if not merged['training_mode']:
+            if isinstance(merged.get('tensorboard'), dict):
+                merged['tensorboard']['enabled'] = False
+            else:
+                merged['tensorboard'] = {'enabled': False}
+            logger.info("Evaluation mode: TensorBoard disabled (training_mode: false)")
+
+        return merged
+
     def build_algorithm(self, algorithm: str):
         """Build algorithm instance based on configuration"""
 
         if algorithm == 'q_learning':
             # Get Q-learning specific config
-            q_config = self.config.get('q_learning', {})
+            q_config = self._merge_shared_config(self.config.get('q_learning', {}))
 
             # Calculate action_dim from speed actions (algorithm-specific)
             speed_actions = q_config.get('speed_actions', [0, 15, 30, 45, 60])
@@ -45,8 +74,8 @@ class MARLManager:
 
         elif algorithm == 'dqn':
             # Get DQN specific config
-            dqn_config = self.config.get('dqn', {})
-            
+            dqn_config = self._merge_shared_config(self.config.get('dqn', {}))
+
             # Calculate action_dim from speed actions (algorithm-specific)
             speed_actions = dqn_config.get('speed_actions', [0, 15, 30, 45, 60])
             action_dim = len(speed_actions)
@@ -57,20 +86,30 @@ class MARLManager:
             return DQNAlgorithm(dqn_config, state_dim, action_dim)
 
         elif algorithm == 'td3':
-            # Get TD3 specific config
-            td3_config = self.config.get('td3', {})
-            
+            # Get TD3 specific config with shared tensorboard config
+            td3_config = self._merge_shared_config(self.config.get('td3', {}))
+
             # TD3 uses continuous states
             state_dim = self.config.get('state_dim', 7)  # Use configured state dimension
             action_dim = self.config.get('action_dim', 1)
             return TD3Algorithm(td3_config, state_dim, action_dim)
 
+        elif algorithm == 'mappo':
+            # MAPPO - Multi-Agent PPO with CTDE
+            mappo_config = self._merge_shared_config(self.config.get('mappo', {}))
+            state_dim = self.config.get('state_dim', 44)  # Same as TD3
+            action_dim = self.config.get('action_dim', 1)
+            return MAPPOAlgorithm(mappo_config, state_dim, action_dim)
+
         elif algorithm == 'ppo':
-            # Placeholder - implement PPO later
+            # Placeholder - implement single-agent PPO later
             raise NotImplementedError("PPO not implemented yet")
         elif algorithm == 'sac':
-            # Placeholder - implement SAC later
-            raise NotImplementedError("SAC not implemented yet")
+            # SAC - Soft Actor-Critic with auto-tuning entropy
+            sac_config = self._merge_shared_config(self.config.get('sac', {}))
+            state_dim = self.config.get('state_dim', 8)  # Default 8D for simplified state
+            action_dim = self.config.get('action_dim', 1)
+            return SACAlgorithm(sac_config, state_dim, action_dim)
         elif algorithm == 'none':
             # No MARL algorithm - for baseline agents
             logger.info("No MARL algorithm initialized (baseline agent mode)")
@@ -104,33 +143,50 @@ class MARLManager:
             # Compute actions (speeds) for each agent
             target_speeds = {}
             
-            # Handle TD3 differently due to multi-agent structure
-            if isinstance(self.algorithm, TD3Algorithm):
+            # Handle multi-agent algorithms (TD3, MAPPO, SAC) differently
+            if isinstance(self.algorithm, (TD3Algorithm, MAPPOAlgorithm, SACAlgorithm)):
                 for agent_id_str, multi_agent_data in states.items():
-                    # Convert string agent_id to int for consistent key types
-                    agent_id_int = int(agent_id_str) if isinstance(agent_id_str, str) else agent_id_str
-                    
-                    # Extract all agent states for TD3
+                    # Keep agent_id as-is (can be string in SUMO or int in CARLA)
+                    agent_id = agent_id_str
+
+                    # Extract all agent states for multi-agent algorithms
                     all_agent_states = multi_agent_data['all_states']
-                    action = self.algorithm.select_action(all_agent_states, agent_id_str, training=training)
-                    speed = self._compute_td3_action(action, agent_id_int)
-                    
+                    action = self.algorithm.select_action(all_agent_states, agent_id, training=training)
+
+                    # Compute speed based on algorithm type
+                    if isinstance(self.algorithm, TD3Algorithm):
+                        speed = self._compute_td3_action(action, agent_id)
+                    elif isinstance(self.algorithm, SACAlgorithm):
+                        speed = self._compute_sac_action(action, agent_id)
+                    else:  # MAPPO
+                        speed = self._compute_mappo_action(action, agent_id)
+
                     # If speed is None (warmup phase), skip this agent to use vanilla agent
                     if speed is None:
-                        logger.debug(f"TD3: Agent {agent_id_int} in warmup phase, using vanilla agent")
+                        algo_name = type(self.algorithm).__name__.replace('Algorithm', '')
+                        logger.debug(f"{algo_name}: Agent {agent_id} in warmup phase, using vanilla agent")
                         # Track vanilla agent's current speed for memory storage
-                        if agent_id_int in observations:
-                            vanilla_speed = observations[agent_id_int].get('speed', 45.0)
-                            self.last_actions[agent_id_int] = vanilla_speed  # Track for TD3 learning
+                        # Handle key type mismatch: extractor uses str keys, but CARLA uses int keys
+                        obs_key = agent_id
+                        if agent_id not in observations:
+                            # Try integer key for CARLA compatibility
+                            try:
+                                obs_key = int(agent_id)
+                            except (ValueError, TypeError):
+                                pass
+                        if obs_key in observations:
+                            vanilla_speed = observations[obs_key].get('speed', 45.0)
+                            self.last_actions[agent_id] = vanilla_speed
                         continue  # Don't add to target_speeds, let vanilla agent handle it
-                    
-                    # Clamp speed to TD3 action bounds
+
+                    # Clamp speed to algorithm action bounds
                     max_action = self.algorithm.max_action
                     clamped_speed = max(0.0, min(max_action, speed))
-                    target_speeds[agent_id_int] = clamped_speed
-                    
+                    target_speeds[agent_id] = clamped_speed
+
                     # Log the target speed assignment
-                    logger.debug(f"TD3: Agent {agent_id_int} target speed set to {clamped_speed:.2f} km/h")
+                    algo_name = type(self.algorithm).__name__.replace('Algorithm', '')
+                    logger.debug(f"{algo_name}: Agent {agent_id} target speed set to {clamped_speed:.2f} km/h")
             else:
                 # Handle single-agent algorithms (Q-learning, DQN)
                 for agent_id, state in states.items():
@@ -178,7 +234,11 @@ class MARLManager:
                 self._update_dqn(rewards, observations, next_observations)
             elif isinstance(self.algorithm, TD3Algorithm):
                 self._update_td3(rewards, observations, next_observations)
-            
+            elif isinstance(self.algorithm, MAPPOAlgorithm):
+                self._update_mappo(rewards, observations, next_observations)
+            elif isinstance(self.algorithm, SACAlgorithm):
+                self._update_sac(rewards, observations, next_observations)
+
         except Exception as e:
             logger.error(f"Error updating MARL algorithm: {e}")
             import traceback
@@ -299,40 +359,259 @@ class MARLManager:
         """TD3 specific update logic."""
         states = self.observation_extractor.extract(observations)
         next_states = self.observation_extractor.extract(next_observations)
-        
+
+        # Debug: Log key availability periodically
+        if hasattr(self, '_update_count'):
+            self._update_count += 1
+        else:
+            self._update_count = 0
+
+        transitions_stored = 0
+
         # Store transitions for each agent
         for agent_id_str in states.keys():
-            # Convert string agent_id back to int for rewards/actions lookup
-            agent_id = int(agent_id_str)
-            
-            if (agent_id in rewards and 
-                agent_id_str in next_states and 
-                agent_id in self.last_actions):
-                
-                # Get multi-agent observations for TD3
-                multi_agent_obs = states[agent_id_str]['all_states']
-                next_multi_agent_obs = next_states[agent_id_str]['all_states']
-                
-                action = self.last_actions[agent_id]
-                reward = rewards[agent_id]
-                done = agent_id_str not in next_states
-                
-                # Store multi-agent transition (use string agent_id for TD3)
-                self.algorithm.store_transition(
-                    multi_agent_obs, agent_id_str, action, reward, 
-                    next_multi_agent_obs, done
-                )
-        
+            # Use agent_id_str directly (extractor always uses string keys)
+            agent_id = agent_id_str
+
+            # Handle key type mismatch: extractor uses str keys, but CARLA uses int keys
+            # Try to find the reward key (might be int or str)
+            reward_key = agent_id
+            if agent_id not in rewards:
+                try:
+                    reward_key = int(agent_id)
+                except (ValueError, TypeError):
+                    pass
+
+            # Check each condition
+            in_rewards = reward_key in rewards
+            in_next_states = agent_id in next_states  # next_states uses str keys from extractor
+            in_last_actions = agent_id in self.last_actions  # last_actions uses str keys
+
+            if not (in_rewards and in_next_states and in_last_actions):
+                if self._update_count % 100 == 0:  # Log periodically
+                    logger.debug(f"TD3 Update: Agent {agent_id} skipped - "
+                               f"in_rewards={in_rewards}, in_next_states={in_next_states}, "
+                               f"in_last_actions={in_last_actions}")
+                continue
+
+            # Get multi-agent observations for TD3
+            multi_agent_obs = states[agent_id]['all_states']
+            next_multi_agent_obs = next_states[agent_id]['all_states']
+
+            action = self.last_actions[agent_id]
+            reward = rewards[reward_key]  # Use the correct key type for rewards
+            done = agent_id not in next_states
+
+            # Store multi-agent transition
+            self.algorithm.store_transition(
+                multi_agent_obs, agent_id, action, reward,
+                next_multi_agent_obs, done
+            )
+            transitions_stored += 1
+
+        # Log transition storage progress periodically
+        if self._update_count % 100 == 0:
+            logger.debug(f"TD3 Update #{self._update_count}: Stored {transitions_stored} transitions, "
+                        f"buffer size={len(self.algorithm.memory)}")
+
+        self.algorithm.update()
+
+    # --------------------------------------------------------------------- #
+    # MAPPO specific methods
+    # --------------------------------------------------------------------- #
+    def _compute_mappo_action(self, action, agent_id: int):
+        """Compute speed from MAPPO action (direct continuous speed value)."""
+        # MAPPO always returns an action (no warmup phase like TD3)
+        if action is None:
+            return None  # Safety fallback
+
+        # MAPPO returns target speed directly (continuous action)
+        speed = float(action)
+
+        # Store the action for MAPPO updates
+        self.last_actions[agent_id] = speed
+
+        return speed
+
+    def _update_mappo(self, rewards: Dict, observations: Dict, next_observations: Dict):
+        """MAPPO specific update logic."""
+        states = self.observation_extractor.extract(observations)
+        next_states = self.observation_extractor.extract(next_observations)
+
+        # Debug: Log key availability periodically
+        if hasattr(self, '_mappo_update_count'):
+            self._mappo_update_count += 1
+        else:
+            self._mappo_update_count = 0
+
+        transitions_stored = 0
+
+        # Store transitions for each agent
+        for agent_id_str in states.keys():
+            agent_id = agent_id_str
+
+            # Handle key type mismatch
+            reward_key = agent_id
+            if agent_id not in rewards:
+                try:
+                    reward_key = int(agent_id)
+                except (ValueError, TypeError):
+                    pass
+
+            # Check conditions
+            in_rewards = reward_key in rewards
+            in_next_states = agent_id in next_states
+            in_last_actions = agent_id in self.last_actions
+
+            if not (in_rewards and in_next_states and in_last_actions):
+                if self._mappo_update_count % 100 == 0:
+                    logger.debug(f"MAPPO Update: Agent {agent_id} skipped - "
+                               f"in_rewards={in_rewards}, in_next_states={in_next_states}, "
+                               f"in_last_actions={in_last_actions}")
+                continue
+
+            # Get multi-agent observations for MAPPO
+            multi_agent_obs = states[agent_id]['all_states']
+            next_multi_agent_obs = next_states[agent_id]['all_states']
+
+            action = self.last_actions[agent_id]
+            reward = rewards[reward_key]
+            done = agent_id not in next_states
+
+            # Store transition
+            self.algorithm.store_transition(
+                multi_agent_obs, agent_id, action, reward,
+                next_multi_agent_obs, done
+            )
+            transitions_stored += 1
+
+        # Log progress periodically
+        if self._mappo_update_count % 100 == 0:
+            logger.debug(f"MAPPO Update #{self._mappo_update_count}: Stored {transitions_stored} transitions, "
+                        f"buffer size={len(self.algorithm.rollout_buffer)}")
+
+        # Perform PPO update (on-policy: updates when enough data collected)
+        self.algorithm.update()
+
+    # --------------------------------------------------------------------- #
+    # SAC specific methods
+    # --------------------------------------------------------------------- #
+    def _compute_sac_action(self, action, agent_id: int):
+        """Compute speed from SAC action (direct continuous speed value)."""
+        # During warmup, SAC returns random action (not None)
+        if action is None:
+            return None  # Safety fallback
+
+        # SAC returns target speed directly (continuous action)
+        speed = float(action)
+
+        # Store the action for SAC updates
+        self.last_actions[agent_id] = speed
+
+        return speed
+
+    def _update_sac(self, rewards: Dict, observations: Dict, next_observations: Dict):
+        """SAC specific update logic."""
+        states = self.observation_extractor.extract(observations)
+        next_states = self.observation_extractor.extract(next_observations)
+
+        # Debug: Log key availability periodically
+        if hasattr(self, '_sac_update_count'):
+            self._sac_update_count += 1
+        else:
+            self._sac_update_count = 0
+
+        transitions_stored = 0
+
+        # Store transitions for each agent
+        for agent_id_str in states.keys():
+            agent_id = agent_id_str
+
+            # Handle key type mismatch
+            reward_key = agent_id
+            if agent_id not in rewards:
+                try:
+                    reward_key = int(agent_id)
+                except (ValueError, TypeError):
+                    pass
+
+            # Check conditions
+            in_rewards = reward_key in rewards
+            in_next_states = agent_id in next_states
+            in_last_actions = agent_id in self.last_actions
+
+            if not (in_rewards and in_next_states and in_last_actions):
+                if self._sac_update_count % 100 == 0:
+                    logger.debug(f"SAC Update: Agent {agent_id} skipped - "
+                               f"in_rewards={in_rewards}, in_next_states={in_next_states}, "
+                               f"in_last_actions={in_last_actions}")
+                continue
+
+            # Get multi-agent observations for SAC
+            multi_agent_obs = states[agent_id]['all_states']
+            next_multi_agent_obs = next_states[agent_id]['all_states']
+
+            action = self.last_actions[agent_id]
+            reward = rewards[reward_key]
+            done = agent_id not in next_states
+
+            # Store transition
+            self.algorithm.store_transition(
+                multi_agent_obs, agent_id, action, reward,
+                next_multi_agent_obs, done
+            )
+            transitions_stored += 1
+
+        # Log progress periodically
+        if self._sac_update_count % 100 == 0:
+            logger.debug(f"SAC Update #{self._sac_update_count}: Stored {transitions_stored} transitions, "
+                        f"buffer size={len(self.algorithm.memory)}")
+
+        # Perform SAC update (off-policy)
         self.algorithm.update()
 
     # --------------------------------------------------------------------- #
     # Algorithm interface methods (strict implementation required)
     # --------------------------------------------------------------------- #
-    def reset_episode(self):
+    def reset_episode(self, episode_metrics: Dict = None):
         """Reset algorithm for new episode."""
         if self.algorithm is None:
             logger.info("Episode reset skipped for baseline agent")
             return
+
+        # Clear last_actions to prevent stale data accumulation
+        self.last_actions.clear()
+
+        # Log episode metrics to TensorBoard if available
+        if episode_metrics and hasattr(self.algorithm, 'log_episode_metrics'):
+            # Extract traffic metrics for separate logging
+            traffic_metrics = {
+                'avg_speed': episode_metrics.get('avg_speed', 0.0),
+                'speed_std': episode_metrics.get('speed_std', 0.0),
+                'speed_variance': episode_metrics.get('speed_variance', 0.0),
+                'min_speed': episode_metrics.get('min_speed', 0.0),
+                'max_speed': episode_metrics.get('max_speed', 0.0),
+                'speed_smoothness': episode_metrics.get('speed_smoothness', 0.0),
+                'avg_step_speed': episode_metrics.get('avg_step_speed', 0.0),
+                'avg_agent_speed_var': episode_metrics.get('avg_agent_speed_var', 0.0),
+                # Target speed metrics (RL-commanded speeds)
+                'target_speed_mean': episode_metrics.get('target_speed_mean', 0.0),
+                'target_speed_max': episode_metrics.get('target_speed_max', 0.0),
+                'target_speed_min': episode_metrics.get('target_speed_min', 0.0),
+                # Throughput metric (vehicles per hour)
+                'throughput': episode_metrics.get('throughput', 0.0),
+            }
+
+            self.algorithm.log_episode_metrics(
+                episode_reward=episode_metrics.get('total_reward', 0.0),
+                episode_length=episode_metrics.get('episode_length', episode_metrics.get('step_length', 0)),
+                success_rate=episode_metrics.get('success_rate', 0.0),
+                collision_rate=episode_metrics.get('collision_rate', 0.0),
+                near_miss_count=episode_metrics.get('near_miss_count', 0),
+                ttc_violation_rate=episode_metrics.get('ttc_violation_rate', 0.0),
+                traffic_metrics=traffic_metrics
+            )
+
         self.algorithm.reset_episode()
         logger.info(f"Episode reset for {self.algorithm_name}")
 
@@ -341,6 +620,11 @@ class MARLManager:
         if self.algorithm is None:
             return {"algorithm_type": "none", "epsilon": "N/A", "training_mode": False}
         return self.algorithm.get_training_info()
+
+    def close(self):
+        """Close algorithm resources (e.g., TensorBoard writer)."""
+        if self.algorithm is not None and hasattr(self.algorithm, 'close'):
+            self.algorithm.close()
 
     def save_checkpoint(self, filepath: str):
         """Save model checkpoint."""

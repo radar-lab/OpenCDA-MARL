@@ -1,0 +1,147 @@
+description: |-
+  TD3 with corrected 43D state space (was incorrectly labeled as 44D).
+  Removed redundant position_x/position_y since we already have rel_x/rel_y.
+  7D ego + 35D nearby vehicles + 1D waypoint_buffer = 43D total.
+
+_extend_fields:
+  - "world.seed"
+  - "MARL.training.metrics_export_interval"
+  - "MARL.training.metrics_export_dir"
+
+world:
+  seed: 5 # Added to default seed (11) = 16 total
+
+agents:
+  agent_type: "marl"
+
+  marl:
+    debug: false
+    max_speed: 65 # km/h
+    emergency_param: 0.4
+    ignore_traffic_light: true
+    collision_time_ahead: 1.5
+
+    local_planner:
+      trajectory_update_freq: 5
+      debug: false
+      debug_trajectory: true
+
+MARL:
+  algorithm: "td3"
+
+  # Corrected state/action dimensions
+  state_dim: 43  # 8D ego + 35D nearby vehicle features
+  action_dim: 1  # Continuous speed control
+
+  td3:
+    # Feature configuration (43D total)
+    # Removed position_x and position_y as they're redundant with rel_x/rel_y
+    features:
+      rel_x: 1
+      rel_y: 1
+      # position_x: 1 
+      # position_y: 1
+      lane_position: 1
+      heading_angle: 1
+      dist_to_intersection: 1
+      dist_to_front_vehicle: 1
+      waypoint_buffer: 1
+      speed: 1
+      nearby_vehicles: 35  
+
+    # Nearby vehicle detection
+    nearby_vehicle_config:
+      detection_radius: 30.0   
+      max_vehicles: 5
+      features_per_vehicle: 7
+      include_ttc: true
+      max_relative_velocity: 40.0
+      max_ttc: 10.0
+
+    # LSTM conflict encoder
+    conflict_encoder:
+      type: "LSTM"
+      input_size: 43  
+      hidden_size: 256
+      num_layers: 1
+
+    # Motion planner network architecture
+    motion_planner:
+      num_layers: 3
+      input_dim: [299, 512, 256]  
+      output_dim: [512, 256, 1]
+
+    # Learning rates
+    learning_rate_actor: 1e-4
+    learning_rate_critic: 1e-3
+
+    # TD3 hyperparameters
+    tau: 0.005
+    discount: 0.99
+    policy_noise: 0.2
+    noise_clip: 0.5
+
+    # Smart distance-aware exploration
+    exploration_noise: 0.3
+    noise_decay: 0.998
+    min_exploration_noise: 0.05
+    policy_freq: 2
+
+    # Training parameters
+    batch_size: 256
+
+    # Prioritized Experience Replay (PER)
+    memory_size: 100000
+    recency_ratio: 0.5
+    clear_episodes: 10
+    clear_keep_ratio: 0.9
+    use_per: true
+    per_alpha: 0.6
+    per_beta: 0.4
+    per_beta_increment: 1.0e-4
+    per_epsilon: 1.0e-6
+
+    # Action bounds (km/h)
+    max_action: 65.0
+    min_action: 10.0
+    warmup_steps: 0
+
+  training:
+    training_mode: false
+    checkpoint_dir: "checkpoints/"
+    save_freq: 5
+    keep_checkpoints: 3
+    load_checkpoint: "checkpoints/td3_43d_300vph/latest_checkpoint.pth"
+
+  rewards:
+    # Terminal rewards
+    collision: -500.0
+    success: 400.0
+
+    # Per-step rewards
+    step_penalty: -0.8
+    speed_bonus: 0.3
+    speed_threshold: 45.0
+
+    # TTC-based safety reward
+    ttc_safe_threshold: 4.0
+    ttc_max_penalty: -15.0
+    ttc_decay_rate: 1.5
+    ttc_near_miss_threshold: 2.0
+
+    # Clearance speed bonus
+    clearance_speed_bonus: 0.3
+    clearance_threshold: 30.0
+
+    # Progress reward
+    progress_scale: 0.4
+    junction_threshold: 5.0
+
+    # Stop penalty
+    stop_threshold: 3.0
+    stop_penalty: -1.5
+
+    # Yielding bonus
+    yielding_bonus: 0.5
+    yielding_ttc_threshold: 3.0
+    yielding_speed_drop: 5.0

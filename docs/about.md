@@ -1,37 +1,73 @@
 # About Us
 
-OpenCDA-MARL is developed by [UA Radar Lab](https://github.com/radar-lab).
+OpenCDA-MARL is developed by the [UA Radar Lab](https://radar.ece.arizona.edu/) at the University of Arizona, advancing research in cooperative autonomous driving through multi-agent reinforcement learning.
 
-## Supervisor
+---
 
-Dr. Siyang Cao (Associate Professor @ UA)
+## :material-account-supervisor: Supervisors
 
-- Supervisor
-- [UArizona ECE](https://ece.engineering.arizona.edu/faculty-staff/faculty/siyang-cao)
-- [Google Scholar](https://scholar.google.com/citations?user=dQvEspMAAAAJ&hl=en)
+<div class="grid cards" markdown>
 
-Dr. Liu Bo (Associate Professor @ UA):
+- **Dr. Siyang Cao**
 
-- Co-Supervisor
-- [UArizona ECE](https://ece.engineering.arizona.edu/faculty-staff/faculty/bo-liu)
+    ---
 
-## Core Developer
+    Associate Professor, University of Arizona
 
-Lihao Guo (Ph.D. Student @ UA):
+    :material-school: Supervisor
 
-- Project Lead
-- OpenCDA-MARL System Architect
-- MARL Algorithm Development
-- [Homepage](https://www.lgcyaxi.net/)
-- [Linkedin](https://www.linkedin.com/in/lgcyaxi)
+    [:material-web: UArizona ECE](https://ece.engineering.arizona.edu/faculty-staff/faculty/siyang-cao) &nbsp; [:material-google: Google Scholar](https://scholar.google.com/citations?user=dQvEspMAAAAJ&hl=en)
 
-Jiahao Tang (Ph.D. Student @ UA):
+- **Dr. Bo Liu**
 
-- Rule-based Agent Configuration
-- [Linkedin](https://www.linkedin.com/in/jiahaotang1997/)
+    ---
 
-Louis Liu (Volunteer Student @ University High School):
+    Associate Professor, University of Arizona
 
-- Map Development
-- Simulation Testing
-- [Linkedin](https://www.linkedin.com/in/louisliu2/)
+    :material-school: Co-Supervisor
+
+    [:material-web: UArizona ECE](https://ece.engineering.arizona.edu/faculty-staff/faculty/bo-liu)
+
+</div>
+
+## :material-code-braces: Core Developers
+
+<div class="grid cards" markdown>
+
+- **Lihao Guo** &nbsp; :material-star:{ .lg }
+
+    ---
+
+    Ph.D. Student, University of Arizona
+
+    :material-briefcase: Project Lead · System Architect · MARL Algorithm Implementation & Analysis
+
+    [:material-home: Homepage](https://www.lgcyaxi.net/) &nbsp; [:material-linkedin: LinkedIn](https://www.linkedin.com/in/lgcyaxi)
+
+- **Jiahao Tang**
+
+    ---
+
+    Ph.D. Student, University of Arizona
+
+    :material-briefcase: Rule-based Agent Configuration & Testing · MARL Algorithm Training
+
+    [:material-linkedin: LinkedIn](https://www.linkedin.com/in/jiahaotang1997/)
+
+- **Louis Liu**
+
+    ---
+
+    Volunteer Student, University High School
+
+    :material-briefcase: Map Development & Testing · Simulation Testing
+
+    [:material-linkedin: LinkedIn](https://www.linkedin.com/in/louisliu2/)
+
+</div>
+
+## :material-help-circle: Contributing
+
+We welcome contributions from the community. See our [Contributing Guide](contributing.md) to get started.
+
+[:material-github: GitHub Repository](https://github.com/radar-lab/opencda-marl){ .md-button } &nbsp; [:material-bug: Report Issues](https://github.com/radar-lab/opencda-marl/issues){ .md-button .md-button--primary }
