@@ -42,9 +42,10 @@ mkdocs-material = ">=9.5.0,<10"
 mkdocs-mermaid2-plugin = ">=1.2.1, <2"
 mkdocs-git-revision-date-localized-plugin = ">=1.4.7, <2"
 pymdown-extensions = ">=10.12.0,<11"
+click = "*"
 
 [feature.docs.tasks]
-docs-serve = "mkdocs serve"
+docs-serve = "mkdocs serve --livereload"
 docs-build = "mkdocs build"
 docs-deploy = "mkdocs gh-deploy"
 
@@ -84,6 +85,7 @@ pyclean = ">=3.4.0,<4"
 [pypi-dependencies]
 gitpython = ">=3.1.30"
 sumolib = ">=1.24.0, <2"
+
 
 [target.win-64.pypi-dependencies]
 torch = { index = "https://download.pytorch.org/whl/nightly/cu128" }

@@ -1,6 +1,6 @@
 # Scenario API
 
-!!! info "Implementation Status"
+!!! success "Implementation Status"
     The Scenario system is **fully implemented** with MARLScenarioManager providing enhanced multi-agent capabilities while maintaining full OpenCDA compatibility.
 
 The Scenario system provides comprehensive scenario management for multi-agent reinforcement learning, extending OpenCDA's proven scenario management with MARL-specific capabilities like dynamic vehicle spawning, coordinated agent management, and collision handling.
@@ -55,17 +55,23 @@ graph TD
 === "Constructor"
 
     ```python
-    def __init__(self, config: Dict, client: carla.Client, cav_world: CavWorld):
+    def __init__(self, scenario_params: Dict, apply_ml,
+                 xodr_path: Optional[str] = None, town: Optional[str] = None,
+                 cav_world: Optional[CavWorld] = None):
         """
         Initialize MARL scenario manager.
-        
+
         Parameters
         ----------
-        config : dict
-            Scenario configuration
-        client : carla.Client
-            CARLA client instance
-        cav_world : CavWorld
+        scenario_params : dict
+            OpenCDA scenario configuration
+        apply_ml : bool
+            Whether to apply ML models
+        xodr_path : str, optional
+            Path to custom OpenDRIVE map
+        town : str, optional
+            CARLA town name
+        cav_world : CavWorld, optional
             CAV world for coordination
         """
     ```
@@ -147,18 +153,21 @@ graph TD
 === "Constructor"
 
     ```python
-    def __init__(self, config: Dict, world: carla.World, map_adapter: MARLMapAdapter):
+    def __init__(self, config: Dict[str, Any], state: Dict[str, Any],
+                 world: carla.World, cav_world):
         """
         Initialize agent manager.
-        
+
         Parameters
         ----------
         config : dict
             Agent configuration
+        state : dict
+            Shared simulation state (traffic events, map data)
         world : carla.World
             CARLA world instance
-        map_adapter : MARLMapAdapter
-            Map adapter for spawn coordination
+        cav_world : CavWorld
+            CAV world for coordination
         """
     ```
 
@@ -226,7 +235,7 @@ graph TD
         Adapter that bridges OpenCDA VehicleManager with RL agents.
         
         Features:
-        - Multiple controller types (behavior, vanilla, rule_based, rl_agent)
+        - Multiple controller types (behavior, vanilla, rule_based, marl)
         - External speed control for RL agents
         - Collision detection with instant destruction
         - Observation extraction for RL
@@ -238,10 +247,10 @@ graph TD
     ```python
     # Available controller types
     CONTROLLER_TYPES = {
-        'placeholder': "OpenCDA BehaviorAgent (development/testing)",
-        'rl_agent': "RL-controlled agent (planned)",
+        'behavior': "OpenCDA BehaviorAgent (standard autonomous)",
+        'vanilla': "VanillaAgent (enhanced collision avoidance)",
         'rule_based': "3-stage intersection rules",
-        'carla_tm': "CARLA Traffic Manager baseline"
+        'marl': "MARL RL-controlled agent (speed control)"
     }
     ```
 
@@ -478,7 +487,7 @@ graph TD
 
     ```python
     # BenchmarkComparator uses MARLScenarioManager through coordinator
-    from opencda_marl.core.coordinator import MARLCoordinator
+    from opencda_marl.coordinator import MARLCoordinator
     
     def run_agent_test(agent_type, scenario, timeout):
         """Run benchmark test using coordinator."""

@@ -164,8 +164,8 @@ extra:
     - icon: fontawesome/solid/university
       link: https://github.com/radar-lab
       name: UA Radar Lab
-  version:
-    provider: mike
+  # version:
+  #   provider: mike  # Enable when using mike for versioned docs deployment
   analytics:
     feedback:
       title: Was this page helpful?

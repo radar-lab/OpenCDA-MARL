@@ -2,7 +2,7 @@
 
 The Agent Manager system is the core component responsible for multi-agent coordination in OpenCDA-MARL. It manages the lifecycle of all vehicles and their associated agents, bridging traffic generation with intelligent vehicle control.
 
-!!! info "Implementation Status"
+!!! success "Implementation Status"
     The Agent Manager system is **fully implemented** and provides comprehensive multi-agent management capabilities including spawning, coordination, and lifecycle management.
 
 ```text
@@ -78,17 +78,20 @@ Agent Management System
         - Integrates with collision detection system
         """
         
-        def __init__(self, traffic_manager, config: Dict, cav_world=None):
+        def __init__(self, config: Dict[str, Any], state: Dict[str, Any],
+                     world: carla.World, cav_world):
             """
             Initialize Agent Manager.
-            
+
             Parameters
             ----------
-            traffic_manager : MARLTrafficManager
-                Traffic manager for spawn event generation
             config : dict
                 Agent configuration including agent_type and behavior settings
-            cav_world : CavWorld, optional
+            state : dict
+                Shared simulation state (traffic events, map data)
+            world : carla.World
+                CARLA world instance
+            cav_world : CavWorld
                 CAV world instance for vehicle management
             """
     ```
@@ -213,7 +216,7 @@ Agent Management System
         - behavior: Standard OpenCDA BehaviorAgent (fallback)
         - vanilla: Enhanced collision avoidance agent
         - rule_based: 3-stage rule-based intersection agent
-        - marl: MARL agent with algorithm selection (PPO/SAC/TD3)
+        - marl: MARL agent with RL speed control
         """
         
         @staticmethod
@@ -369,36 +372,25 @@ Agent Management System
 
 === "MARLAgent (Reinforcement Learning)"
 
-    MARL agent supporting multiple algorithms (PPO, SAC, TD3) for research purposes.
+    MARL agent with RL-controlled speed. The local planner handles steering and waypoint following; the RL algorithm controls speed only.
 
     ```yaml
-    # MARLAgent configuration (planned)
+    # MARLAgent configuration
     agents:
-        agent_type: "marl"
-    
-        agent_kwargs:
-            algorithm: "PPO"                   # Algorithm selection: PPO, SAC, TD3
-            policy_fn: null                    # Policy function (loaded model)
-            blend: 0.7                         # Action blending with baseline
-            clip_kmh: [0.0, 70.0]             # Speed clipping range
-            
-            # Algorithm-specific parameters
-            ppo:
-                learning_rate: 3e-4
-                clip_ratio: 0.2
-                entropy_coef: 0.01
-            
-            sac:
-                learning_rate: 3e-4
-                tau: 0.005
-                alpha: 0.2
+      agent_type: "marl"
+
+    MARL:
+      algorithm: "td3"                     # td3, dqn, q_learning, mappo, sac
+      state_dim: 8                         # Observation vector dimension
+      action_dim: 1                        # Speed control only
+      training: true
     ```
 
     **Features:**
-    - Multiple RL algorithm support
-    - Policy function integration
-    - Action blending with baseline agents
-    - Configurable observation/action spaces
+
+    - Five RL algorithms: TD3, DQN, Q-Learning, MAPPO, SAC
+    - Speed-only control (local planner handles steering)
+    - Configurable observation features via ObservationExtractor
     - Training and evaluation modes
 
 ## Multi-Agent Coordination Examples
@@ -562,12 +554,12 @@ Agent Management System
         # Cruising
         max_speed: 35
 
-    # MARL agent configuration (planned)
-    agent_kwargs:
-        algorithm: "PPO"
-        policy_fn: null
-        blend: 0.7
-        clip_kmh: [0.0, 70.0]
+    # MARL algorithm configuration
+    MARL:
+      algorithm: "td3"
+      state_dim: 8
+      action_dim: 1
+      training: true
     ```
 
 ## Integration Points
