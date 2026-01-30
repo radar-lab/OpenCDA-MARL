@@ -8,7 +8,7 @@ OpenCDA-MARL is developed by the [UA Radar Lab](https://radar.ece.arizona.edu/) 
 
 <div class="grid cards" markdown>
 
--   **Dr. Siyang Cao**
+- **Dr. Siyang Cao**
 
     ---
 
@@ -18,7 +18,7 @@ OpenCDA-MARL is developed by the [UA Radar Lab](https://radar.ece.arizona.edu/) 
 
     [:material-web: UArizona ECE](https://ece.engineering.arizona.edu/faculty-staff/faculty/siyang-cao) &nbsp; [:material-google: Google Scholar](https://scholar.google.com/citations?user=dQvEspMAAAAJ&hl=en)
 
--   **Dr. Bo Liu**
+- **Dr. Bo Liu**
 
     ---
 
@@ -34,7 +34,7 @@ OpenCDA-MARL is developed by the [UA Radar Lab](https://radar.ece.arizona.edu/) 
 
 <div class="grid cards" markdown>
 
--   **Lihao Guo** &nbsp; :material-star:{ .lg }
+- **Lihao Guo** &nbsp; :material-star:{ .lg }
 
     ---
 
@@ -44,7 +44,7 @@ OpenCDA-MARL is developed by the [UA Radar Lab](https://radar.ece.arizona.edu/) 
 
     [:material-home: Homepage](https://www.lgcyaxi.net/) &nbsp; [:material-linkedin: LinkedIn](https://www.linkedin.com/in/lgcyaxi)
 
--   **Jiahao Tang**
+- **Jiahao Tang**
 
     ---
 
@@ -54,7 +54,7 @@ OpenCDA-MARL is developed by the [UA Radar Lab](https://radar.ece.arizona.edu/) 
 
     [:material-linkedin: LinkedIn](https://www.linkedin.com/in/jiahaotang1997/)
 
--   **Louis Liu**
+- **Louis Liu**
 
     ---
 
