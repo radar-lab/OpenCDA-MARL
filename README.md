@@ -75,15 +75,19 @@ For quick reference:
 If you are using OpenCDA-MARL for your research, please cite both the MARL extension and the original OpenCDA paper:
 
 ```bibtex
-@software{opencda-marl2025,
-  title={OpenCDA-MARL: A Unified Benchmarking Framework for Cooperative Autonomous Intersection Management with Multi-Agent Reinforcement Learning},
-  author={Lihao Guo, Louis Liu, Jiahao Tang, Liu Bo, Siyang Cao},
-  year={2025},
-  url={https://github.com/radar-lab/OpenCDA-MARL}
+@ARTICLE{11396022,
+  author={Guo, Lihao and Liu, Louis and Tang, Jiahao and Liu, Bo and Cao, Siyang},
+  journal={IEEE Robotics and Automation Letters}, 
+  title={OpenCDA-MARL: A Unified Benchmarking Framework for Cooperative Autonomous Intersection Management With Multi-Agent Reinforcement Learning}, 
+  year={2026},
+  pages={1-8},
+  keywords={Vehicle dynamics;Training;Robot sensing systems;Heuristic algorithms;Vehicle-to-everything;Benchmark testing;Real-time systems;Monitoring;Laser radar;Graphical user interfaces},
+  doi={10.1109/LRA.2026.3664656}
 }
 
+
 @misc{xu2021opencdaanopencooperativedriving,
-      title={OpenCDA:An Open Cooperative Driving Automation Framework Integrated with Co-Simulation}, 
+      title={OpenCDA: An Open Cooperative Driving Automation Framework Integrated with Co-Simulation}, 
       author={Runsheng Xu and Yi Guo and Xu Han and Xin Xia and Hao Xiang and Jiaqi Ma},
       year={2021},
       eprint={2107.06260},
