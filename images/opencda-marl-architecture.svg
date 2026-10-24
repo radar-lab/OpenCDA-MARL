@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 660" role="img" aria-labelledby="t d">
+  <title id="t">OpenCDA-MARL architecture</title>
+  <desc id="d">Entry points feed a sealed run-loop kernel. The kernel knows only the api contracts; the builtin learners, agents and planners register through the same doors an external plugin uses. Telemetry feeds the web monitor. CARLA, SUMO and their co-simulation run beneath the kernel, on the vendored OpenCDA core.</desc>
+  <style>
+    :root { --bg:#ffffff; --ink:#1f2937; --mute:#6b7280; --line:#9ca3af;
+            --kernel:#e0e7ff; --kernel-s:#6366f1; --api:#d1fae5; --api-s:#10b981;
+            --plug:#fef3c7; --plug-s:#f59e0b; --built:#fce7f3; --built-s:#ec4899;
+            --tele:#cffafe; --tele-s:#06b6d4; --back:#e5e7eb; --back-s:#6b7280;
+            --step:#ffffff; --entry:#f3f4f6; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#111827; --ink:#f3f4f6; --mute:#9ca3af; --line:#6b7280;
+              --kernel:#312e81; --kernel-s:#818cf8; --api:#064e3b; --api-s:#34d399;
+              --plug:#78350f; --plug-s:#fbbf24; --built:#831843; --built-s:#f472b6;
+              --tele:#164e63; --tele-s:#22d3ee; --back:#374151; --back-s:#9ca3af;
+              --step:#1f2937; --entry:#1f2937; }
+    }
+    text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; fill: var(--ink); }
+    .h { font-size: 15px; font-weight: 700; }
+    .s { font-size: 12px; fill: var(--mute); }
+    .t { font-size: 13px; }
+    .b { font-size: 12.5px; font-weight: 600; }
+    .step { fill: var(--step); stroke: var(--kernel-s); stroke-width: 1.5; }
+    .arrow { stroke: var(--kernel-s); stroke-width: 1.6; fill: none; marker-end: url(#a); }
+    .dash { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; marker-end: url(#g); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#6366f1"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="660" rx="14" fill="var(--bg)"/>
+  <text x="30" y="38" class="h" style="font-size:19px">OpenCDA-MARL architecture</text>
+  <text x="30" y="58" class="s">one sealed lifecycle, many replaceable joints</text>
+
+  <!-- entry points -->
+  <rect x="30" y="76" width="300" height="46" rx="8" fill="var(--entry)" stroke="var(--line)"/>
+  <text x="45" y="96" class="b">Profiles</text>
+  <text x="45" y="113" class="s">family/scenario/profile YAML, merged by config</text>
+  <rect x="350" y="76" width="300" height="46" rx="8" fill="var(--entry)" stroke="var(--line)"/>
+  <text x="365" y="96" class="b">Command line</text>
+  <text x="365" y="113" class="s">opencda.py · opencda-marl · pixi run tasks</text>
+  <rect x="670" y="76" width="300" height="46" rx="8" fill="var(--entry)" stroke="var(--line)"/>
+  <text x="685" y="96" class="b">ParallelEnv</text>
+  <text x="685" y="113" class="s">drive the scenarios from your own RL stack</text>
+  <path d="M180 122 V142" class="arrow"/>
+  <path d="M500 122 V142" class="arrow"/>
+  <path d="M820 122 V142" class="arrow"/>
+
+  <!-- kernel -->
+  <rect x="30" y="142" width="620" height="206" rx="12" fill="var(--kernel)" stroke="var(--kernel-s)" stroke-width="2"/>
+  <text x="48" y="168" class="h">_kernel/ — the sealed lifecycle</text>
+  <text x="48" y="186" class="s">knows the contracts, never imports builtin (a test enforces it)</text>
+
+  <g class="t" text-anchor="middle">
+    <rect x="48" y="204" width="130" height="34" rx="7" class="step"/><text x="113" y="226">scenario manager</text>
+    <rect x="198" y="204" width="130" height="34" rx="7" class="step"/><text x="263" y="226">traffic manager</text>
+    <rect x="348" y="204" width="130" height="34" rx="7" class="step"/><text x="413" y="226">agent manager</text>
+    <rect x="498" y="204" width="130" height="34" rx="7" class="step"/><text x="563" y="226">observe</text>
+    <rect x="48" y="268" width="130" height="34" rx="7" class="step"/><text x="113" y="290">act</text>
+    <rect x="198" y="268" width="130" height="34" rx="7" class="step"/><text x="263" y="290">reward</text>
+    <rect x="348" y="268" width="130" height="34" rx="7" class="step"/><text x="413" y="290">learn</text>
+    <rect x="498" y="268" width="130" height="34" rx="7" class="step"/><text x="563" y="290">telemetry</text>
+  </g>
+  <path d="M178 221 H198" class="arrow"/>
+  <path d="M328 221 H348" class="arrow"/>
+  <path d="M478 221 H498" class="arrow"/>
+  <path d="M563 238 V252 H113 V268" class="arrow"/>
+  <path d="M178 285 H198" class="arrow"/>
+  <path d="M328 285 H348" class="arrow"/>
+  <path d="M478 285 H498" class="arrow"/>
+  <path d="M628 285 H640 V186 H413 V204" class="arrow" style="stroke-dasharray:2 4"/>
+  <text x="48" y="330" class="s">adapter · envs · policy manager · sensing · traffic · checkpointing · world reset</text>
+
+  <!-- builtin -->
+  <rect x="670" y="142" width="300" height="206" rx="12" fill="var(--built)" stroke="var(--built-s)" stroke-width="2"/>
+  <text x="688" y="168" class="h">builtin/ — the framework's plugins</text>
+  <text x="688" y="186" class="s">registered through the same doors as yours</text>
+  <text x="688" y="212" class="b">Learners</text>
+  <text x="688" y="230" class="t">MAPPO · MASAC · MATD3 · DQN · Q-learning</text>
+  <text x="688" y="248" class="t">PCMAPPO · PCMASAC · PCMATD3</text>
+  <text x="688" y="270" class="b">Agents</text>
+  <text x="688" y="288" class="t">behavior · vanilla · rule_based · marl</text>
+  <text x="688" y="310" class="b">Joints</text>
+  <text x="688" y="328" class="t">planner · observation extractor · reward</text>
+  <text x="688" y="344" class="t" style="font-size:12px">intent providers · reward / objective profiles</text>
+
+  <!-- api -->
+  <rect x="30" y="372" width="300" height="118" rx="12" fill="var(--api)" stroke="var(--api-s)" stroke-width="2"/>
+  <text x="48" y="398" class="h">api/ — contracts and doors</text>
+  <text x="48" y="418" class="t">the only surface plugins touch</text>
+  <text x="48" y="438" class="t">algorithms · agent · planner · extractor</text>
+  <text x="48" y="456" class="t">intent provider · reward calculator</text>
+  <text x="48" y="474" class="t">rewards · objectives · preferences · safety</text>
+
+  <!-- plugins -->
+  <rect x="350" y="372" width="300" height="118" rx="12" fill="var(--plug)" stroke="var(--plug-s)" stroke-width="2"/>
+  <text x="368" y="398" class="h">plugins/ — one plugin system</text>
+  <text x="368" y="418" class="t">discovery by entry point or config</text>
+  <text x="368" y="438" class="t">loading · freeze · rollback</text>
+  <text x="368" y="458" class="t">group <tspan font-family="ui-monospace, Consolas, monospace" font-size="12">opencda_marl.plugins</tspan></text>
+  <text x="368" y="476" class="s">pixi run python -m opencda_marl.plugins</text>
+
+  <!-- telemetry -->
+  <rect x="670" y="372" width="300" height="118" rx="12" fill="var(--tele)" stroke="var(--tele-s)" stroke-width="2"/>
+  <text x="688" y="398" class="h">telemetry/ — watch a run</text>
+  <text x="688" y="418" class="t">metrics store (SQLite) · step trace</text>
+  <text x="688" y="438" class="t">web monitor on 127.0.0.1:8765</text>
+  <text x="688" y="458" class="t">live traffic view, run labels</text>
+  <text x="688" y="476" class="s">started or reused by every run</text>
+
+  <!-- relations -->
+  <path d="M180 372 V350" class="dash"/>
+  <text x="188" y="364" class="s">the kernel reads the contracts</text>
+  <path d="M740 348 L690 360 L650 380" class="dash"/>
+  <text x="700" y="364" class="s" style="font-size:11px">registers here</text>
+  <path d="M350 430 H330" class="dash"/>
+
+  <!-- backends -->
+  <text x="30" y="520" class="h">Simulation backends — the loop is identical on both</text>
+  <rect x="30" y="532" width="205" height="48" rx="8" fill="var(--back)" stroke="var(--back-s)"/>
+  <text x="45" y="553" class="b">CARLA 0.9.15 / 0.9.16</text><text x="45" y="571" class="s">marl · pcma · momarl profiles</text>
+  <rect x="250" y="532" width="205" height="48" rx="8" fill="var(--back)" stroke="var(--back-s)"/>
+  <text x="265" y="553" class="b">SUMO (libsumo)</text><text x="265" y="571" class="s">sumo-marl profiles</text>
+  <rect x="470" y="532" width="180" height="48" rx="8" fill="var(--back)" stroke="var(--back-s)"/>
+  <text x="485" y="553" class="b">CARLA–SUMO</text><text x="485" y="571" class="s">co-simulation (cosim-marl)</text>
+  <rect x="670" y="532" width="300" height="48" rx="8" fill="var(--back)" stroke="var(--back-s)"/>
+  <text x="685" y="553" class="b">Bundled with the wheel</text><text x="685" y="571" class="s">configs · recordings · RAL baselines</text>
+  <path d="M560 492 V530" class="dash"/>
+  <text x="568" y="514" class="s">the kernel runs on a backend</text>
+
+  <rect x="30" y="598" width="940" height="42" rx="8" fill="none" stroke="var(--line)" stroke-dasharray="6 4"/>
+  <text x="48" y="624" class="t"><tspan font-weight="700">opencda/</tspan> — the vendored OpenCDA core (vehicle manager, planning, perception, V2X), under UCLA's licence, with every edit listed in the patch ledger</text>
+</svg>
