@@ -7,12 +7,12 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="Multi-Agent Reinforcement Learning for Cooperative Autonomous Driving" name="description"/>
 <meta content="OpenCDA-MARL" name="author"/>
-<link href="../../faq/" rel="prev"/>
-<link href="../sumo_training/" rel="next"/>
+<link href="../../carla-version-support/" rel="prev"/>
+<link href="../../run-experiments/" rel="next"/>
 <link href="../../images/favicon.ico" rel="icon"/>
-<meta content="mkdocs-1.6.1, mkdocs-material-9.7.1" name="generator"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.7.7" name="generator"/>
 <title>Architecture - OpenCDA-MARL</title>
-<link href="../../assets/stylesheets/main.484c7ddc.min.css" rel="stylesheet"/>
+<link href="../../assets/stylesheets/main.ec1eaa64.min.css" rel="stylesheet"/>
 <link href="../../assets/stylesheets/palette.ab4e12ef.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
@@ -25,7 +25,7 @@
 <input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
 <label class="md-overlay" for="__drawer"></label>
 <div data-md-component="skip">
-<a class="md-skip" href="#opencda-marl-architecture">
+<a class="md-skip" href="#architecture">
           Skip to content
         </a>
 </div>
@@ -116,10 +116,21 @@
 <ul class="md-tabs__list">
 <li class="md-tabs__item">
 <a class="md-tabs__link" href="../..">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../installation/">
           
   
   
-  Home
+  Getting Started
 
         </a>
 </li>
@@ -128,25 +139,16 @@
           
   
   
-  MARL Framework
+  Guide
 
         </a>
 </li>
 <li class="md-tabs__item">
-<a class="md-tabs__link" href="../../opencda/core/">
+<a class="md-tabs__link" href="../pcma/">
           
   
   
-  OpenCDA Integration
-
-        </a>
-</li>
-<li class="md-tabs__item">
-<a class="md-tabs__link" href="../../api/opencda/overview/">
-          
-  
-  
-  API Reference
+  Reference
 
         </a>
 </li>
@@ -157,7 +159,7 @@
   
     
   
-  About Us
+  About
 
       </a>
 </li>
@@ -189,35 +191,12 @@
 </a>
 </div>
 <ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1" type="checkbox"/>
-<label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_1_label" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_1">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    Home
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
 <a class="md-nav__link" href="../..">
 <span class="md-ellipsis">
     
   
-    OpenCDA-MARL
+    Home
   
 
     
@@ -225,8 +204,8 @@
 </a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_1_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_1_2" id="__nav_1_2_label" tabindex="0">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
 <span class="md-ellipsis">
     
   
@@ -237,8 +216,8 @@
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_1_2_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_1_2">
+<nav aria-expanded="false" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
 <span class="md-nav__icon md-icon"></span>
             
   
@@ -272,11 +251,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../faq/">
+<a class="md-nav__link" href="../../carla-version-support/">
 <span class="md-ellipsis">
     
   
-    FAQ
+    CARLA Version Support
   
 
     
@@ -286,28 +265,25 @@
 </ul>
 </nav>
 </li>
-</ul>
-</nav>
-</li>
 <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
 <span class="md-ellipsis">
     
   
-    MARL Framework
+    Guide
   
 
     
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_2">
+<nav aria-expanded="true" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
 <span class="md-nav__icon md-icon"></span>
             
   
-    MARL Framework
+    Guide
   
 
           </label>
@@ -342,77 +318,55 @@
     </label>
 <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="#directory-structure">
+<a class="md-nav__link" href="#the-four-zones">
 <span class="md-ellipsis">
       
-        Directory Structure
+        The four zones
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#architecture-overview">
+<a class="md-nav__link" href="#the-run-loop-and-its-joints">
 <span class="md-ellipsis">
       
-        Architecture Overview
-      
-    </span>
-</a>
-<nav aria-label="Architecture Overview" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#layer-1-opencda-core">
-<span class="md-ellipsis">
-      
-        Layer 1: OpenCDA Core
+        The run loop and its joints
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#layer-2-marl-adapter-interface">
+<a class="md-nav__link" href="#replaceable-joints">
 <span class="md-ellipsis">
       
-        Layer 2: MARL Adapter Interface
+        Replaceable joints
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#layer-3-algorithm-implementation">
+<a class="md-nav__link" href="#ports">
 <span class="md-ellipsis">
       
-        Layer 3: Algorithm Implementation
-      
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#configuration-system">
-<span class="md-ellipsis">
-      
-        Configuration System
+        Ports
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#execution-flow">
+<a class="md-nav__link" href="#adjustable-seams">
 <span class="md-ellipsis">
       
-        Execution Flow
+        Adjustable seams
       
     </span>
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="#simulator-support">
+<a class="md-nav__link" href="#rules-the-joints-live-under">
 <span class="md-ellipsis">
       
-        Simulator Support
+        Rules the joints live under
       
     </span>
 </a>
@@ -421,11 +375,11 @@
 </nav>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../sumo_training/">
+<a class="md-nav__link" href="../../run-experiments/">
 <span class="md-ellipsis">
     
   
-    SUMO Training
+    Run Experiments
   
 
     
@@ -433,11 +387,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../updates/">
+<a class="md-nav__link" href="../throughput/">
 <span class="md-ellipsis">
     
   
-    Updates
+    Training Throughput
   
 
     
@@ -445,122 +399,34 @@
 </a>
 </li>
 <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_4" type="checkbox"/>
-<label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
 <span class="md-ellipsis">
     
   
-    Changelog-MARL
+    Customize
   
 
     
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_2_4_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_2_4">
+<nav aria-expanded="false" aria-labelledby="__nav_3_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_3_4">
 <span class="md-nav__icon md-icon"></span>
             
   
-    Changelog-MARL
+    Customize
   
 
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../changelog/v1.0.0/">
+<a class="md-nav__link" href="../replace_component/">
 <span class="md-ellipsis">
     
   
-    v1.0.0
-  
-
-    
-  </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../contributing/">
-<span class="md-ellipsis">
-    
-  
-    Contributing
-  
-
-    
-  </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    OpenCDA Integration
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
-<label class="md-nav__title" for="__nav_3">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    OpenCDA Integration
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/core/">
-<span class="md-ellipsis">
-    
-  
-    Core Components
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    Changelog-MARL
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_3_2_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_3_2">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    Changelog-MARL
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/">
-<span class="md-ellipsis">
-    
-  
-    Overview
+    Replace a Component
   
 
     
@@ -568,11 +434,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/architecture_changes/">
+<a class="md-nav__link" href="../custom_algorithms/">
 <span class="md-ellipsis">
     
   
-    Architecture Changes
+    Add an Algorithm
   
 
     
@@ -580,11 +446,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/api_changes/">
+<a class="md-nav__link" href="../custom_planner/">
 <span class="md-ellipsis">
     
   
-    API Changes
+    A Planner
   
 
     
@@ -592,11 +458,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/platform_changes/">
+<a class="md-nav__link" href="../custom_agent/">
 <span class="md-ellipsis">
     
   
-    Platform Changes
+    An Agent Type
   
 
     
@@ -604,11 +470,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/config_changes/">
+<a class="md-nav__link" href="../custom_intent_provider/">
 <span class="md-ellipsis">
     
   
-    Config Changes
+    An Intent Provider
   
 
     
@@ -616,11 +482,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/breaking_changes/">
+<a class="md-nav__link" href="../custom_observation_extractor/">
 <span class="md-ellipsis">
     
   
-    Breaking Changes
+    An Observation Extractor
   
 
     
@@ -628,49 +494,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/changelog/migration_and_docs/">
+<a class="md-nav__link" href="../custom_reward_calculator/">
 <span class="md-ellipsis">
     
   
-    Migration &amp; Docs
-  
-
-    
-  </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3_3" type="checkbox"/>
-<label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    Integration
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_3_3_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_3_3">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    Integration
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/scenarios/">
-<span class="md-ellipsis">
-    
-  
-    Scenario Testing
+    A Reward Calculator
   
 
     
@@ -678,23 +506,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/traffic_generation/">
+<a class="md-nav__link" href="../custom_profiles/">
 <span class="md-ellipsis">
     
   
-    Traffic Generation
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../opencda/yaml_define/">
-<span class="md-ellipsis">
-    
-  
-    YAML Configuration
+    Profile Tables
   
 
     
@@ -713,7 +529,7 @@
 <span class="md-ellipsis">
     
   
-    API Reference
+    Reference
   
 
     
@@ -725,40 +541,17 @@
 <span class="md-nav__icon md-icon"></span>
             
   
-    API Reference
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_1" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    OpenCDA Core
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_1_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_4_1">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    OpenCDA Core
+    Reference
   
 
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/overview/">
+<a class="md-nav__link" href="../pcma/">
 <span class="md-ellipsis">
     
   
-    Overview
+    PCMA Learners
   
 
     
@@ -766,11 +559,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/cav_world/">
+<a class="md-nav__link" href="../../opencda/marl_patches/">
 <span class="md-ellipsis">
     
   
-    CavWorld
+    OpenCDA Patch Ledger
   
 
     
@@ -778,145 +571,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/perception_manager/">
+<a class="md-nav__link" href="../../contributing/">
 <span class="md-ellipsis">
     
   
-    PerceptionManager
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/vehicle_manager/">
-<span class="md-ellipsis">
-    
-  
-    VehicleManager
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/scenario_manager/">
-<span class="md-ellipsis">
-    
-  
-    ScenarioManager
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/localization_manager/">
-<span class="md-ellipsis">
-    
-  
-    LocalizationManager
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/behavior_agent/">
-<span class="md-ellipsis">
-    
-  
-    BehaviorAgent
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda/v2x_manager/">
-<span class="md-ellipsis">
-    
-  
-    V2XManager
-  
-
-    
-  </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_2" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-<span class="md-ellipsis">
-    
-  
-    MARL Extension
-  
-
-    
-  </span>
-<span class="md-nav__icon md-icon"></span>
-</label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_2_label" class="md-nav" data-md-level="2">
-<label class="md-nav__title" for="__nav_4_2">
-<span class="md-nav__icon md-icon"></span>
-            
-  
-    MARL Extension
-  
-
-          </label>
-<ul class="md-nav__list" data-md-scrollfix="">
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/overview/">
-<span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/coordinator/">
-<span class="md-ellipsis">
-    
-  
-    Coordinator
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/scenario/">
-<span class="md-ellipsis">
-    
-  
-    Scenario
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/adapters/vehicle_adapter/">
-<span class="md-ellipsis">
-    
-  
-    Vehicle Adapter
+    Contributing
   
 
     
@@ -924,34 +583,34 @@
 </a>
 </li>
 <li class="md-nav__item md-nav__item--nested">
-<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_2_5" type="checkbox"/>
-<label class="md-nav__link" for="__nav_4_2_5" id="__nav_4_2_5_label" tabindex="0">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4_4" type="checkbox"/>
+<label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
 <span class="md-ellipsis">
     
   
-    Core Components
+    Changelog
   
 
     
   </span>
 <span class="md-nav__icon md-icon"></span>
 </label>
-<nav aria-expanded="false" aria-labelledby="__nav_4_2_5_label" class="md-nav" data-md-level="3">
-<label class="md-nav__title" for="__nav_4_2_5">
+<nav aria-expanded="false" aria-labelledby="__nav_4_4_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_4_4">
 <span class="md-nav__icon md-icon"></span>
             
   
-    Core Components
+    Changelog
   
 
           </label>
 <ul class="md-nav__list" data-md-scrollfix="">
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/agent_manager/">
+<a class="md-nav__link" href="../changelog/v2.1.0/">
 <span class="md-ellipsis">
     
   
-    Agent Manager
+    v2.1.0
   
 
     
@@ -959,62 +618,11 @@
 </a>
 </li>
 <li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/map_manager/">
+<a class="md-nav__link" href="../changelog/v1.0.0/">
 <span class="md-ellipsis">
     
   
-    Map Manager
-  
-
-    
-  </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/environment/">
-<span class="md-ellipsis">
-    
-  
-    Environment Interface
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/traffic_config/">
-<span class="md-ellipsis">
-    
-  
-    Traffic Configuration
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/benchmark/">
-<span class="md-ellipsis">
-    
-  
-    Benchmark System
-  
-
-    
-  </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="../../api/opencda-marl/training/">
-<span class="md-ellipsis">
-    
-  
-    Training Infrastructure
+    v1.0.0
   
 
     
@@ -1032,7 +640,7 @@
 <span class="md-ellipsis">
     
   
-    About Us
+    About
   
 
     
@@ -1046,319 +654,305 @@
 </div>
 <div class="md-content" data-md-component="content">
 <article class="md-content__inner md-typeset">
-<h1 id="opencda-marl-architecture">OpenCDA-MARL Architecture<a class="headerlink" href="#opencda-marl-architecture" title="Permanent link">¶</a></h1>
-<p>OpenCDA-MARL extends the original OpenCDA framework to support Multi-Agent Reinforcement Learning (MARL) for cooperative autonomous driving. This document describes the current architecture implementation.</p>
-<div class="admonition success">
-<p class="admonition-title">Release Status</p>
-<p>OpenCDA-MARL v1.0.0 is the first stable release. The system supports intersection scenarios with multiple agent types and five RL algorithms (TD3, DQN, Q-Learning, MAPPO, SAC). Both CARLA and SUMO simulators are supported.</p>
-</div>
-<h2 id="directory-structure">Directory Structure<a class="headerlink" href="#directory-structure" title="Permanent link">¶</a></h2>
-<details>
-<summary>Directory Structure</summary>
-<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a href="#__codelineno-0-1" id="__codelineno-0-1" name="__codelineno-0-1"></a>OpenCDA-MARL/
-</span><span id="__span-0-2"><a href="#__codelineno-0-2" id="__codelineno-0-2" name="__codelineno-0-2"></a>├──<span class="w"> </span>docs/<span class="w">                       </span><span class="c1"># Documentation</span>
-</span><span id="__span-0-3"><a href="#__codelineno-0-3" id="__codelineno-0-3" name="__codelineno-0-3"></a>├──<span class="w"> </span>opencda/<span class="w">                    </span><span class="c1"># Original OpenCDA core (preserved)</span>
-</span><span id="__span-0-4"><a href="#__codelineno-0-4" id="__codelineno-0-4" name="__codelineno-0-4"></a>│<span class="w">   </span>├──<span class="w"> </span>assets/<span class="w">                 </span><span class="c1"># Maps and resources</span>
-</span><span id="__span-0-5"><a href="#__codelineno-0-5" id="__codelineno-0-5" name="__codelineno-0-5"></a>│<span class="w">   </span>├──<span class="w"> </span>co_simulation/<span class="w">          </span><span class="c1"># SUMO integration</span>
-</span><span id="__span-0-6"><a href="#__codelineno-0-6" id="__codelineno-0-6" name="__codelineno-0-6"></a>│<span class="w">   </span>├──<span class="w"> </span>core/<span class="w">                   </span><span class="c1"># Core modules</span>
-</span><span id="__span-0-7"><a href="#__codelineno-0-7" id="__codelineno-0-7" name="__codelineno-0-7"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>actuation/<span class="w">          </span><span class="c1"># Control algorithms</span>
-</span><span id="__span-0-8"><a href="#__codelineno-0-8" id="__codelineno-0-8" name="__codelineno-0-8"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>application/<span class="w">        </span><span class="c1"># Cooperative driving apps</span>
-</span><span id="__span-0-9"><a href="#__codelineno-0-9" id="__codelineno-0-9" name="__codelineno-0-9"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>common/<span class="w">             </span><span class="c1"># Base classes and V2X</span>
-</span><span id="__span-0-10"><a href="#__codelineno-0-10" id="__codelineno-0-10" name="__codelineno-0-10"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>map/<span class="w">                </span><span class="c1"># HD Map management</span>
-</span><span id="__span-0-11"><a href="#__codelineno-0-11" id="__codelineno-0-11" name="__codelineno-0-11"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>plan/<span class="w">               </span><span class="c1"># Planning algorithms</span>
-</span><span id="__span-0-12"><a href="#__codelineno-0-12" id="__codelineno-0-12" name="__codelineno-0-12"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>sensing/<span class="w">            </span><span class="c1"># Perception and localization</span>
-</span><span id="__span-0-13"><a href="#__codelineno-0-13" id="__codelineno-0-13" name="__codelineno-0-13"></a>│<span class="w">   </span>├──<span class="w"> </span>customize/<span class="w">              </span><span class="c1"># User customizations</span>
-</span><span id="__span-0-14"><a href="#__codelineno-0-14" id="__codelineno-0-14" name="__codelineno-0-14"></a>│<span class="w">   </span>└──<span class="w"> </span>scenario_testing/<span class="w">       </span><span class="c1"># Scenario scripts and configs</span>
-</span><span id="__span-0-15"><a href="#__codelineno-0-15" id="__codelineno-0-15" name="__codelineno-0-15"></a>│
-</span><span id="__span-0-16"><a href="#__codelineno-0-16" id="__codelineno-0-16" name="__codelineno-0-16"></a>├──<span class="w"> </span>opencda_marl/<span class="w">               </span><span class="c1"># MARL extensions</span>
-</span><span id="__span-0-17"><a href="#__codelineno-0-17" id="__codelineno-0-17" name="__codelineno-0-17"></a>│<span class="w">   </span>├──<span class="w"> </span>coordinator.py<span class="w">          </span><span class="c1"># Main MARL orchestrator</span>
-</span><span id="__span-0-18"><a href="#__codelineno-0-18" id="__codelineno-0-18" name="__codelineno-0-18"></a>│<span class="w">   </span>├──<span class="w"> </span>core/<span class="w">                   </span><span class="c1"># Core MARL components</span>
-</span><span id="__span-0-19"><a href="#__codelineno-0-19" id="__codelineno-0-19" name="__codelineno-0-19"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>agent_manager.py<span class="w">    </span><span class="c1"># Vehicle spawning &amp; adapter management</span>
-</span><span id="__span-0-20"><a href="#__codelineno-0-20" id="__codelineno-0-20" name="__codelineno-0-20"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>events.py<span class="w">           </span><span class="c1"># StepEvent dataclass</span>
-</span><span id="__span-0-21"><a href="#__codelineno-0-21" id="__codelineno-0-21" name="__codelineno-0-21"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>world_reset_manager.py<span class="w">  </span><span class="c1"># CARLA memory management</span>
-</span><span id="__span-0-22"><a href="#__codelineno-0-22" id="__codelineno-0-22" name="__codelineno-0-22"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>adapter/<span class="w">            </span><span class="c1"># Vehicle control abstraction</span>
-</span><span id="__span-0-23"><a href="#__codelineno-0-23" id="__codelineno-0-23" name="__codelineno-0-23"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>vehicle_adapter.py<span class="w">   </span><span class="c1"># MARL vehicle wrapper</span>
-</span><span id="__span-0-24"><a href="#__codelineno-0-24" id="__codelineno-0-24" name="__codelineno-0-24"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>vehicle_defaults.py<span class="w">  </span><span class="c1"># Default configs</span>
-</span><span id="__span-0-25"><a href="#__codelineno-0-25" id="__codelineno-0-25" name="__codelineno-0-25"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>exception.py<span class="w">         </span><span class="c1"># Custom exceptions</span>
-</span><span id="__span-0-26"><a href="#__codelineno-0-26" id="__codelineno-0-26" name="__codelineno-0-26"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>agents/<span class="w">             </span><span class="c1"># Agent implementations</span>
-</span><span id="__span-0-27"><a href="#__codelineno-0-27" id="__codelineno-0-27" name="__codelineno-0-27"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>agent_factory.py<span class="w">     </span><span class="c1"># Agent factory pattern</span>
-</span><span id="__span-0-28"><a href="#__codelineno-0-28" id="__codelineno-0-28" name="__codelineno-0-28"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>basic_agent.py<span class="w">       </span><span class="c1"># Base autonomous agent</span>
-</span><span id="__span-0-29"><a href="#__codelineno-0-29" id="__codelineno-0-29" name="__codelineno-0-29"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>marl_agent.py<span class="w">        </span><span class="c1"># RL-controlled agent</span>
-</span><span id="__span-0-30"><a href="#__codelineno-0-30" id="__codelineno-0-30" name="__codelineno-0-30"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>marl_behavior_agent.py<span class="w"> </span><span class="c1"># Behavior agent</span>
-</span><span id="__span-0-31"><a href="#__codelineno-0-31" id="__codelineno-0-31" name="__codelineno-0-31"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>vanilla_agent.py<span class="w">     </span><span class="c1"># Safety agent</span>
-</span><span id="__span-0-32"><a href="#__codelineno-0-32" id="__codelineno-0-32" name="__codelineno-0-32"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>rule_based_agent.py<span class="w">  </span><span class="c1"># Rule-based agent</span>
-</span><span id="__span-0-33"><a href="#__codelineno-0-33" id="__codelineno-0-33" name="__codelineno-0-33"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>marl/<span class="w">               </span><span class="c1"># MARL algorithms &amp; infrastructure</span>
-</span><span id="__span-0-34"><a href="#__codelineno-0-34" id="__codelineno-0-34" name="__codelineno-0-34"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>marl_manager.py<span class="w">      </span><span class="c1"># Algorithm orchestrator</span>
-</span><span id="__span-0-35"><a href="#__codelineno-0-35" id="__codelineno-0-35" name="__codelineno-0-35"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>extractor.py<span class="w">         </span><span class="c1"># Observation feature extraction</span>
-</span><span id="__span-0-36"><a href="#__codelineno-0-36" id="__codelineno-0-36" name="__codelineno-0-36"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>metrics.py<span class="w">           </span><span class="c1"># Training metrics tracking</span>
-</span><span id="__span-0-37"><a href="#__codelineno-0-37" id="__codelineno-0-37" name="__codelineno-0-37"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>checkpoint.py<span class="w">        </span><span class="c1"># Model checkpoint management</span>
-</span><span id="__span-0-38"><a href="#__codelineno-0-38" id="__codelineno-0-38" name="__codelineno-0-38"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>algorithms/<span class="w">          </span><span class="c1"># RL implementations</span>
-</span><span id="__span-0-39"><a href="#__codelineno-0-39" id="__codelineno-0-39" name="__codelineno-0-39"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>base_algorithm.py<span class="w">    </span><span class="c1"># Abstract base class</span>
-</span><span id="__span-0-40"><a href="#__codelineno-0-40" id="__codelineno-0-40" name="__codelineno-0-40"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>q_learning.py<span class="w">        </span><span class="c1"># Q-Learning</span>
-</span><span id="__span-0-41"><a href="#__codelineno-0-41" id="__codelineno-0-41" name="__codelineno-0-41"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>dqn.py<span class="w">              </span><span class="c1"># Deep Q-Network</span>
-</span><span id="__span-0-42"><a href="#__codelineno-0-42" id="__codelineno-0-42" name="__codelineno-0-42"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>td3.py<span class="w">              </span><span class="c1"># Twin Delayed DDPG</span>
-</span><span id="__span-0-43"><a href="#__codelineno-0-43" id="__codelineno-0-43" name="__codelineno-0-43"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>mappo.py<span class="w">            </span><span class="c1"># Multi-Agent PPO</span>
-</span><span id="__span-0-44"><a href="#__codelineno-0-44" id="__codelineno-0-44" name="__codelineno-0-44"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>sac.py<span class="w">              </span><span class="c1"># Soft Actor-Critic</span>
-</span><span id="__span-0-45"><a href="#__codelineno-0-45" id="__codelineno-0-45" name="__codelineno-0-45"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>rollout_buffer.py<span class="w">   </span><span class="c1"># MAPPO rollout buffer</span>
-</span><span id="__span-0-46"><a href="#__codelineno-0-46" id="__codelineno-0-46" name="__codelineno-0-46"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>smart_replay_buffer.py<span class="w"> </span><span class="c1"># High-perf replay buffer</span>
-</span><span id="__span-0-47"><a href="#__codelineno-0-47" id="__codelineno-0-47" name="__codelineno-0-47"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>plan/<span class="w">               </span><span class="c1"># Planning components</span>
-</span><span id="__span-0-48"><a href="#__codelineno-0-48" id="__codelineno-0-48" name="__codelineno-0-48"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>safety/<span class="w">             </span><span class="c1"># Collision avoidance</span>
-</span><span id="__span-0-49"><a href="#__codelineno-0-49" id="__codelineno-0-49" name="__codelineno-0-49"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>traffic/<span class="w">            </span><span class="c1"># Traffic management system</span>
-</span><span id="__span-0-50"><a href="#__codelineno-0-50" id="__codelineno-0-50" name="__codelineno-0-50"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>traffic_manager.py<span class="w">   </span><span class="c1"># Traffic orchestrator</span>
-</span><span id="__span-0-51"><a href="#__codelineno-0-51" id="__codelineno-0-51" name="__codelineno-0-51"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>events.py<span class="w">           </span><span class="c1"># SpawnEvent definition</span>
-</span><span id="__span-0-52"><a href="#__codelineno-0-52" id="__codelineno-0-52" name="__codelineno-0-52"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>flows.py<span class="w">            </span><span class="c1"># Traffic flow patterns</span>
-</span><span id="__span-0-53"><a href="#__codelineno-0-53" id="__codelineno-0-53" name="__codelineno-0-53"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>planner.py<span class="w">          </span><span class="c1"># Route planning</span>
-</span><span id="__span-0-54"><a href="#__codelineno-0-54" id="__codelineno-0-54" name="__codelineno-0-54"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>serializer.py<span class="w">       </span><span class="c1"># Event recording/replay (JSON/HDF5)</span>
-</span><span id="__span-0-55"><a href="#__codelineno-0-55" id="__codelineno-0-55" name="__codelineno-0-55"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>sumo_adapter.py<span class="w">     </span><span class="c1"># SUMO interface</span>
-</span><span id="__span-0-56"><a href="#__codelineno-0-56" id="__codelineno-0-56" name="__codelineno-0-56"></a>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>sumo_spawner.py<span class="w">     </span><span class="c1"># SUMO vehicle spawning</span>
-</span><span id="__span-0-57"><a href="#__codelineno-0-57" id="__codelineno-0-57" name="__codelineno-0-57"></a>│<span class="w">   </span>├──<span class="w"> </span>envs/<span class="w">                   </span><span class="c1"># MARL environments</span>
-</span><span id="__span-0-58"><a href="#__codelineno-0-58" id="__codelineno-0-58" name="__codelineno-0-58"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>marl_env.py<span class="w">         </span><span class="c1"># CARLA MARL environment (main RL loop)</span>
-</span><span id="__span-0-59"><a href="#__codelineno-0-59" id="__codelineno-0-59" name="__codelineno-0-59"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>sumo_marl_env.py<span class="w">    </span><span class="c1"># SUMO-only environment</span>
-</span><span id="__span-0-60"><a href="#__codelineno-0-60" id="__codelineno-0-60" name="__codelineno-0-60"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>carla_monitor.py<span class="w">    </span><span class="c1"># CARLA telemetry</span>
-</span><span id="__span-0-61"><a href="#__codelineno-0-61" id="__codelineno-0-61" name="__codelineno-0-61"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>carla_spectator.py<span class="w">  </span><span class="c1"># Camera control</span>
-</span><span id="__span-0-62"><a href="#__codelineno-0-62" id="__codelineno-0-62" name="__codelineno-0-62"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>evaluation.py<span class="w">       </span><span class="c1"># Episode evaluation</span>
-</span><span id="__span-0-63"><a href="#__codelineno-0-63" id="__codelineno-0-63" name="__codelineno-0-63"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>evaluation_plots.py<span class="w"> </span><span class="c1"># Visualization plots</span>
-</span><span id="__span-0-64"><a href="#__codelineno-0-64" id="__codelineno-0-64" name="__codelineno-0-64"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>cross_agent_evaluator.py<span class="w">  </span><span class="c1"># Multi-agent comparison</span>
-</span><span id="__span-0-65"><a href="#__codelineno-0-65" id="__codelineno-0-65" name="__codelineno-0-65"></a>│<span class="w">   </span>├──<span class="w"> </span>gui/<span class="w">                    </span><span class="c1"># PySide6 Qt-based GUI</span>
-</span><span id="__span-0-66"><a href="#__codelineno-0-66" id="__codelineno-0-66" name="__codelineno-0-66"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>dashboard.py<span class="w">        </span><span class="c1"># Main dashboard</span>
-</span><span id="__span-0-67"><a href="#__codelineno-0-67" id="__codelineno-0-67" name="__codelineno-0-67"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>observation_viewer.py<span class="w"> </span><span class="c1"># Agent observations</span>
-</span><span id="__span-0-68"><a href="#__codelineno-0-68" id="__codelineno-0-68" name="__codelineno-0-68"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>step_controller.py<span class="w">  </span><span class="c1"># Simulation control</span>
-</span><span id="__span-0-69"><a href="#__codelineno-0-69" id="__codelineno-0-69" name="__codelineno-0-69"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>widgets/<span class="w">            </span><span class="c1"># GUI panels</span>
-</span><span id="__span-0-70"><a href="#__codelineno-0-70" id="__codelineno-0-70" name="__codelineno-0-70"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>agent_observation_panel.py
-</span><span id="__span-0-71"><a href="#__codelineno-0-71" id="__codelineno-0-71" name="__codelineno-0-71"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>environment_panel.py
-</span><span id="__span-0-72"><a href="#__codelineno-0-72" id="__codelineno-0-72" name="__codelineno-0-72"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>metrics_display.py
-</span><span id="__span-0-73"><a href="#__codelineno-0-73" id="__codelineno-0-73" name="__codelineno-0-73"></a>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>panels/
-</span><span id="__span-0-74"><a href="#__codelineno-0-74" id="__codelineno-0-74" name="__codelineno-0-74"></a>│<span class="w">   </span>│<span class="w">           </span>├──<span class="w"> </span>reward_panel.py
-</span><span id="__span-0-75"><a href="#__codelineno-0-75" id="__codelineno-0-75" name="__codelineno-0-75"></a>│<span class="w">   </span>│<span class="w">           </span>├──<span class="w"> </span>system_panel.py
-</span><span id="__span-0-76"><a href="#__codelineno-0-76" id="__codelineno-0-76" name="__codelineno-0-76"></a>│<span class="w">   </span>│<span class="w">           </span>├──<span class="w"> </span>traffic_panel.py
-</span><span id="__span-0-77"><a href="#__codelineno-0-77" id="__codelineno-0-77" name="__codelineno-0-77"></a>│<span class="w">   </span>│<span class="w">           </span>└──<span class="w"> </span>weather_panel.py
-</span><span id="__span-0-78"><a href="#__codelineno-0-78" id="__codelineno-0-78" name="__codelineno-0-78"></a>│<span class="w">   </span>├──<span class="w"> </span>scenarios/<span class="w">              </span><span class="c1"># MARL scenario management</span>
-</span><span id="__span-0-79"><a href="#__codelineno-0-79" id="__codelineno-0-79" name="__codelineno-0-79"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>scenario_builder.py<span class="w"> </span><span class="c1"># Factory for scenarios</span>
-</span><span id="__span-0-80"><a href="#__codelineno-0-80" id="__codelineno-0-80" name="__codelineno-0-80"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>scenario_manager.py<span class="w"> </span><span class="c1"># Main scenario orchestrator</span>
-</span><span id="__span-0-81"><a href="#__codelineno-0-81" id="__codelineno-0-81" name="__codelineno-0-81"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>templates/<span class="w">          </span><span class="c1"># Scenario templates</span>
-</span><span id="__span-0-82"><a href="#__codelineno-0-82" id="__codelineno-0-82" name="__codelineno-0-82"></a>│<span class="w">   </span>│<span class="w">       </span>├──<span class="w"> </span>base_template.py
-</span><span id="__span-0-83"><a href="#__codelineno-0-83" id="__codelineno-0-83" name="__codelineno-0-83"></a>│<span class="w">   </span>│<span class="w">       </span>└──<span class="w"> </span>intersection.py
-</span><span id="__span-0-84"><a href="#__codelineno-0-84" id="__codelineno-0-84" name="__codelineno-0-84"></a>│<span class="w">   </span>├──<span class="w"> </span>assets/<span class="w">                 </span><span class="c1"># MARL-specific assets</span>
-</span><span id="__span-0-85"><a href="#__codelineno-0-85" id="__codelineno-0-85" name="__codelineno-0-85"></a>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>maps/<span class="w">              </span><span class="c1"># Custom intersection maps</span>
-</span><span id="__span-0-86"><a href="#__codelineno-0-86" id="__codelineno-0-86" name="__codelineno-0-86"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>├──<span class="w"> </span>intersection.xodr
-</span><span id="__span-0-87"><a href="#__codelineno-0-87" id="__codelineno-0-87" name="__codelineno-0-87"></a>│<span class="w">   </span>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>intersection.fbx
-</span><span id="__span-0-88"><a href="#__codelineno-0-88" id="__codelineno-0-88" name="__codelineno-0-88"></a>│<span class="w">   </span>│<span class="w">   </span>└──<span class="w"> </span>intersection_sumo/<span class="w">  </span><span class="c1"># SUMO scenario files</span>
-</span><span id="__span-0-89"><a href="#__codelineno-0-89" id="__codelineno-0-89" name="__codelineno-0-89"></a>│<span class="w">   </span>└──<span class="w"> </span>utils/<span class="w">                  </span><span class="c1"># Utilities</span>
-</span><span id="__span-0-90"><a href="#__codelineno-0-90" id="__codelineno-0-90" name="__codelineno-0-90"></a>│
-</span><span id="__span-0-91"><a href="#__codelineno-0-91" id="__codelineno-0-91" name="__codelineno-0-91"></a>├──<span class="w"> </span>configs/<span class="w">                    </span><span class="c1"># Unified configuration</span>
-</span><span id="__span-0-92"><a href="#__codelineno-0-92" id="__codelineno-0-92" name="__codelineno-0-92"></a>│<span class="w">   </span>├──<span class="w"> </span>opencda/<span class="w">                </span><span class="c1"># Original OpenCDA configs</span>
-</span><span id="__span-0-93"><a href="#__codelineno-0-93" id="__codelineno-0-93" name="__codelineno-0-93"></a>│<span class="w">   </span>└──<span class="w"> </span>marl/<span class="w">                   </span><span class="c1"># MARL-specific configs</span>
-</span><span id="__span-0-94"><a href="#__codelineno-0-94" id="__codelineno-0-94" name="__codelineno-0-94"></a>│<span class="w">       </span>├──<span class="w"> </span>default.yaml<span class="w">        </span><span class="c1"># Base configuration</span>
-</span><span id="__span-0-95"><a href="#__codelineno-0-95" id="__codelineno-0-95" name="__codelineno-0-95"></a>│<span class="w">       </span>├──<span class="w"> </span>td3_simple_v4.yaml<span class="w">  </span><span class="c1"># Latest TD3 config</span>
-</span><span id="__span-0-96"><a href="#__codelineno-0-96" id="__codelineno-0-96" name="__codelineno-0-96"></a>│<span class="w">       </span>├──<span class="w"> </span>dqn.yaml<span class="w">            </span><span class="c1"># DQN config</span>
-</span><span id="__span-0-97"><a href="#__codelineno-0-97" id="__codelineno-0-97" name="__codelineno-0-97"></a>│<span class="w">       </span>├──<span class="w"> </span>mappo.yaml<span class="w">          </span><span class="c1"># MAPPO config</span>
-</span><span id="__span-0-98"><a href="#__codelineno-0-98" id="__codelineno-0-98" name="__codelineno-0-98"></a>│<span class="w">       </span>├──<span class="w"> </span>sac.yaml<span class="w">            </span><span class="c1"># SAC config</span>
-</span><span id="__span-0-99"><a href="#__codelineno-0-99" id="__codelineno-0-99" name="__codelineno-0-99"></a>│<span class="w">       </span>├──<span class="w"> </span>vanilla.yaml<span class="w">        </span><span class="c1"># Vanilla baseline</span>
-</span><span id="__span-0-100"><a href="#__codelineno-0-100" id="__codelineno-0-100" name="__codelineno-0-100"></a>│<span class="w">       </span>├──<span class="w"> </span>behavior.yaml<span class="w">       </span><span class="c1"># Behavior baseline</span>
-</span><span id="__span-0-101"><a href="#__codelineno-0-101" id="__codelineno-0-101" name="__codelineno-0-101"></a>│<span class="w">       </span>├──<span class="w"> </span>rule_based.yaml<span class="w">     </span><span class="c1"># Rule-based baseline</span>
-</span><span id="__span-0-102"><a href="#__codelineno-0-102" id="__codelineno-0-102" name="__codelineno-0-102"></a>│<span class="w">       </span>├──<span class="w"> </span>sumo.yaml<span class="w">           </span><span class="c1"># SUMO-only mode</span>
-</span><span id="__span-0-103"><a href="#__codelineno-0-103" id="__codelineno-0-103" name="__codelineno-0-103"></a>│<span class="w">       </span>└──<span class="w"> </span>...<span class="w">                 </span><span class="c1"># Additional TD3 variants</span>
-</span><span id="__span-0-104"><a href="#__codelineno-0-104" id="__codelineno-0-104" name="__codelineno-0-104"></a>│
-</span><span id="__span-0-105"><a href="#__codelineno-0-105" id="__codelineno-0-105" name="__codelineno-0-105"></a>├──<span class="w"> </span>checkpoints/<span class="w">                </span><span class="c1"># Saved model weights</span>
-</span><span id="__span-0-106"><a href="#__codelineno-0-106" id="__codelineno-0-106" name="__codelineno-0-106"></a>└──<span class="w"> </span>scripts/<span class="w">                    </span><span class="c1"># Installation and setup scripts</span>
-</span></code></pre></div>
-</details>
-<h2 id="architecture-overview">Architecture Overview<a class="headerlink" href="#architecture-overview" title="Permanent link">¶</a></h2>
-<p>OpenCDA-MARL follows a 3-layer architecture that preserves OpenCDA's core functionality while adding MARL capabilities through adapter interfaces.</p>
-<p><img alt="OpenCDA-MARL Architecture" src="../../images/OpenCDA_MARL_architecture.png"/></p>
-<pre class="mermaid"><code>graph TD
-    subgraph "Layer 3: Algorithms"
-        TD3[TD3] &amp; DQN[DQN] &amp; QL[Q-Learning] &amp; MAPPO[MAPPO] &amp; SAC[SAC]
-        RB[Rule-based] &amp; BH[Behavior] &amp; VN[Vanilla]
-    end
-
-    subgraph "Layer 2: MARL Adapter"
-        CO[MARLCoordinator] --&gt; ENV[MARLEnv]
-        CO --&gt; SM[ScenarioManager]
-        CO --&gt; GUI[Dashboard GUI]
-        ENV --&gt; MM[MARLManager]
-        MM --&gt; TD3 &amp; DQN &amp; QL &amp; MAPPO &amp; SAC
-        SM --&gt; AM[AgentManager]
-        AM --&gt; VA[VehicleAdapter]
-        VA --&gt; RB &amp; BH &amp; VN
-    end
-
-    subgraph "Layer 1: OpenCDA Core"
-        CARLA[CARLA Simulation]
-        VM[VehicleManager]
-        LP[LocalPlanner]
-    end
-
-    VA --&gt; VM --&gt; LP
-    SM --&gt; CARLA</code></pre>
-<h3 id="layer-1-opencda-core">Layer 1: OpenCDA Core<a class="headerlink" href="#layer-1-opencda-core" title="Permanent link">¶</a></h3>
-<p>Fully preserved OpenCDA components including CARLA integration, physics simulation, sensor systems (RGB, LiDAR, GPS), vehicle management, V2X communication, and scenario management. This layer remains unchanged from the original OpenCDA framework.</p>
-<h3 id="layer-2-marl-adapter-interface">Layer 2: MARL Adapter Interface<a class="headerlink" href="#layer-2-marl-adapter-interface" title="Permanent link">¶</a></h3>
-<p>The bridge layer between OpenCDA and MARL algorithms:</p>
-<ul>
-<li><strong>MARLCoordinator</strong>: Main orchestrator — manages simulation lifecycle, episode/step execution, GUI mode, and callback system</li>
-<li><strong>MARLEnv</strong>: Custom RL environment with direct CARLA integration (observation → action → reward → learn cycle)</li>
-<li><strong>MARLAgentManager</strong>: Spawns vehicles, manages adapters, handles lifecycle events (success/collision)</li>
-<li><strong>MARLVehicleAdapter</strong>: Bridges OpenCDA VehicleManager with MARL agent control</li>
-<li><strong>GUI Dashboard</strong>: PySide6 Qt-based dashboard with real-time visualization and step control</li>
-<li><strong>Evaluation System</strong>: Episode metrics, cross-agent comparison, evaluation plots</li>
-</ul>
-<h3 id="layer-3-algorithm-implementation">Layer 3: Algorithm Implementation<a class="headerlink" href="#layer-3-algorithm-implementation" title="Permanent link">¶</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="layer-3-algorithm-implementation-rl-algorithms" name="__tabbed_1" type="radio"><input id="layer-3-algorithm-implementation-baseline-agents" name="__tabbed_1" type="radio"><input id="layer-3-algorithm-implementation-training-infrastructure" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="layer-3-algorithm-implementation-rl-algorithms">RL Algorithms</label><label for="layer-3-algorithm-implementation-baseline-agents">Baseline Agents</label><label for="layer-3-algorithm-implementation-training-infrastructure">Training Infrastructure</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">¶</a></h1>
+<p>One sealed lifecycle, many replaceable joints. The framework fixes <em>how a
+run executes</em> — world, traffic, agents, observe, act, reward, learn,
+telemetry — and turns every part an experiment might vary into a plugin
+selected by configuration. The intended workflow: a research project varies one
+component behind one joint, and the validated component integrates back
+without the loop ever changing shape. This page is the map of those joints; <a href="../replace_component/">Replace a
+Component</a> is the practice — the mechanism, then
+one worked page per kind, of which <a href="../custom_algorithms/">Add an
+Algorithm</a> covers the largest.</p>
+<h2 id="the-four-zones">The four zones<a class="headerlink" href="#the-four-zones" title="Permanent link">¶</a></h2>
 <table>
 <thead>
 <tr>
-<th>Algorithm</th>
-<th>Type</th>
-<th>Description</th>
+<th>zone</th>
+<th>contents</th>
+<th>import rule</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>TD3</strong></td>
-<td>Continuous</td>
-<td>Twin Delayed DDPG with LSTM encoder for multi-agent context</td>
+<td><code>opencda_marl/_kernel/</code></td>
+<td>the complete lifecycle: scenario manager, traffic, agent manager, envs, policy manager, checkpointing</td>
+<td>never imports <code>builtin</code> — the kernel knows contracts, not implementations</td>
 </tr>
 <tr>
-<td><strong>DQN</strong></td>
-<td>Discrete</td>
-<td>Deep Q-Network with epsilon-greedy exploration</td>
+<td><code>opencda_marl/api/</code></td>
+<td>every contract and every <code>register_*</code> door</td>
+<td>the only surface plugins and external code touch</td>
 </tr>
 <tr>
-<td><strong>Q-Learning</strong></td>
-<td>Discrete</td>
-<td>Tabular Q-Learning with configurable state bins</td>
+<td><code>opencda_marl/plugins/</code></td>
+<td>the one plugin system: discovery, loading, freeze, rollback</td>
+<td>—</td>
 </tr>
 <tr>
-<td><strong>MAPPO</strong></td>
-<td>On-Policy</td>
-<td>Multi-Agent PPO with GAE and rollout buffer</td>
-</tr>
-<tr>
-<td><strong>SAC</strong></td>
-<td>Continuous</td>
-<td>Soft Actor-Critic with entropy regularization</td>
+<td><code>opencda_marl/builtin/</code></td>
+<td>the framework's own plugin set (learners, planners, agents, extractors, rewards, intent providers)</td>
+<td>registers through the same doors an external package would</td>
 </tr>
 </tbody>
 </table>
+<p>The boundary is enforced, not conventional: <code>test/basic/test_architecture.py</code>
+parses the imports of every kernel module and fails on a violation.</p>
+<h2 id="the-run-loop-and-its-joints">The run loop and its joints<a class="headerlink" href="#the-run-loop-and-its-joints" title="Permanent link">¶</a></h2>
+<div class="mermaid">flowchart TB
+    SB[scenario config] --&gt; SM[scenario manager]
+    SM --&gt; TM[traffic manager]
+    TM --&gt; AM[agent manager]
+    AM --&gt; OBS[observe]
+    OBS --&gt; ACT[act]
+    ACT --&gt; RWD[reward]
+    RWD --&gt; LRN[learn]
+    LRN --&gt; TEL["telemetry / monitor"]
+    TEL --&gt; AM
+
+    P1([planner]) -.-&gt; TM
+    P2([population mix]) -.-&gt; TM
+    P3([agent type]) -.-&gt; AM
+    P4([intent provider]) -.-&gt; AM
+    P5([observation extractor]) -.-&gt; OBS
+    P6([algorithm]) -.-&gt; ACT
+    P7(["reward calculator<br/>reward / objective /<br/>preference profiles"]) -.-&gt; RWD
+    P8([traffic view backend]) -.-&gt; TEL
 </div>
-<div class="tabbed-block">
+<p>Solid arrows are the sealed loop; dashed nodes are the joints. The loop is
+identical on both backends — CARLA (<code>marl/</code>, <code>pcma/</code>, <code>momarl/</code> families)
+and SUMO (<code>sumo-marl/</code>) — so a component validated on one transfers to the
+other unchanged. The one exception is the <code>agent</code> kind: an agent factory
+drives a CARLA vehicle, and on SUMO a population key is only a label
+(vehicles outside the learner's population drive under SUMO's own
+car-following model).</p>
+<h2 id="replaceable-joints">Replaceable joints<a class="headerlink" href="#replaceable-joints" title="Permanent link">¶</a></h2>
+<p>Every joint is a <em>kind</em> in one unified registry. Registration happens at
+import time through <code>opencda_marl.api</code>; <code>pixi run python -m
+opencda_marl.plugins</code> lists what is registered and from where.</p>
 <table>
 <thead>
 <tr>
-<th>Agent</th>
-<th>Description</th>
+<th>kind</th>
+<th>contract</th>
+<th>register through</th>
+<th>selected by</th>
+<th>built-ins</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Rule-based</strong></td>
-<td>3-stage intersection navigation (junction management → car following → cruising)</td>
+<td><code>algorithm</code></td>
+<td><code>Policy</code> protocol (+<code>IntentPolicy</code> for path heads), <code>PolicyCapabilities</code> — <code>opencda_marl.api.policy</code></td>
+<td><code>register_algorithm</code></td>
+<td><code>MARL.algorithm</code></td>
+<td><code>masac</code>, <code>pcmasac</code>, <code>mappo</code>, <code>pcmappo</code>, <code>matd3</code>, <code>pcmatd3</code>, <code>dqn</code>, <code>q_learning</code></td>
 </tr>
 <tr>
-<td><strong>Behavior</strong></td>
-<td>Simplified OpenCDA behavior cloning with route following</td>
+<td><code>planner</code></td>
+<td>class with constructor <code>(world, config)</code></td>
+<td><code>register_component("planner", key)</code></td>
+<td><code>scenario.traffic.planner.type</code></td>
+<td><code>marl</code></td>
 </tr>
 <tr>
-<td><strong>Vanilla</strong></td>
-<td>Enhanced safety with multi-vehicle TTC tracking</td>
+<td><code>agent</code></td>
+<td>factory <code>(vehicle, carla_map, config)</code>; resolved on CARLA only</td>
+<td><code>register_component("agent", key)</code></td>
+<td><code>agents.agent_type</code> (globally) or <code>agents.population.mix</code> (per vehicle)</td>
+<td><code>marl</code>, <code>rule_based</code>, <code>vanilla</code>, <code>behavior</code>; the no-learner baselines are exactly <code>behavior</code>, <code>vanilla</code> and <code>rule_based</code> (<code>BASELINE_AGENT_TYPES</code> is closed)</td>
+</tr>
+<tr>
+<td><code>reward_calculator</code></td>
+<td>produces <code>RewardOutput</code> per agent (<code>opencda_marl.api.contracts</code>)</td>
+<td><code>register_component("reward_calculator", key)</code></td>
+<td><code>MARL.components.reward_calculator</code></td>
+<td><code>default</code></td>
+</tr>
+<tr>
+<td><code>observation_extractor</code></td>
+<td>maps raw observations to the declared feature vector</td>
+<td><code>register_component("observation_extractor", key)</code></td>
+<td><code>MARL.components.observation_extractor</code></td>
+<td><code>default</code></td>
+</tr>
+<tr>
+<td><code>intent_provider</code></td>
+<td><code>IntentProvider</code>: spawn context → <code>RouteIntentDecision</code> (<code>opencda_marl.api.intent</code>)</td>
+<td><code>register_component("intent_provider", key)</code></td>
+<td><code>MARL.action_space.path.provider: &lt;any registered key&gt;</code>; without it, <code>MARL.action_space.path.selector</code> names a built-in (<code>keep_current</code>→<code>tao_fixed</code>, <code>random_legal</code>→<code>naive_random</code>, <code>rule_based</code>→<code>rule_based_path</code>, <code>learned</code>→the policy bridge)</td>
+<td><code>tao_fixed</code>, <code>naive_random</code>, <code>rule_based_path</code></td>
+</tr>
+<tr>
+<td><code>reward_profile</code></td>
+<td>a named parameter table</td>
+<td><code>register_reward_profile</code></td>
+<td><code>MARL.reward_profile</code></td>
+<td><code>simple_progress_v1</code>, <code>dense_intersection_v1</code>, <code>cooperative_intersection_v1</code>, <code>competitive_intersection_v1/_v2</code></td>
+</tr>
+<tr>
+<td><code>objective_profile</code></td>
+<td>the objective vector definition</td>
+<td><code>register_objective_profile</code></td>
+<td><code>MARL.objective_mode</code></td>
+<td><code>cooperative_pref_v1</code>, <code>competitive_ordering_v1</code></td>
+</tr>
+<tr>
+<td><code>preference_profile</code></td>
+<td>a named preference table (by entry direction)</td>
+<td><code>register_preference_profile</code></td>
+<td><code>MARL.preference.profile</code></td>
+<td><code>balanced</code>, <code>asymmetric_split</code>, <code>reversed_asymmetric_split</code>, <code>mild_asymmetric_split</code></td>
+</tr>
+<tr>
+<td><code>context_encoder</code></td>
+<td>module with <code>forward(sequences)</code> / <code>forward_padded(sequences, lengths)</code> over the ego-first, nearest-first neighbour sequence; constructor <code>(input_size, hidden_size, num_layers)</code></td>
+<td><code>register_component("context_encoder", key)</code></td>
+<td><code>MARL.&lt;algo&gt;.context_encoder</code></td>
+<td><code>lstm</code></td>
+</tr>
+<tr>
+<td><em>your own axis</em></td>
+<td>whatever your experiment needs</td>
+<td><code>register_component("your_kind", key)</code> — unknown kinds are accepted and listed</td>
+<td>your config key</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="tabbed-block">
+<p>How a plugin package reaches the registry — an <code>opencda_marl.plugins</code> entry
+point, <code>MARL.plugins</code> in config, <code>$OPENCDA_MARL_PLUGINS</code>, or a module
+dropped into <code>builtin/algorithms/contrib/</code> — is covered in
+<a href="../custom_algorithms/#making-it-discoverable">Add an Algorithm</a>.</p>
+<h2 id="ports">Ports<a class="headerlink" href="#ports" title="Permanent link">¶</a></h2>
+<p>Not everything replaceable is a registry kind; these are seams by contract
+rather than by key:</p>
+<table>
+<thead>
+<tr>
+<th>port</th>
+<th>contract</th>
+<th>where</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>drive the scenarios from your own RL loop</td>
+<td>PettingZoo-style <code>ParallelEnv</code></td>
+<td><code>opencda_marl/envs/parallel_env.py</code></td>
+</tr>
+<tr>
+<td>a new monitor chart</td>
+<td>vanilla JS against the <code>/api/runs/...</code> endpoints, no build step</td>
+<td><code>opencda_marl/telemetry/static/</code></td>
+</tr>
+<tr>
+<td>feed the live traffic view from a new backend</td>
+<td><code>collect_traffic_view()</code> / <code>collect_traffic_geometry()</code> on the env</td>
+<td><code>opencda_marl/telemetry/traffic_view.py</code> documents the file shapes, including the <code>y_up</code> frame flag</td>
+</tr>
+<tr>
+<td>a new scenario or profile</td>
+<td>a YAML stating only what changes</td>
+<td><code>opencda_marl/_bundled/configs/&lt;family&gt;/&lt;scenario&gt;/</code>, or the same path under your own <code>--marl-config-root</code></td>
+</tr>
+<tr>
+<td>a new deterministic traffic recording</td>
+<td>record mode writes one as run output; adopting it as a benchmark is a copy into the package</td>
+<td><code>artifacts/recordings/</code> → <code>opencda_marl/_bundled/recordings/</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="adjustable-seams">Adjustable seams<a class="headerlink" href="#adjustable-seams" title="Permanent link">¶</a></h2>
+<p>The joints above swap implementations; these config-level seams change what
+the <em>fixed</em> loop does — each one is a configuration axis:</p>
+<table>
+<thead>
+<tr>
+<th>seam</th>
+<th>key</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>mixed autonomy</td>
+<td><code>agents.population: {mix: {marl: 0.5, rule_based: 0.5}, seed: N}</code></td>
+<td>shares exact over each window of <code>resolution</code> vehicles, reproducible per seed (a shorter prefix only approximates them; live flows draw flow by flow). The learner commands (speed and path actions, at spawn and at the approach decision zone) and learns from its own population, <code>agents.agent_type</code>, only; background vehicles keep their demand routes and stay in the traffic context. The mix must name <code>agents.agent_type</code>, or the learner gets no vehicle. On CARLA the mix is checked at construction: a mix without the learning population is rejected, a zero learner share warns, and every positive-share name must be a registered agent type (matched exactly, case-sensitive). On SUMO every other name is background traffic SUMO drives itself</td>
+</tr>
+<tr>
+<td>what one path action means</td>
+<td><code>MARL.action_space.path.provider: &lt;registered intent_provider&gt;</code></td>
+<td>the built-in semantic action (left / straight / right / keep) is the example; a provider declares its own alternatives, mask and head width through <code>opencda_marl.api.path_action</code></td>
+</tr>
+<tr>
+<td>when the path decision happens</td>
+<td><code>MARL.action_space.path.decision_zone: {trigger: spawn \| approach, distance_m}</code></td>
+<td>decide at spawn, or on approaching the junction</td>
+</tr>
+<tr>
+<td>committed exit lanes in the observation</td>
+<td><code>MARL.&lt;algo&gt;.features.committed_exit_lanes: &lt;width&gt;</code></td>
+<td>per exit lane, how many other vehicles at the same junction have already committed to it, in <code>&lt;width&gt;</code> slots; off by default, and the state dimension changes with it</td>
+</tr>
+<tr>
+<td>per-vehicle objective preferences</td>
+<td><code>agents.preference: {mode, sampler, dim, alpha, seed, regime}</code></td>
+<td>the spawn-time sampler; <code>regime: aligned \| conflicting</code> decides whether preference-heterogeneous vehicles meet</td>
+</tr>
+<tr>
+<td>traffic determinism</td>
+<td><code>scenario.traffic.mode: replay \| live \| record</code></td>
+<td>the bundled recordings are evaluation ground truth</td>
+</tr>
+<tr>
+<td>per-vehicle driver behaviour</td>
+<td><code>metadata.driver</code> on a spawn event</td>
+<td>reaches the agent factory as <code>config["spawn_metadata"]</code>, and on SUMO is applied to background vehicles (<code>speed_factor</code>, <code>tau</code>, <code>min_gap</code>, <code>imperfection</code>, <code>accel</code>, <code>decel</code>)</td>
+</tr>
+<tr>
+<td>the SUMO frame convention</td>
+<td><code>runtime.coordinate_landmarks</code></td>
+<td>junction landmarks in CARLA's frame decide <code>y_flip</code>; a <code>&lt;net&gt;_landmarks.json</code> (or <code>&lt;net&gt;_junction_graph.json</code>) next to the network is found without configuration, keyed by junction id either flat, <code>{"12": [x, y]}</code>, or nested, <code>{"junctions": {"12": {"centre": [x, y]}}}</code>. A map with none keeps the default, no y flip, so a CARLA town export needs landmarks</td>
+</tr>
+<tr>
+<td>the map, on both backends</td>
+<td>CARLA: <code>scenario.map.town</code> or <code>scenario.map.xodr_path</code>; SUMO: <code>runtime.sumo_cfg</code></td>
+<td>an <code>.xodr</code> builds the CARLA world from the road network alone. SUMO does not read <code>scenario.map</code>: it loads the network named by the <code>&lt;net-file&gt;</code> of the <code>.sumocfg</code> at <code>runtime.sumo_cfg</code>, so a <code>.sumocfg</code> naming the derived <code>.net.xml</code> pairs the two, and SUMO reads that network in CARLA's frame only with the landmarks above. No <code>.sumocfg</code> names the derived town networks in <code>opencda_marl/assets/maps/</code>, and no landmarks ship for any town (<a href="../../run-experiments/#maps-on-both-backends">Run Experiments</a>)</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Historical note: the path-intent axis is identified as <code>route_intent</code> in
+code, metadata and traces — the name predates the pluggable path action.
+It still covers what the axis does (choose the way out of the junction,
+by whatever alternatives its provider offers); the preference sampler, which conditions
+objectives rather than routes, moved to <code>agents.preference</code>
+(<code>agents.route_intent.preference</code> still works).</p>
+</blockquote>
+<h2 id="rules-the-joints-live-under">Rules the joints live under<a class="headerlink" href="#rules-the-joints-live-under" title="Permanent link">¶</a></h2>
 <ul>
-<li><strong>MARLManager</strong>: Algorithm orchestrator — selects and manages the active RL algorithm</li>
-<li><strong>ObservationExtractor</strong>: Converts CARLA vehicle data into normalized RL features</li>
-<li><strong>CheckpointManager</strong>: Saves latest, best, and episode-specific model weights</li>
-<li><strong>TrainingMetrics</strong>: Per-episode statistics with CSV export</li>
-<li><strong>SmartReplayBuffer</strong>: Pre-allocated numpy arrays with recency bias sampling</li>
-<li><strong>TensorBoard</strong>: Loss, Q-values, gradients, rewards, convergence metrics</li>
-<li><strong>Convergence Detection</strong>: Coefficient of variation-based (CV &lt; 15% over 10 episodes)</li>
+<li><strong>Load once, then freeze.</strong> Plugins register at import time during
+  startup; afterwards the registry is frozen — no hot reload, so what ran
+  is what was listed.</li>
+<li><strong>No silent shadowing.</strong> Overriding an existing key — built-ins included —
+  requires <code>override=True</code>; a typo cannot replace a component quietly.</li>
+<li><strong>Version rollback.</strong> A plugin whose declared API version mismatches is
+  rolled back as a unit, across every kind it registered.</li>
+<li><strong>Config composes.</strong> Three layers per scenario reference
+  (<code>default.yaml</code> → <code>base.yaml</code> → profile), <code>include:</code> for reuse, external
+  roots via <code>--marl-config-root</code>; a profile states only what it changes.</li>
+<li><strong>Contracts are pinned by tests</strong>, not by convention:
+  <code>test/basic/test_architecture.py</code> (zones), <code>test/route_intent/</code> (registry,
+  policy contract, components, intent), <code>test/basic/test_config_lint.py</code>
+  (every shipped profile resolves).</li>
 </ul>
-</div>
-</div>
-</input></input></input></div>
-<div class="admonition note">
-<p class="admonition-title">Key Design Decision</p>
-<p>The MARL agent controls <strong>speed only</strong> — the local planner handles steering and waypoint following. This separation simplifies the RL action space while leveraging OpenCDA's proven path planning.</p>
-</div>
-<h2 id="configuration-system">Configuration System<a class="headerlink" href="#configuration-system" title="Permanent link">¶</a></h2>
-<p>The configuration system uses OmegaConf for YAML merging:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a href="#__codelineno-1-1" id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="c1"># Load MARL configurations</span>
-</span><span id="__span-1-2"><a href="#__codelineno-1-2" id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">marl</span><span class="p">:</span>
-</span><span id="__span-1-3"><a href="#__codelineno-1-3" id="__codelineno-1-3" name="__codelineno-1-3"></a>    <span class="n">default_yaml</span> <span class="o">=</span> <span class="s2">"configs/marl/default.yaml"</span>
-</span><span id="__span-1-4"><a href="#__codelineno-1-4" id="__codelineno-1-4" name="__codelineno-1-4"></a>    <span class="n">config_yaml</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"configs/marl/</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">test_scenario</span><span class="si">}</span><span class="s2">.yaml"</span>
-</span><span id="__span-1-5"><a href="#__codelineno-1-5" id="__codelineno-1-5" name="__codelineno-1-5"></a>
-</span><span id="__span-1-6"><a href="#__codelineno-1-6" id="__codelineno-1-6" name="__codelineno-1-6"></a>    <span class="c1"># OmegaConf merge: base defaults + algorithm-specific overrides</span>
-</span><span id="__span-1-7"><a href="#__codelineno-1-7" id="__codelineno-1-7" name="__codelineno-1-7"></a>    <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-</span><span id="__span-1-8"><a href="#__codelineno-1-8" id="__codelineno-1-8" name="__codelineno-1-8"></a>        <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">default_yaml</span><span class="p">),</span>
-</span><span id="__span-1-9"><a href="#__codelineno-1-9" id="__codelineno-1-9" name="__codelineno-1-9"></a>        <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config_yaml</span><span class="p">)</span>
-</span><span id="__span-1-10"><a href="#__codelineno-1-10" id="__codelineno-1-10" name="__codelineno-1-10"></a>    <span class="p">)</span>
-</span></code></pre></div>
-<p>Available configuration files cover all algorithms (<code>td3_simple_v4.yaml</code>, <code>dqn.yaml</code>, <code>mappo.yaml</code>, <code>sac.yaml</code>), baseline agents (<code>vanilla.yaml</code>, <code>behavior.yaml</code>, <code>rule_based.yaml</code>), and alternative modes (<code>sumo.yaml</code>).</p>
-<h2 id="execution-flow">Execution Flow<a class="headerlink" href="#execution-flow" title="Permanent link">¶</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a href="#__codelineno-2-1" id="__codelineno-2-1" name="__codelineno-2-1"></a><span class="c1"># MARL training with TD3</span>
-</span><span id="__span-2-2"><a href="#__codelineno-2-2" id="__codelineno-2-2" name="__codelineno-2-2"></a>python<span class="w"> </span>opencda.py<span class="w"> </span>-t<span class="w"> </span>td3_simple_v4<span class="w"> </span>--marl
-</span><span id="__span-2-3"><a href="#__codelineno-2-3" id="__codelineno-2-3" name="__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a href="#__codelineno-2-4" id="__codelineno-2-4" name="__codelineno-2-4"></a><span class="c1"># MARL with GUI visualization</span>
-</span><span id="__span-2-5"><a href="#__codelineno-2-5" id="__codelineno-2-5" name="__codelineno-2-5"></a>python<span class="w"> </span>opencda.py<span class="w"> </span>-t<span class="w"> </span>td3_simple_v4<span class="w"> </span>--marl<span class="w"> </span>--gui
-</span><span id="__span-2-6"><a href="#__codelineno-2-6" id="__codelineno-2-6" name="__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a href="#__codelineno-2-7" id="__codelineno-2-7" name="__codelineno-2-7"></a><span class="c1"># Quick test with pixi</span>
-</span><span id="__span-2-8"><a href="#__codelineno-2-8" id="__codelineno-2-8" name="__codelineno-2-8"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test
-</span><span id="__span-2-9"><a href="#__codelineno-2-9" id="__codelineno-2-9" name="__codelineno-2-9"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test-gui
-</span></code></pre></div>
-<ol>
-<li><strong>Configuration Loading</strong>: Merge <code>default.yaml</code> + algorithm-specific YAML via OmegaConf</li>
-<li><strong>MARLCoordinator</strong>: Create main orchestrator with merged config</li>
-<li><strong>Component Initialization</strong>: Create CavWorld, ScenarioManager, MARLEnv</li>
-<li><strong>Algorithm Setup</strong>: MARLEnv creates MARLManager, CheckpointManager, TrainingMetrics</li>
-<li><strong>Training Loop</strong>: Run episodes × max_steps per episode</li>
-<li><strong>Each Step</strong>: Observe → Select Action → Execute → Calculate Reward → Update Algorithm → Log</li>
-</ol>
-<pre class="mermaid"><code>sequenceDiagram
-    participant C as Coordinator
-    participant E as MARLEnv
-    participant S as ScenarioManager
-    participant M as MARLManager
-    participant A as Algorithm
-
-    C-&gt;&gt;E: step()
-    E-&gt;&gt;S: get observations
-    E-&gt;&gt;M: select_action(obs)
-    M-&gt;&gt;A: select_action(obs)
-    A--&gt;&gt;M: action (target speed)
-    E-&gt;&gt;S: step(target_speeds)
-    S--&gt;&gt;E: events + new observations
-    E-&gt;&gt;E: calculate_rewards()
-    E-&gt;&gt;A: store_transition()
-    E-&gt;&gt;A: update()
-    E--&gt;&gt;C: step results</code></pre>
-<h2 id="simulator-support">Simulator Support<a class="headerlink" href="#simulator-support" title="Permanent link">¶</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="simulator-support-carla-mode-default" name="__tabbed_2" type="radio"><input id="simulator-support-sumo-mode" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="simulator-support-carla-mode-default">CARLA Mode (Default)</label><label for="simulator-support-sumo-mode">SUMO Mode</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p>Full autonomous driving simulation with physics, sensors, and 3D visualization. Used for realistic multi-agent training and evaluation.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-3-1"><a href="#__codelineno-3-1" id="__codelineno-3-1" name="__codelineno-3-1"></a><span class="nt">meta</span><span class="p">:</span>
-</span><span id="__span-3-2"><a href="#__codelineno-3-2" id="__codelineno-3-2" name="__codelineno-3-2"></a><span class="w">  </span><span class="nt">simulator</span><span class="p">:</span><span class="w"> </span><span class="s">"carla"</span><span class="w">  </span><span class="c1"># Default</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<p>Lightweight traffic-only simulation without CARLA. Useful for large-scale traffic experiments and faster iteration.</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a href="#__codelineno-4-1" id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nt">meta</span><span class="p">:</span>
-</span><span id="__span-4-2"><a href="#__codelineno-4-2" id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="w">  </span><span class="nt">simulator</span><span class="p">:</span><span class="w"> </span><span class="s">"sumo"</span>
-</span></code></pre></div>
-</div>
-</div>
-</input></input></div>
 <aside class="md-source-file">
 <span class="md-source-file__fact">
 <span class="md-icon" title="Last update">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"></path></svg>
 </span>
-<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 30, 2026 23:56:11 UTC">January 30, 2026</span>
+<span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 24, 2026 00:39:06 UTC">October 24, 2026</span>
 </span>
 </aside>
 <form class="md-feedback" hidden="" name="feedback">
@@ -1444,9 +1038,9 @@
 <div class="md-dialog__inner md-typeset"></div>
 </div>
 <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.prefetch", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
-<script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+<script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
 <script src="../../javascripts/mathjax.js"></script>
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-</body>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
 </html>

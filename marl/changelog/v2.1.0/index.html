@@ -1,0 +1,2462 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Multi-Agent Reinforcement Learning for Cooperative Autonomous Driving">
+      
+      
+        <meta name="author" content="OpenCDA-MARL">
+      
+      
+      
+        <link rel="prev" href="../../../contributing/">
+      
+      
+        <link rel="next" href="../v1.0.0/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>v2.1.0 - OpenCDA-MARL</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="deep-purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#v210-first-2x-release" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://github.com/radar-lab/opencda-marl" title="OpenCDA-MARL" class="md-header__button md-logo" aria-label="OpenCDA-MARL" data-md-component="logo">
+      
+  <img src="../../../images/logo.PNG" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenCDA-MARL
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              v2.1.0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/radar-lab/opencda-marl" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencda-marl
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../installation/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../architecture/" class="md-tabs__link">
+          
+  
+  
+  Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../pcma/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../about/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  About
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://github.com/radar-lab/opencda-marl" title="OpenCDA-MARL" class="md-nav__button md-logo" aria-label="OpenCDA-MARL" data-md-component="logo">
+      
+  <img src="../../../images/logo.PNG" alt="logo">
+
+    </a>
+    OpenCDA-MARL
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/radar-lab/opencda-marl" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencda-marl
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../carla-version-support/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CARLA Version Support
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../run-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run Experiments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../throughput/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Throughput
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Customize
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Customize
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../replace_component/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Replace a Component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add an Algorithm
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_planner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A Planner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An Agent Type
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_intent_provider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An Intent Provider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_observation_extractor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    An Observation Extractor
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_reward_calculator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    A Reward Calculator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../custom_profiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Profile Tables
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pcma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PCMA Learners
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../opencda/marl_patches/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenCDA Patch Ledger
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Changelog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.1.0
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.1.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Breaking">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#migrating-from-1x" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating from 1.x
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#learners" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Learners
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#infrastructure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastructure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mixed-autonomy-and-path-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mixed autonomy and path decisions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known issues
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docs
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../v1.0.0/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v1.0.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="v210-first-2x-release">v2.1.0 — first 2.x release<a class="headerlink" href="#v210-first-2x-release" title="Permanent link">&para;</a></h1>
+<p>This is the first 2.x release. Breaking and <em>Migrating from 1.x</em> compare
+with 1.0.0; the other sections, Fixed in particular, also record changes
+made during 2.x development, some of them in features that are new since
+1.0.0.</p>
+<p><strong>Theme</strong>: a framework other people's algorithms can plug into, with a
+lifecycle that has been verified end to end on both backends.</p>
+<h2 id="breaking">Breaking<a class="headerlink" href="#breaking" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Configs are package data</strong> under <code>opencda_marl/_bundled/configs/&lt;family&gt;/</code>
+  with three-layer resolution (<code>default.yaml</code> → <code>&lt;scenario&gt;/base.yaml</code> →
+  profile). Scenario references are <code>&lt;family&gt;/&lt;scenario&gt;/&lt;profile&gt;</code>; extra
+  roots via <code>--marl-config-root</code> / <code>OPENCDA_MARL_CONFIG_ROOTS</code> may hold only
+  a profile and inherit the other layers.</li>
+<li><strong>Algorithms are registered, not listed.</strong> Built-ins and external
+  packages go through the same <code>register_algorithm(...)</code> with declared
+  <code>PolicyCapabilities</code>; the hard-coded name table and every
+  <code>if algorithm == …</code> dispatch are gone. Plugins are discovered through the
+  <code>opencda_marl.plugins</code> entry-point group, <code>OPENCDA_MARL_PLUGINS</code>, or
+  <code>MARL.plugins</code>; <code>python -m opencda_marl.plugins</code> lists what is registered
+  and from where.</li>
+<li><strong>The engine imports no learners.</strong> The <code>Policy</code> contract lives in
+  <code>opencda_marl.api.policy</code>; the eight first-party learners live in
+  <code>opencda_marl/builtin/algorithms/</code>, which the wheel loads through its own
+  <code>opencda_marl.plugins</code> entry point — the same door any external package
+  uses (<code>OPENCDA_MARL_PLUGINS</code> / <code>MARL.plugins</code> work too, and a <code>contrib/</code>
+  drop-in folder auto-registers modules for cloned checkouts). Direct
+  imports change from <code>opencda_marl.core.marl.algorithms.sac</code> to
+  <code>opencda_marl.builtin.algorithms.sac</code>, and the 1.x keys <code>sac</code> / <code>td3</code>
+  are now <code>masac</code> / <code>matd3</code> (see <a href="#migrating-from-1x">Migrating from 1.x</a>);
+  the checkpoint format is unchanged. The wheel is the framework: it
+  bundles the SUMO benchmark (configs, lite replay, network) and installs
+  an <code>opencda-marl</code> CLI (<code>run</code> / <code>list</code>), so installing it gives a runnable
+  SUMO environment with no repository checkout. There is no PyPI release
+  yet: <code>pixi run wheel</code> builds the wheel.</li>
+<li><strong>Sealed kernel, one plugin system.</strong> The package is four zones, and a
+  test enforces their boundaries: <code>_kernel/</code> owns the complete lifecycle
+  (coordinator, both backend envs, world/scenario management, adapters,
+  traffic, sensing, policy machinery) and never imports a concrete
+  plugin; <code>api/</code> is the public surface — the data contracts, the
+  <code>Policy</code> contract and every <code>register_*</code> door (<code>from opencda_marl.api
+  import …</code> is the one import external packages need); <code>plugins/</code> is the
+  single plugin system — entry-point group <code>opencda_marl.plugins</code>,
+  <code>$OPENCDA_MARL_PLUGINS</code>, <code>MARL.plugins</code>, the contrib drop-in — with
+  cross-kind API-version rollback and a startup <strong>freeze</strong> (plugins load
+  once; no hot reload; a run's behaviour set is fixed at initialize);
+  <code>builtin/</code> is the framework's own plugin set, loaded through the same
+  doors. Every part of the loop is a registrable kind: algorithm,
+  planner, agent type, reward calculator, observation extractor, intent
+  provider, context encoder, and the reward/objective/preference
+  profiles — <code>python -m opencda_marl.plugins</code> lists all of them with
+  sources. The 1.x import paths (<code>opencda_marl.core.*</code>,
+  <code>opencda_marl.coordinator</code>) are gone.</li>
+<li><strong>Config composes.</strong> A profile may <code>include:</code> fragment YAMLs (merged
+  in order under the profile's own keys), and a component may register a
+  <code>validate</code> hook that checks its own config section at resolution — a
+  misconfigured plugin fails at initialize with its own message.</li>
+<li><strong>Multi-objective is the reward axis, not a mode.</strong> Objectives and
+  preference profiles live in <code>opencda_marl/api/</code> (<code>objectives.py</code>,
+  <code>preferences.py</code>); the preference sampler and regimes in
+  <code>opencda_marl/_kernel/traffic/</code>; the intent reward accumulator and the
+  policy-intent bridge in <code>opencda_marl/_kernel/policy/</code>; the spawn
+  observation in <code>opencda_marl/api/intent_observation.py</code>; the route-action
+  trace writer in <code>opencda_marl/telemetry/trace.py</code>; and the
+  dependency-free schema env in <code>opencda_marl/envs/</code>. The <code>momarl/</code> config
+  family name stays — it labels the path + speed example family.</li>
+<li><strong>Evaluation is store-first.</strong> The legacy per-step <code>.npz</code> archives, the
+  matplotlib plotter and the cross-agent PNG reporter are gone; evaluation
+  mode <code>full</code> maps to <code>summary</code> with a warning. The manager mirrors its
+  per-episode statistics and final summary into the metrics store, so
+  evaluation numbers appear in the monitor next to training runs. In a
+  learner run they go into the learner's own store (<code>Eval/*</code> tags, one
+  <code>evaluation_episode</code> event per episode, <code>final_summary</code> in the run's
+  metadata), so the run is one monitor entry. Only a run without a store of
+  its own (a baseline agent, or a learner with <code>outputs.metrics_store</code>
+  disabled) gets a separate <code>evaluation/...</code> run, labelled with the learner
+  key or the agent type and the mode <code>train</code> or <code>eval</code>.</li>
+<li><strong>The Qt desktop dashboard and <code>--gui</code> are retired</strong>; the web monitor
+  (<code>pixi run monitor</code>, started by every run) is the framework's one GUI.</li>
+<li>The SUMO intersection profiles are named <code>route_*</code> (one per learner and
+  action space).</li>
+<li>
+<p><strong>The bundled rule-based baseline drives differently.</strong> <code>RuleBasedAgent</code>
+  (<code>agents.agent_type: rule_based</code>, <code>marl/intersection/rule_based</code>) changed
+  in the ways listed here, so rule-based numbers from 1.x do not reproduce
+  on this release; use 1.x for them.</p>
+<ul>
+<li><em>Follower law.</em> The leader gap is bumper to bumper (the bounding
+  boxes, 2.4 m per half-length without one), <code>minimum_distance_buffer</code>
+  is that physical gap (3.0 m default, was a 5 m centre-to-centre
+  distance), and the target speed is the leader's speed plus a braking
+  curve (<code>closing_decel</code>, 1 m/s²) that reaches zero at the safe
+  distance: a follower closes on a queue, stops at the buffer and moves
+  off with its leader. <code>following_speed_buffer</code> is retired; a profile
+  that still sets it gets one warning that the key is no longer read.</li>
+<li><em>Stop on conflict.</em> With <code>junction_stop_on_conflict</code> (on by default)
+  a vehicle that must yield at a predicted trajectory conflict brakes
+  on a <code>junction_stop_decel</code> curve to <code>junction_stop_buffer</code> metres
+  before the entry and holds until the conflict clears; inside the
+  junction the slow-down rule still applies, so the box is never
+  blocked.</li>
+<li><em>Following cap in junction management.</em> Stage 1 also applies the
+  car-following speed, taking the lower cap, so yielding to crossing
+  traffic never drives into a stopped leader.</li>
+<li><em>Abreast guard</em> (<code>abreast_guard</code>, on by default). A same-direction
+  vehicle within <code>abreast_longitudinal_m</code> whose lateral distance is
+  below <code>abreast_lateral_m</code> makes the vehicle that is behind (ties by
+  actor id) cap its speed at the neighbour's less <code>abreast_drop_kmh</code>
+  until the pair is no longer alongside. Inside <code>abreast_hard_m</code> a
+  neighbour always binds; beyond it, only while it closes laterally by
+  <code>abreast_closing_m</code> per step and moves. In a pair at rest inside the
+  hard zone the rear vehicle creeps ahead at <code>abreast_creep_kmh</code> and
+  ends the pair.</li>
+<li><em>Lane hold</em> (<code>lane_hold</code>, on by default). The vehicle keeps its
+  current lane, and drops back, while the planner's next lane is
+  occupied alongside, the way SUMO's lane-change model waits for a gap.</li>
+<li><em>Merge order</em> (<code>lane_hold_geometry_priority</code>, on by default). In a
+  standing merge the vehicle ahead goes first, along the pair's shared
+  heading; actor ids break ties only within 0.5 m. <code>false</code> orders by
+  actor id alone, which can hold a merging vehicle with the larger id
+  and the standing vehicle behind it in place for good.</li>
+<li><em>Forward corridor.</em> Another vehicle is a leader only when its
+  projected body overlaps the ego's forward driving corridor, so a
+  queue in an adjacent lane no longer stops a clear lane.</li>
+<li><em>Junction distance</em> resolved in 2 m steps instead of 5 m.</li>
+<li><em>Branch choice at forks.</em> The conflict predictor follows the branch
+  whose heading is closest to the other vehicle's heading extrapolated
+  by its yaw rate, instead of always the first branch of
+  <code>waypoint.next()</code>.</li>
+</ul>
+<p>The bundled profile states <code>lane_hold: true</code> and
+<code>lane_hold_geometry_priority: true</code> explicitly.</p>
+</li>
+<li>
+<p><strong>Some observation features changed meaning, so checkpoints that use
+  them see different inputs.</strong> On CARLA, <code>position_x</code> / <code>position_y</code> are
+  absolute map coordinates in the common CARLA frame (they repeated
+  <code>rel_x</code> / <code>rel_y</code> before); SUMO's are unchanged. For replay vehicles with
+  assigned junction geometry, <code>rel_x</code> / <code>rel_y</code> are the map position minus
+  that junction's centre and <code>dist_to_intersection</code> is the planar distance
+  to it, on both backends (CARLA used a nearest-waypoint vector). SUMO
+  spawn-time path decisions now see their neighbours in the CARLA frame
+  (see Fixed), so SUMO path-head checkpoints trained earlier saw different
+  distance and TTC features.</p>
+</li>
+<li><strong>CARLA baseline agents run <code>max_episodes</code>.</strong> A <code>behavior</code>, <code>vanilla</code>
+  or <code>rule_based</code> run on CARLA was forced to one episode; it now runs
+  <code>scenario.simulation.max_episodes</code>, as on SUMO. Every bundled family
+  base sets 500, so a baseline profile of your own that sets no count now
+  runs 500 episodes: add <code>max_episodes: 1</code> to keep one, as the bundled
+  <code>marl/intersection</code> baseline profiles do.</li>
+</ul>
+<h3 id="migrating-from-1x">Migrating from 1.x<a class="headerlink" href="#migrating-from-1x" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>1.x</th>
+<th>2.1.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>python opencda.py -t rule_based --marl</code> (flat <code>configs/marl/&lt;name&gt;.yaml</code>)</td>
+<td><code>-t marl/intersection/rule_based --marl</code> (<code>&lt;family&gt;/&lt;scenario&gt;/&lt;profile&gt;</code>)</td>
+</tr>
+<tr>
+<td><code>configs/</code> at the repository root</td>
+<td>package data under <code>opencda_marl/_bundled/configs/</code>; your own profiles go under a <code>--marl-config-root</code></td>
+</tr>
+<tr>
+<td><code>MARL.algorithm: sac</code> / <code>td3</code> with <code>sac:</code> / <code>td3:</code> sections</td>
+<td><code>masac</code> / <code>matd3</code> with <code>masac:</code> / <code>matd3:</code> sections; the old keys are rejected</td>
+</tr>
+<tr>
+<td><code>opencda_marl.core.marl.algorithms.*</code>, <code>opencda_marl.core.agents.*</code></td>
+<td><code>opencda_marl.builtin.algorithms.*</code>, <code>opencda_marl.builtin.agents.*</code>; register through <code>opencda_marl.api</code></td>
+</tr>
+<tr>
+<td><code>checkpoints/&lt;run&gt;/</code>, <code>recordings/</code> at the root</td>
+<td><code>load_checkpoint: ral/&lt;run&gt;</code> (bundled in <code>opencda_marl/_bundled/checkpoints/ral/</code>) and <code>opencda_marl/_bundled/recordings/</code>; run outputs land under <code>artifacts/</code></td>
+</tr>
+<tr>
+<td><code>--gui</code>, <code>pixi run marl-quick-test-gui</code></td>
+<td>removed; the web monitor starts with every run</td>
+</tr>
+<tr>
+<td><code>pixi run marl-eval-agents</code>, <code>pixi run fix-tensorboard</code></td>
+<td>removed (evaluation is a run with <code>training_mode: false</code>)</td>
+</tr>
+<tr>
+<td><code>pixi run tensorboard</code> / <code>tb</code> on <code>runs/</code>, event files under <code>runs/&lt;class&gt;/&lt;timestamp&gt;/</code> (<code>sac</code>, <code>td3</code>, <code>qlearning</code>, <code>mappo</code>, <code>dqn</code>)</td>
+<td>on <code>artifacts/</code>, which holds every family's event files under <code>&lt;outputs.tensorboard.dir&gt;/&lt;key&gt;/&lt;run&gt;/</code>, named by the registered key: <code>sac</code> becomes <code>masac</code>, <code>td3</code> becomes <code>matd3</code> and <code>qlearning</code> becomes <code>q_learning</code>; <code>mappo</code> and <code>dqn</code> keep their names, and the new keys <code>pcmasac</code>, <code>pcmatd3</code> and <code>pcmappo</code> get their own directories. Event files written by 1.x stay under <code>runs/</code></td>
+</tr>
+<tr>
+<td><code>pixi run cda-platoon-town06</code></td>
+<td>runs <code>platoon_joining_town06_carla</code></td>
+</tr>
+<tr>
+<td>a CARLA baseline profile ran one episode whatever it set</td>
+<td>it runs <code>max_episodes</code> (500 from a bundled family base); set <code>max_episodes: 1</code> for one</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lifecycle">Lifecycle<a class="headerlink" href="#lifecycle" title="Permanent link">&para;</a></h2>
+<ul>
+<li>One episode loop for CARLA and SUMO; the coordinator closes evaluation
+  episodes explicitly on both backends (the evaluation manager previously
+  never fired on SUMO and fired a step early on CARLA).</li>
+<li>CARLA world reloads carry the full learner state for every family —
+  networks, optimizers, encoders, replay / rollout buffers, normalizers,
+  route-intent providers.</li>
+<li>Resumed runs keep their episode numbering and checkpoint history
+  (<code>training_metadata.json</code>); a configured checkpoint that fails to load
+  aborts instead of scoring random weights.</li>
+<li>SUMO: first episode finishes, every episode saves like CARLA, empty steps
+  are counted, one consistent SUMO install (libsumo pinned to the
+  environment's SUMO), torch / numpy / random seeded from <code>world.seed</code>.</li>
+<li><code>MARL.plugins</code> is loaded by the coordinator at initialize, before either
+  backend resolves a planner, an intent provider or an agent type, and for
+  runs without a learner too; each plugin is imported once per process.</li>
+<li>Metrics archives flush at close; record-mode traffic writes the replay
+  file once.</li>
+<li>OpenDRIVE worlds skip pedestrian navigation generation by default
+  (<code>world.pedestrian_navigation: true</code> restores it): rebuilding the walker
+  navmesh on every world reload left navigation-build jobs running beside
+  training. Road geometry and vehicle physics are unchanged.</li>
+</ul>
+<h2 id="learners">Learners<a class="headerlink" href="#learners" title="Permanent link">&para;</a></h2>
+<ul>
+<li>MAPPO / PCMAPPO: per-trajectory GAE, <code>n_steps</code> rollouts, critic
+  bootstrap, exact PPO ratio, opt-in value normalization, loaded checkpoints
+  skip the random warmup, <code>training_step</code> advances per update.</li>
+<li>SAC family: one packed LSTM encode and one actor forward per update, one
+  device readback, fused Polyak; opt-in CUDA-graph update (<code>--cuda-graph-update</code>
+  from the launcher) that fails fast on capture errors.</li>
+<li>TD3: batched context storage, warmup that ends on CARLA, per-piece
+  checkpoint loading.</li>
+<li>All families share one neighbour ordering and one encode path; acting and
+  learning contexts are identical by construction. The neighbour-context
+  encoder is a registrable kind (<code>MARL.&lt;algo&gt;.context_encoder</code>, default
+  <code>lstm</code>), replaceable without touching a learner.</li>
+<li>Single-agent learners (<code>multi_agent=False</code>) declare what <code>select_action</code>
+  returns through the class attribute <code>returns_action_index</code>: <code>False</code> (the
+  <code>BaseAlgorithm</code> default, and DQN) means a target speed in km/h, <code>True</code>
+  (tabular Q-learning) an index into its own <code>speed_actions</code> table.</li>
+</ul>
+<h2 id="infrastructure">Infrastructure<a class="headerlink" href="#infrastructure" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Metrics store + monitor</strong>: every run writes a per-run SQLite store
+  (<code>artifacts/metrics/&lt;algo&gt;/&lt;run&gt;/metrics.sqlite</code>, where <code>&lt;algo&gt;</code> is the
+  registered algorithm key); <strong>starting a
+  simulation starts the monitor</strong> — a detached web service that outlives
+  the run and is reused by later runs (<code>outputs.monitor</code>, a mapping or a
+  bare bool), serving a dependency-free dashboard (static frontend: no
+  build step) that overlays runs, smooths, lists episode summaries and
+  draws the live traffic view. One monitor serves one artifacts root: a
+  run reuses only a monitor of its own root (<code>GET /api/root</code> reports the
+  served directory and the service <code>pid</code>), and when the port serves
+  another root it takes the next one, up to <code>port + 7</code>. The liveness probe
+  is a plain keep-alive request and the port is bound exclusively, so two
+  monitors can no longer share a port on Windows. To stop the service, end
+  the <code>pid</code> it reports; on Windows stop it before deleting or renaming its
+  root, which it holds as its working directory and <code>monitor.log</code>.
+  TensorBoard event files are still written by default and are optional.</li>
+<li><strong>The monitor answers only loopback names when bound to loopback.</strong> A
+  monitor on <code>127.0.0.1</code> (the default) serves only requests whose <code>Host</code>
+  is a loopback name (<code>127.0.0.1</code>, <code>localhost</code>, <code>::1</code>, <code>*.localhost</code>),
+  which blocks DNS-rebinding reads from a web page. <code>ssh -L
+  8765:127.0.0.1:8765</code> is unaffected. A proxy that forwards under its own
+  host name (Jupyter server-proxy, code-server <code>/proxy</code>, Open OnDemand, dev
+  tunnels) gets a 403 naming the fix: start the monitor with
+  <code>python -m opencda_marl.telemetry.monitor --root &lt;root&gt; --allow-host NAME</code>
+  (repeatable); later runs on the same root reuse it.
+  <code>opencda_marl.telemetry.monitor.ensure_service(root, host, port,
+  allow_hosts=())</code> passes the names to a service it starts.</li>
+<li><strong>Strict JSON everywhere.</strong> The store skips a non-finite scalar and
+  counts it in the run's meta (<code>skipped_nonfinite</code>) instead of failing the
+  whole flush batch; episode, event and meta payloads and every monitor
+  response are strict JSON (a non-finite value becomes <code>null</code>).</li>
+<li><strong>Experiment matrix</strong>: <code>--parallel N</code> slots with one CARLA server each,
+  <code>--cuda-visible-devices</code> / <code>--carla-gpus</code> spreading, host-binary or Docker
+  server restarts, <code>--resume</code>, process-tree timeouts, non-zero exit on any
+  failed run, an evaluation launcher, a checkpoint-eval route and
+  analyzers that no longer confuse evaluation slugs with training runs.
+  The launcher is wired to the bundled <code>momarl/intersection</code> family — one
+  learner (PCMAPPO) under every built-in path provider, eight profiles in
+  all with the SUMO <code>route_*</code> set — and the evaluation slug pattern is
+  derived from its condition table, so the two cannot drift apart.
+  Profiles outside the bundled family run directly through
+  <code>opencda.py --marl-config-root</code>, not through this launcher. The default
+  <code>--carla-restart-mode process</code> starts and restarts CARLA itself, so
+  outside <code>--dry-run</code> it stops before the first run unless <code>CARLA_ROOT</code> /
+  <code>CARLA_BIN</code> or <code>--carla-root</code> / <code>--carla-bin</code> is set (no install path is
+  guessed);
+  servers managed elsewhere take <code>--carla-restart-mode none</code> or <code>docker</code>.
+  <code>--clean-planned-slugs</code> also removes each slug's monitor store, so a
+  relaunch no longer appends to the old run. A cell slug is
+  <code>&lt;prefix&gt;&lt;map&gt;_&lt;condition&gt;_&lt;regime&gt;_seed&lt;N&gt;</code> with <code>--slug-prefix</code>
+  defaulting to <code>matrix_</code>; a run launched under another prefix, an earlier
+  default included, keeps it (the first part of its directory names under
+  <code>artifacts/checkpoints/matrix/</code>), so pass it with <code>--slug-prefix</code> to
+  resume or evaluate it. Continuation cells (<code>continue_*</code>) load their
+  source from the same prefix unless <code>--continue-source-prefix</code> names
+  another run. The analyzers (<code>analyze_matrix_results.py</code>,
+  <code>analyze_matrix_eval.py</code>, <code>inspect_route_diversity.py</code>) and
+  <code>run_matrix_eval.py</code> read cells under any prefix, keep the prefix in
+  every row and comparison group, warn when one root holds several runs,
+  and take <code>--slug-prefix</code> to read one.
+  <code>scripts/run_carla_checkpoint_eval.py</code> writes to <code>artifacts/eval_runs/</code>
+  by default.</li>
+<li><strong>Schematic traffic view</strong>: headless runs publish lane geometry and
+  live vehicle poses (throttled, atomic JSON next to the metrics store;
+  CARLA poses come from the step's existing world snapshot — no extra
+  server round trips), and the monitor draws a SUMO-GUI-style live view —
+  lanes as lines, RL agents as oriented triangles — replacing the need
+  for CARLA rendering when watching a run. The geometry is written before
+  the first state and retried until it succeeds; <code>role: agent</code> marks a
+  live vehicle of the learning population (background vehicles are
+  <code>traffic</code>); <code>outputs.traffic_view</code> accepts a bare bool.</li>
+<li><strong>Coordinate frames come from the map</strong>: <code>netOffset</code> is read from the
+  SUMO network header instead of three hardcoded constants, and every
+  SUMO-side position goes through one <code>CoordinateBridge</code>.
+  <code>runtime.coordinate_landmarks</code> (or a <code>&lt;net&gt;_landmarks.json</code> beside the
+  network) decides the convention from junction landmarks, which matters
+  for CARLA town exports (they mirror CARLA's y axis); a map that ships no
+  landmarks keeps the default. This fixes a real defect — SUMO's
+  distance-to-junction subtracted a CARLA-frame centre from a SUMO-frame
+  position, leaving the whole offset (~140 m on the bundled map) in the
+  result. Junction centres are per active junction, and crossing order is
+  reported per junction.</li>
+<li><strong>Maps on both backends</strong>: <code>scripts/convert_opendrive_maps.py</code> derives
+  SUMO networks from OpenDRIVE (<code>opencda_marl/assets/maps/</code>), keeping
+  CARLA's junction ids as SUMO node ids; a scenario pointed at an <code>.xodr</code>
+  builds a building-free CARLA world on the same roads. SUMO takes its
+  network from the <code>.sumocfg</code> at <code>runtime.sumo_cfg</code>, not from
+  <code>scenario.map</code>, and reads a derived town network in CARLA's frame only
+  with the junction landmarks of the entry above; no <code>.sumocfg</code> names the
+  derived town networks in <code>opencda_marl/assets/maps/</code>, and no landmarks
+  ship for any town (see
+  <a href="../../../run-experiments/#maps-on-both-backends">Run Experiments</a>). The
+  converter records repository- or <code>$CARLA_ROOT</code>-relative paths in its
+  outputs.</li>
+<li><strong>The step trace runs on either backend</strong>, keys on the environment's own
+  counters, and records <code>population</code> / <code>learning</code> per vehicle, so offline
+  metrics can separate the learner's vehicles from background traffic.
+  CARLA collision events carry the other actor's id and type, the event
+  frame and the impulse in <code>metadata</code>. An agent may expose a safety-filter
+  state through <code>shield_state()</code>; its fields (<code>applied_speed</code>,
+  <code>shield_active</code>, <code>shield_stage</code>, <code>lane_hold</code>, <code>merge_priority_*</code>) reach
+  the trace. The hook is read on the CARLA vehicle path only, so on SUMO
+  these fields are null: SUMO builds no driver agent. The bundled
+  <code>RuleBasedAgent</code> implements it on CARLA: <code>lane_hold</code>,
+  <code>merge_priority_release</code> and <code>merge_priority_override</code> record each step's
+  lane hold and merge order, <code>merge_priority_enabled</code> the configured
+  <code>lane_hold_geometry_priority</code> switch, and <code>applied_speed</code> the target its
+  rules gave the controller; <code>shield_active</code> and <code>shield_stage</code> stay null,
+  as it has no safety filter. The other bundled agents (<code>marl</code>, <code>vanilla</code>,
+  <code>behavior</code>) do not implement it, so their vehicles, the learner's <code>marl</code>
+  vehicles included, record null in all seven fields.</li>
+<li><strong>PettingZoo <code>ParallelEnv</code> port</strong> of the scenarios for external RL
+  stacks. <code>from_scenario</code> resolves a reference exactly as the command line
+  does (a <code>configs/</code> root under the working directory,
+  <code>OPENCDA_MARL_CONFIG_ROOTS</code>, then the bundled configs) and composes
+  <code>include:</code>; <code>MARL.external.features</code> can come from the profile or through
+  <code>overrides</code>, and the observation width follows those features, not the
+  profile's <code>MARL.state_dim</code>. Loop on the new <code>env.episode_over</code>, not on
+  <code>env.agents</code>, which is empty before the first spawn. An agent you stop
+  sending actions for is handed back to SUMO's car-following model; one
+  never commanded keeps its departure speed.</li>
+<li><strong>The wheel declares what it imports, and is built clean.</strong> The base
+  dependencies carry everything the SUMO backend needs: <code>eclipse-sumo</code>
+  bundles the simulator and its <code>traci</code> / <code>sumolib</code> clients, which the
+  engine imports from the package's own <code>sumo/tools</code> (its SUMO resolver
+  puts that first on <code>sys.path</code>). <code>libsumo</code> is an optional accelerator;
+  without it the engine falls back to <code>traci</code> with one warning, which names
+  the matching <code>pip install libsumo==&lt;SUMO version&gt;</code>, and a SUMO step runs
+  about 13× slower. The vendored OpenCDA core ships in the
+  wheel, with <code>networkx</code>, so every engine module imports. <code>[carla]</code> adds
+  the libraries for CARLA scenarios run from a repository checkout
+  (<code>python opencda.py -t &lt;ref&gt; --marl</code>, which reads the maps from the
+  working tree); the wheel's own CLI and env port drive SUMO only, and
+  <code>carla</code> itself comes with your simulator. <code>[ports]</code> adds PettingZoo /
+  Gymnasium. <code>pixi run wheel</code> builds from a clean <code>build/</code> and refuses a
+  wheel with a member that has no source file; <code>test_wheel_contents.py</code>
+  walks the engine's imports and fails on any that is declared nowhere.</li>
+<li><strong><code>pixi run verify</code></strong> runs the verification battery. It now checks that
+  <code>traci</code> / <code>sumolib</code> import from the <code>eclipse-sumo</code> package alone (with
+  <code>SUMO_HOME</code> unset and the separate distributions hidden). Neither smoke
+  run starts a detached monitor: the SUMO run turns it off, and the CARLA
+  run uses the rule-based baseline from its own profile, which writes
+  under the verify root.</li>
+<li><strong>pixi</strong>: <code>tensorboard</code> / <code>tb</code> serve <code>--logdir=artifacts</code>. On win-64,
+  activation sets <code>SUMO_HOME</code> to the environment's own <code>eclipse-sumo</code>
+  package, and <code>CARLA_ROOT</code> / <code>CARLA_HOME</code> / <code>CARLA_BIN</code> default to the
+  example <code>D:\Applications\CARLA_0.9.16</code> location; activation overrides
+  shell values, so edit those lines in <code>pixi.toml</code> when CARLA lives
+  elsewhere. The alternate manifests in <code>dependencies/pixi/</code> drop
+  <code>marl-quick-test-gui</code>, <code>marl-eval-agents</code> and <code>pyside6</code>; their
+  <code>marl-quick-test</code> runs <code>marl/intersection/rule_based</code>. The Python 3.10
+  backup manifest no longer sets <code>SUMO_HOME</code>; set it yourself there.</li>
+<li>Linux: solvable <code>linux-64</code> lock, CARLA servers survive the pixi activation
+  environment, measured multi-GPU throughput documented.</li>
+</ul>
+<h2 id="mixed-autonomy-and-path-decisions">Mixed autonomy and path decisions<a class="headerlink" href="#mixed-autonomy-and-path-decisions" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Per-vehicle population</strong> (<code>agents.population: {mix, seed}</code>): each
+  spawned vehicle draws its agent type from a seeded pattern, so the
+  shares are exact over every window of <code>resolution</code> (default 100)
+  vehicles and reproducible per seed; a shorter prefix only approximates
+  them, and live flows draw flow by flow. The learner commands — speed and
+  path actions alike, at spawn and at the approach decision zone — and
+  learns from its own population (<code>agents.agent_type</code>) only; background
+  vehicles keep their demand routes and stay visible in the traffic
+  context. A mix must name that learning population: on CARLA a mix
+  without it, or with a positive share for a name that is not a
+  registered agent type (matched exactly, case-sensitive), is rejected at
+  construction, and a zero learner share warns. Every built-in agent type
+  reads its own section over <code>vehicle.behavior</code>, so a mix naming
+  <code>rule_based</code> or <code>vanilla</code> works on a profile without an
+  <code>agents.rule_based</code> / <code>agents.vanilla</code> section. On SUMO only the
+  learner's population gets the RL runtime mode and a commanded speed;
+  every other name is background traffic that keeps SUMO's default
+  safeguards and car-following model, with any per-vehicle driver
+  parameters from the recording (<code>metadata.driver</code>) applied.</li>
+<li><strong>The <code>agent</code> kind is resolved on CARLA only</strong>, one agent per spawned
+  vehicle; on SUMO a population key is a label and a registered agent
+  factory never runs. <code>BASELINE_AGENT_TYPES</code> (<code>behavior</code>, <code>vanilla</code>,
+  <code>rule_based</code>) is closed: a registered agent type is not treated as a
+  no-learner baseline.</li>
+<li><strong>What one path action means is a registered provider</strong>
+  (<code>MARL.action_space.path.provider</code>); the built-in semantic action (left /
+  straight / right / keep) is the example, and a provider declares its own
+  alternatives, mask and head width through <code>opencda_marl.api.path_action</code>.
+  A registered provider runs on both backends: the pipeline wires the
+  provider the configured mode names (rebuilt through the registry on a
+  CARLA world reload), and no kernel apply or log site reaches into the
+  built-in decision type.</li>
+<li><strong>A decision zone</strong> (<code>MARL.action_space.path.decision_zone: {trigger:
+  spawn | approach, distance_m}</code>) takes the one-shot path decision at
+  spawn or on approaching the junction.</li>
+<li><strong>A committed-exit-lane observation channel</strong>
+  (<code>MARL.&lt;algo&gt;.features.committed_exit_lanes: &lt;width&gt;</code>, off by default)
+  gives each agent, per exit lane, the number of other vehicles at the
+  same junction that have already committed to it; the state width
+  changes with it.</li>
+<li><strong>Spawn metadata reaches the agent factory</strong> as
+  <code>config["spawn_metadata"]</code>, so a plugin agent can be per-vehicle and
+  reproducible from a recording. An agent may also expose a safety-filter
+  state through <code>shield_state()</code> (the speed it applied, whether the filter
+  intervened); on CARLA the vehicle adapter merges those fields into the
+  vehicle's observation and the trace records them. The hook is read on
+  the CARLA vehicle path only; the bundled <code>RuleBasedAgent</code> implements it
+  for its lane hold and merge order.</li>
+<li><strong>The safety API hands agents the step's TTC and kinematics.</strong>
+  <code>constant_velocity_ttc</code> is the world snapshot's quadratic as a public
+  function, <code>min_ttc_to_others</code> folds it over the kinematics of every other
+  vehicle, and <code>published_kinematics</code> returns what the agent manager
+  published for the current step, so an agent that acts on time to
+  collision uses the number the learner and the metrics see without a
+  second round of simulator queries.</li>
+<li><strong>Competition metrics follow the objective, not a built-in profile
+  name.</strong> Any run with an objective spec (or a reward profile whose name
+  says competitive) records the per-agent competition metadata and the
+  terminal records behind the route-intent and preference summaries, so an
+  objective registered through the plugin door keeps them.</li>
+</ul>
+<h2 id="performance">Performance<a class="headerlink" href="#performance" title="Permanent link">&para;</a></h2>
+<ul>
+<li>CARLA: one world snapshot per step replaces O(N²) server round trips; the
+  MARL collision sensor is installed at construction; the duplicate safety
+  IMU, the disabled-V2X neighbour search and several per-step costs with no
+  consumer are gone.</li>
+<li>Shared extractor caches, once-per-spec reward metadata, once-per-tick
+  vehicle updates.</li>
+<li><strong>State extraction reads no config at step time and runs once per
+  observation dict.</strong> Profiled on one SUMO episode (2,400 steps, ~14
+  vehicles, libsumo): the simulator was 6% of the step, while the feature
+  extractor walked the configured mapping -- an OmegaConf <code>DictConfig</code> --
+  for every feature of every agent (31% of the step in the config
+  resolver) and ran three times per step on identical inputs, because the
+  manager's identity memo keyed on a learning view that a mixed population
+  rebuilt on every call and the SUMO step handed the learner a copy of the
+  read it had just extracted from. The feature list is now resolved once
+  into a plan over plain values, the learning view is stable across the
+  calls of a step, and the SUMO step reuses its post-step read (outside
+  readers still get a copy); neighbour settings and exit-lane rows are
+  built once per step rather than per vehicle. The same episode reproduces
+  bit for bit at 27 ms/step under the profiler instead of 62.</li>
+<li><strong>Neighbour blocks in one pass per snapshot.</strong> The per-ego neighbour
+  search, sort and TTC solves were the next 10% of a SUMO step (34k calls
+  per episode). The world snapshot now computes every vehicle's k-slot
+  block and minimum TTC at once -- same selection (k nearest within the
+  radius, ascending distance, ties by row), same normalisation, same
+  constant-velocity TTC -- and caches it per parameter set, so the per-ego
+  calls of both backends index into it; the scalar implementation stays as
+  the reference the batched pass is tested against on random scenes. Row
+  lookup by actor id is a dict, not an array scan. The same episode
+  reproduces bit for bit at 17 ms/step under the profiler instead of 27.</li>
+<li><strong>A SUMO vehicle's population is resolved once per episode.</strong> The
+  observation builder re-derived it on every step for every vehicle -- a
+  config read through the resolver plus a spawn-event lookup, 34k calls
+  and 1.9 s per 2,400-step episode -- for an answer the spawn event fixes
+  for the vehicle's whole life. The episode state now remembers it (0.1 s),
+  a new episode forgets it, and a vehicle seen before its spawn event is
+  registered is asked again rather than remembered with the default.</li>
+<li><strong>The learner crosses the device boundary less often.</strong> Its per-agent
+  work was already batched (one context sort, one LSTM encode, one actor
+  and one critic pass per step); what remained at the boundary were two
+  host-to-device copies of the same table rows, three or four
+  device-to-host syncs for the step's outputs, and a rollout re-stacked and
+  re-uploaded for every PPO epoch. The ego rows are now read from the
+  sequence tensor already on the device, the outputs come back in one
+  transfer, and the rollout's device tensors are built once per fill.
+  Numerics are unchanged (the same episode reproduces bit for bit); the
+  gain is modest -- transfers halved, the PPO update about 20% faster --
+  because at a dozen agents the GPU is launch-bound: a full acting step
+  measures 0.74 ms on CPU against 1.34 ms on CUDA with the real network
+  shapes. Acting on a CPU replica is the remaining lever there, and a
+  design decision rather than a fix.</li>
+<li><strong>Learners act on a CPU replica and train on the GPU.</strong> With
+  <code>acting_device: auto</code> (the default) a learner training on CUDA acts on
+  CPU copies of its actor, critic and context encoder, refreshed lazily
+  after every optimiser step or checkpoint load through one pinned flat
+  copy, with the value normalisers mirrored; PCMAPPO, MAPPO, PCMASAC and
+  TD3 opt in. The replica caps torch's intra-op pool (<code>acting_threads</code>,
+  default at most 8) because a tiny op pays to wake every thread.
+  Back-to-back on the same machine state, one SUMO PCMAPPO episode under
+  cProfile: 47–49 s acting on the GPU, 41 s on the replica, the acting
+  path itself 11.5 s → 6.6 s. Runs are no longer bit-identical to GPU
+  acting; <code>acting_device: train</code> restores it.</li>
+</ul>
+<h2 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Platooning scenarios ran the plain behavior agent.</strong> <code>VehicleManager</code>
+  tested for <code>'platoon'</code> while the platooning scenarios pass
+  <code>['platooning']</code>, so no platoon member or joining vehicle got the
+  platooning agent. It tests <code>'platooning'</code> again, as stock OpenCDA does.</li>
+<li><strong>The bundled DQN baseline drove every vehicle at the top speed.</strong> The
+  manager read DQN's returned speed as an index into DQN's own
+  <code>speed_actions</code> table, so 15, 30, 45 and 60 km/h all clamped to the last
+  entry. The manager now follows the policy's <code>returns_action_index</code>
+  declaration (see Learners). The single-agent speed clamp also accepts a <code>speed_actions</code>
+  table held as a numpy array, which failed every step before.</li>
+<li><strong>DQN and tabular Q-learning train again.</strong> The shared training strategy
+  indexed their per-agent states as multi-agent dicts and called a
+  six-argument <code>store_transition</code>; single-agent learners, and any
+  registered policy with <code>multi_agent=False</code>, now get their own flow.</li>
+<li><strong><code>MARL.plugins</code> reached too few runs.</strong> It loaded only when a learner
+  was configured, and on CARLA only after the scenario had resolved its
+  planner and intent provider, so a component registered only there was
+  an unknown key. It now loads at initialize for every run (see
+  Lifecycle), and loading the same plugin again is a no-op instead of
+  reporting a working <code>.py</code> plugin as failed.</li>
+<li><strong>SUMO ignored <code>MARL.components.reward_calculator</code>.</strong> It read a
+  top-level <code>components</code> block and silently ran the default calculator;
+  it now selects from the MARL block, as CARLA does.</li>
+<li><strong>The SUMO evaluation miscounted its vehicles.</strong> A finished vehicle
+  still counted as active, and a vehicle still in SUMO's insertion queue at
+  the end of an episode dropped out of the evaluation's total. A queued
+  vehicle is now an unfinished route (a timeout) in <code>Eval/*</code> and
+  <code>episodes_summary.csv</code>, matching the training summary and CARLA's
+  never-entered spawns. <code>SumoMARLEnv.pending_spawn_count()</code> counts only
+  spawn events not yet due (CARLA's <code>pending_spawns</code>), and
+  <code>SumoMARLEnv.queued_insertions()</code> lists the queued vehicles.</li>
+<li><strong>A SUMO learner that stopped receiving commands kept its last speed.</strong>
+  TraCI's <code>setSpeed</code> persists, so a vehicle the policy stopped commanding
+  (a warmup or no-action step, an external loop that sent nothing for it)
+  held its last commanded speed. It is now handed back to SUMO's
+  car-following model on the commanded → un-commanded transition; a
+  vehicle never commanded keeps the departure speed the spawner set.</li>
+<li><strong>SUMO spawn-time path decisions mixed coordinate frames.</strong> The spawning
+  ego is built in the CARLA frame, but its neighbours were in SUMO's, so
+  their distance and TTC features carried the network offset (and the
+  mirror on a y-flipped map). Every neighbour now goes through the
+  coordinate bridge, position and velocity heading alike.</li>
+<li><strong>A SUMO vehicle queued for insertion survived the episode reset.</strong> SUMO
+  holds a vehicle whose departure lane has no room in an insertion queue
+  that <code>traci.vehicle.getIDList</code> does not list, so the reset left it there
+  and it entered the next episode with the old route, blocking its own id
+  ("vehicle ... to add already exists"). A short approach edge admits one
+  vehicle at a time, so under demand this carried a sizeable share of an
+  episode's spawns into the next. The reset now reads the queue (SUMO's
+  pending list, completed from the spawner's registry), counts those
+  vehicles as unfinished routes of the episode that spawned them, and
+  removes them.</li>
+<li><strong>A SUMO trip ended at the end of an edge, not at its destination.</strong> The
+  waypoint shim converted a stored position back with the bundled
+  intersection's constant offset (not the published bridge) and clamped
+  <code>next()</code> at the lane's end, so on a calibrated map the planner's walk
+  past a junction exit stopped at the first edge end and a route's
+  destination sat wherever that edge ended. The spawner ranked destination
+  edges by distance to their vertices, so a point halfway along a long
+  edge lost to any short edge nearby; and SUMO's own arrival, at the end
+  of the target edge, decided success, so a trip's length depended on how
+  the network splits its edges. <code>next()</code> now measures progress through
+  the bridge and continues onto the linked lane, <code>previous()</code> mirrors it,
+  <code>get_left_lane()</code> / <code>get_right_lane()</code> return the adjacent lane at the
+  same fraction of its length, candidate edges rank by distance to the
+  lane, and the environment ends a trip within <code>world.arrival_radius_m</code>
+  (5 m) of its destination point, as CARLA does, with SUMO's arrival as
+  the fallback. The SUMO twin's route table reproduces the CARLA planner's
+  spawn and destination points, and a replayed event keeps the
+  recording's destination when a route decision keeps its demand route.</li>
+<li><strong><code>WorldSnapshot.capture</code> skips an unreadable actor instead of ending the
+  run.</strong> Its error path referred to a logger the module never imported, so
+  a CARLA server that stopped answering for one call raised <code>NameError</code>
+  instead of costing one actor for one step.</li>
+<li><strong>The abreast guard told no neighbours apart.</strong> It read <code>.id</code>, which the
+  perception's obstacle vehicles do not have, so every neighbour was id 0:
+  the tie-break always yielded and all neighbours shared one closing
+  memory. It reads <code>carla_id</code> now.</li>
+<li><strong>The branch choice at forks never saw a turning obstacle.</strong> Perception
+  obstacles carry no angular velocity, so the yaw rate read as zero and
+  every vehicle was predicted straight on. The rate is now estimated from
+  each obstacle's heading change between steps over the world's fixed
+  delta; an unmatched detection (<code>carla_id</code> -1), or an id two objects
+  carry in one step, gets no rate and is predicted straight on.</li>
+<li><strong>A population mix naming <code>rule_based</code> or <code>vanilla</code> crashed</strong> at the
+  first such spawn on any profile without that agent's own section; both
+  now read their section over <code>vehicle.behavior</code>.</li>
+<li><strong>A resumed external policy restarted its monitor counters.</strong> A
+  non-<code>BaseAlgorithm</code> policy's metrics store now continues its episode and
+  update-step counters when a resumed run reopens the same store.</li>
+<li><strong>Store discovery missed some run directories.</strong> Read-only opens work for
+  run directories containing <code>#</code>, <code>%</code> or spaces, for stores under a mapped
+  network drive (no longer resolved to UNC) and for UNC roots; such runs
+  were missing from discovery and the monitor. An unreadable store is
+  logged once at WARNING.</li>
+<li><strong>The monitor page missed tags that appear mid-run.</strong> <code>Loss/*</code> after the
+  warmup and <code>Eval/*</code> now show up without reselecting the run, and the
+  default selection extends to them; tags are re-listed at most every
+  10 s, and only when a selected run wrote scalars. A failed refresh shows
+  <code>refresh failed: ...</code> in the status line and polling continues.</li>
+<li><strong><code>outputs.monitor: false</code> started the monitor anyway</strong> and
+  <code>outputs.monitor: true</code> stopped initialize; both sections now take a
+  bare bool.</li>
+<li><strong>A learner run appeared twice in the monitor.</strong> The evaluation manager
+  opened a store of its own next to the learner's, with no mode in its
+  metadata (<code>?</code> in the run list). A learner's evaluation numbers now go
+  into the learner's store (see <em>Evaluation is store-first</em> under
+  Breaking), and a separate evaluation run is labelled with the learner key
+  or the agent type and <code>train</code> or <code>eval</code>.</li>
+<li><strong>MASAC and PCMASAC runs shared one <code>sac/</code> directory.</strong> The metrics
+  store directory, the run's <code>algorithm</code> label and the TensorBoard event
+  directory came from the learner class, which the two keys share. Both
+  writers now name the run by the registered algorithm key, for every
+  learner: <code>&lt;metrics log_dir&gt;/&lt;key&gt;/&lt;run&gt;/</code> and
+  <code>&lt;tensorboard log_dir&gt;/&lt;key&gt;/&lt;run&gt;/</code> (the TensorBoard names that change
+  from 1.x are listed in <a href="#migrating-from-1x">Migrating from 1.x</a>). Only a
+  learner built without <code>MARLManager</code> falls back to the class-derived
+  name. A bare <code>tensorboard: true|false</code> or <code>metrics_store: true|false</code>,
+  in <code>outputs</code> or in an algorithm block, is the <code>enabled</code> switch and keeps
+  the other settings (the TensorBoard one wrote to <code>./runs</code> before), and
+  an empty block reads as absent instead of failing the learner.</li>
+<li><strong>Built-in learners logged no timeouts to the store.</strong> Their episode
+  summaries carried the success and collision rates but not
+  <code>timeout_rate</code>, <code>successes</code>, <code>collisions</code> or <code>timeouts</code>, which external
+  policies logged, so the monitor's columns depended on the learner's base
+  class. Every learner logs all of them now.</li>
+<li><strong>The episode table cut its most useful columns.</strong> It kept the first 12
+  extra columns in alphabetical order, which <code>intent_*</code> diagnostics could
+  fill. The outcome, throughput, TTC and near-miss columns now come first,
+  then the <code>reward_component_*</code> columns, then the rest alphabetically, up
+  to 24 extra columns.</li>
+<li><strong>Counts in the episode table printed as decimals.</strong> A count of 0
+  printed <code>0.00</code>, and a count from 1 to 999 kept three decimals (<code>2.000</code>).
+  A column whose shown values are all whole numbers (counts, episode and
+  step numbers) now prints integers. Any other column keeps the page's
+  usual precision on every row, so a reward of 3 shown next to 2.537 reads
+  <code>3.000</code>. The table makes this choice again on every refresh, over the
+  rows it shows. A missing or non-finite value prints a dash.</li>
+<li><strong>A finished run's traffic view looked live.</strong> The last frame stayed on
+  screen with only an age label. A frame with no newer one for
+  <code>max(3 s, 3 × interval)</code> is now dimmed and labelled <code>stale</code>, and a frame
+  from a run whose store was closed after it is labelled <code>run ended</code>.
+  <code>traffic_state.json</code> gains the publish <code>interval</code>, and a store's
+  metadata gains <code>closed_at</code> when its writer closes it (removed when a
+  resumed run reopens the store).</li>
+<li><strong>MASAC logged preference tags that were always zero.</strong> The
+  <code>SAC/pref_shift_*</code> tags are logged only under an internal preference mode
+  (<code>internalpref</code>, <code>internalpref_sep</code>) and <code>SAC/pref_sep_*</code> only under
+  <code>internalpref_sep</code>; elsewhere (plain MASAC, <code>pref_mode: direct</code>) they
+  were constant zeros.</li>
+<li><strong>CARLA baseline agents ignored <code>max_episodes</code>.</strong> A <code>behavior</code>,
+  <code>vanilla</code> or <code>rule_based</code> run was forced to one episode. It now honours
+  <code>scenario.simulation.max_episodes</code>, as SUMO did (see Breaking for a
+  baseline profile that sets no count).</li>
+<li><strong>SUMO runs carried no scenario label.</strong> The <code>-t</code> scenario reference now
+  labels SUMO runs in the store metadata (<code>scenario</code>), as it did CARLA
+  runs.</li>
+<li><strong>Another SUMO install could still supply the bindings.</strong> With the
+  environment's <code>eclipse-sumo</code> present, the SUMO resolver removed only
+  <code>$SUMO_HOME/tools</code> from <code>sys.path</code>, so a <code>PYTHONPATH</code> entry for a system
+  SUMO's <code>tools</code> stayed behind the package's. The resolver now removes
+  every other SUMO <code>tools</code> directory: <code>$SUMO_HOME/tools</code>, and any directory
+  named <code>tools</code> that ships both <code>traci/</code> and <code>sumolib/</code>. A project's own
+  <code>tools/</code> without those bindings is kept.</li>
+<li><strong>A CARLA world build that timed out ended the run.</strong> On a loaded
+  machine, generating an OpenDRIVE world or loading a town could outlast
+  the client timeout. The build is now retried once with twice
+  <code>world.timeout</code>, and the client timeout is restored afterwards. A second
+  time-out stops the run with a message that says to check the server or
+  raise <code>world.timeout</code>; any other error is raised at once, as before. A
+  town load that timed out is no longer reported as a missing map.</li>
+<li><strong>The evaluation summary printed <code>±</code> as mojibake</strong> on a console that is
+  not UTF-8; it prints <code>+/-</code>.</li>
+<li><strong>The RAL evaluation profiles load the bundled kit.</strong> The
+  <code>marl/intersection</code> evaluation profiles name <code>load_checkpoint:
+  ral/&lt;run&gt;</code>, matching <code>checkpoints/ral/manifest.json</code>; <code>mappo_h128</code>,
+  <code>td3_43d</code> and <code>td3_lstm256</code> load their own entries instead of copies of
+  other runs' paths, and <code>td3_44d</code> is a training profile (no bundled
+  weights).</li>
+<li><strong><code>sumo-marl/intersection/base.yaml</code> is headless</strong> (<code>world.sumo_gui:
+  false</code>); <code>sac.yaml</code> still opens the SUMO window.</li>
+<li><strong>A section left empty in a profile erased the family's.</strong> <code>outputs:</code>
+  with nothing under it parses as null, and the merge replaced the lower
+  layer's whole block with it, at any depth and in <code>include:</code> fragments
+  too; the run then crashed on its first read of the section. An empty key
+  now keeps the lower layer's mapping. Any other scalar, a bare <code>true</code> /
+  <code>false</code> included, still replaces it; a mapping still merges into it, and
+  a list over it is still an error; null over a scalar or a list still
+  sets it. A top-level section (<code>scenario</code>, <code>world</code>, <code>runtime</code>,
+  <code>agents</code>, <code>outputs</code>, <code>MARL</code>) that is still null after the merge, because
+  no layer defines it as a mapping, reads as an empty mapping: the
+  coordinator, the <code>opencda-marl</code> CLI and the PettingZoo port's
+  <code>from_scenario</code> normalise it before anything reads it. The matrix
+  launcher's check for whether a cell needs the perception model
+  (<code>--apply_ml</code>) now merges the layers the same way, a cell's <code>include:</code>
+  fragments included, so neither an empty section nor a fragment hides
+  whether perception is on.</li>
+<li><strong>Checkpoints carried the run configuration of the machine that trained
+  them.</strong> Every built-in learner pickled its whole config into each
+  checkpoint: the <code>tensorboard</code> and <code>metrics_store</code> blocks (log directories
+  under <code>outputs.root_dir</code>, the run name) and, because a nested OmegaConf
+  node keeps a reference to the configuration it came from, the entire run
+  configuration, every section with <code>outputs.root_dir</code> among them. DQN also
+  stored its speed list as such a node. The built-in learners now save
+  <code>checkpoint_config()</code>, which every <code>BaseAlgorithm</code> inherits from
+  <code>TrainingLogger</code>: plain values, without the run-output blocks, and with
+  any value that is an absolute path replaced by <code>&lt;absolute path removed&gt;</code>.
+  Interpolations inside nested blocks are kept as written. The top-level
+  values of the learner's section reach it already resolved, so one that
+  resolves to an absolute path is replaced, but a path inside a longer
+  string (<code>run@${outputs.root_dir}</code>) is saved as it resolved.
+  Hyperparameters are kept, and DQN saves its speed list as a plain list.
+  Nothing reads the saved config back, so checkpoints written earlier, which
+  still carry all of it, load and resume unchanged. The bundled baseline
+  checkpoints are unchanged. A learner of your own should save the same
+  (<a href="../../custom_algorithms/#what-a-checkpoint-should-hold">Add an Algorithm</a>).</li>
+<li><strong>Matrix cells launched with a capitalised map name were invisible
+  downstream.</strong> The launchers accepted <code>--maps Custom</code> (validation
+  lowercased it) but wrote <code>matrix_Custom_*</code> cells, which
+  <code>run_matrix_eval.py</code> and the analyzers never matched.
+  <code>launch_matrix.py</code>, <code>launch_eval_matrix.py</code> and
+  <code>launch_distributed_matrix.py</code> now normalise <code>--maps</code>, and
+  <code>--continue-source-map</code> / <code>--checkpoint-map</code> where they take one, to the
+  map profile key (<code>matrix_common.canonical_map</code> / <code>canonical_maps</code>), and
+  plan each map once however it is spelt or repeated. An unknown
+  <code>--continue-source-map</code> or <code>--checkpoint-map</code> now stops the launcher up
+  front. Cells an earlier run already wrote as <code>matrix_Custom_*</code> keep that
+  name: rename the directories named after their slugs to
+  <code>matrix_custom_*</code> (or re-run the cells) to bring them into
+  <code>run_matrix_eval.py</code> and the analyzers and, on a case-sensitive
+  filesystem, back into the evaluation launcher, continuation and
+  <code>--resume</code>.</li>
+</ul>
+<h2 id="known-issues">Known issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>SUMO spawn-time path decisions see the ego heading +x.</strong> A spawn
+  transform generated on SUMO carries yaw 0, so the ego of a spawn-time
+  path decision moves along +x whatever its lane, and its TTC and closing
+  features against its neighbours are wrong. This covers SUMO runs with
+  <code>scenario.traffic.mode: live</code> or <code>record</code>, and replays of recordings
+  made on SUMO — including <code>lite_2min_SUMO.json</code>, which the bundled
+  <code>sumo-marl</code> profiles replay — because a recording carries no backend
+  tag. Decisions taken at the approach zone read the live vehicle, and
+  replays of recordings made on CARLA carry each vehicle's own yaw; both
+  are unaffected. <code>make_spawn_event_proxy(..., heading_rad=)</code> and
+  <code>spawn_lane_heading_rad</code> in <code>opencda_marl/_kernel/traffic/sumo_route_intent.py</code>
+  are the seam for the fix. SUMO path-head checkpoints trained in live or
+  record mode are not comparable with ones trained after it.</li>
+<li><code>OpenCDAMARLParallelEnv.from_scenario</code> drives the SUMO backend only.</li>
+<li><strong>A long CARLA evaluation can die at an automatic world reset.</strong> The world
+  manager reloads the world when a step gets 1.5x slower than the episode's
+  baseline, and the reload uses the fixed <code>world.timeout</code> without a retry.
+  On a windowed server a reload takes 10 to 35 s, so a run of a few tens of
+  episodes can end with a time-out at the reload, followed by a time-out in
+  the next <code>world.tick()</code> or a native <code>Assertion failed: _episode != nullptr</code>
+  from the CARLA client. A failed reload does not stop the run cleanly.
+  Raise <code>world.timeout</code> in the profile, or run a headless server
+  (<code>-RenderOffScreen</code>), until this is fixed. Smoke runs and
+  <code>pixi run verify --full</code> are too short to reach it.</li>
+<li><strong>The first build of the bundled intersection world can exceed the
+  default time-out.</strong> <code>generate_opendrive_world</code> took 23 to 37 s on a
+  windowed server; the defaults are 20 s (MARL profiles) and 10 s (OpenCDA
+  scenarios) with one retry, and the retry waits behind the still-running
+  first request, so it fails whenever one build takes more than about 30 s.
+  Set <code>world: {timeout: 90.0}</code> in the profile.</li>
+<li><strong>Sensors are not destroyed at an episode reset or a world reload.</strong> The
+  CARLA client logs <code>sensor object went out of the scope but the sensor is
+  still alive in the simulation</code> for the GNSS, IMU and collision sensors,
+  and they accumulate on the server during long runs.</li>
+<li><strong><code>--apply_ml</code> fails on Windows in the standard OpenCDA path.</strong> The ML
+  manager imports <code>torch</code> after <code>cv2</code>, <code>open3d</code> or <code>matplotlib</code> have been
+  loaded, and <code>import torch</code> then fails with <code>WinError 127</code> (<code>shm.dll</code>).
+  Import <code>torch</code> first, for example
+  <code>python -c "import torch, sys, runpy; sys.argv = ['opencda.py', '-t', '&lt;scenario&gt;', '--apply_ml']; runpy.run_path('opencda.py', run_name='__main__')"</code>.</li>
+<li><strong><code>platoon_joining_2lanefree_carla</code> does not exercise the joining
+  branches.</strong> The platoon members and the merging vehicle now run the
+  platooning agent (the fix under Fixed), but the merging vehicle reaches the
+  main road 80 to 125 m behind the platoon and about 8 km/h slower, so it
+  never comes within the 35 m communication range and the frontal, cut-in
+  and back joining code is not reached. The scenario file is the one the
+  upstream repository ships.</li>
+<li><strong>Console noise from the OpenCDA scenarios.</strong> On
+  <code>single_2lanefree_carla</code> the safety manager prints
+  <code>Safety Warning from the safety manager: {... 'offroad': True ...}</code> at
+  every tick of the whole route, and OpenCV or Open3D windows can print
+  <code>qt.qpa.screen: Unable to open monitor interface</code> and
+  <code>QThreadStorage: entry N destroyed before end of thread</code> on a
+  multi-monitor Windows setup. The run itself completes.</li>
+</ul>
+<h2 id="docs">Docs<a class="headerlink" href="#docs" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The portal is Getting Started (Installation, Quick Start, CARLA Version
+  Support), Guide (Architecture, Run Experiments, Training Throughput,
+  Customize — one worked page per replaceable kind) and Reference (PCMA,
+  the OpenCDA patch ledger, Contributing, this changelog). The API
+  reference was retired; the code and its tests are the reference.</li>
+<li>The Agent Workflow page and the Code Index are what coding agents read
+  before acting; the PR template is the review contract.</li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 24, 2026 00:39:06 UTC">October 24, 2026</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback! Help us improve this page by <a href="https://github.com/radar-lab/opencda-marl/issues/new/?title=[Feedback]+v2.1.0+-+/marl/changelog/v2.1.0/" target="_blank" rel="noopener">telling us what you need</a>.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/radar-lab/opencda-marl" target="_blank" rel="noopener" title="GitHub Repository" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://opencda-documentation.readthedocs.io/en/latest/" target="_blank" rel="noopener" title="OpenCDA Documentation" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M351.9 280H161c2.9 64.5 17.2 123.9 37.5 167.4 11.4 24.5 23.7 41.8 35.1 52.4 11.2 10.5 18.9 12.2 22.9 12.2s11.7-1.7 22.9-12.2c11.4-10.6 23.7-28 35.1-52.4 20.3-43.5 34.6-102.9 37.5-167.4zm-191-48h190.9c-2.8-64.5-17.1-123.9-37.4-167.4-11.4-24.4-23.7-41.8-35.1-52.4C268.1 1.7 260.4 0 256.4 0s-11.7 1.7-22.9 12.2c-11.4 10.6-23.7 28-35.1 52.4-20.3 43.5-34.6 102.9-37.5 167.4m-48 0c3.5-85.6 25.6-165.1 57.9-217.3C78.7 47.3 10.9 131.2 1.5 232zM1.5 280c9.4 100.8 77.2 184.7 169.3 217.3-32.3-52.2-54.4-131.7-57.9-217.3zm398.4 0c-3.5 85.6-25.6 165.1-57.9 217.3 92.1-32.7 159.9-116.5 169.3-217.3zm111.4-48C501.9 131.2 434.1 47.3 342 14.7c32.3 52.2 54.4 131.7 57.9 217.3z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="https://radar.ece.arizona.edu/" target="_blank" rel="noopener" title="UA Radar Lab" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M271.9 20.2c-9.8-5.6-21.9-5.6-31.8 0l-224 128c-12.6 7.2-18.8 22-15.1 36S17.5 208 32 208h32v208l-51.2 38.4C4.7 460.4 0 469.9 0 480c0 17.7 14.3 32 32 32h448c17.7 0 32-14.3 32-32 0-10.1-4.7-19.6-12.8-25.6L448 416V208h32c14.5 0 27.2-9.8 30.9-23.8s-2.5-28.8-15.1-36l-224-128zM400 208v208h-64V208zm-112 0v208h-64V208zm-112 0v208h-64V208zm80-112a32 32 0 1 1 0 64 32 32 0 1 1 0-64"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.prefetch", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

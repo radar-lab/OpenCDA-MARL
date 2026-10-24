@@ -16,14 +16,14 @@
         <link rel="prev" href="../installation/">
       
       
-        <link rel="next" href="../faq/">
+        <link rel="next" href="../carla-version-support/">
       
       
         
       
       
       <link rel="icon" href="../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#quick-start-guide" class="md-skip">
+        <a href="#quick-start" class="md-skip">
           Skip to content
         </a>
       
@@ -227,17 +227,36 @@
   
   
   
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
     
   
   
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href=".." class="md-tabs__link">
+        <a href="../installation/" class="md-tabs__link">
           
   
   
-  Home
+  Getting Started
 
         </a>
       </li>
@@ -257,7 +276,7 @@
           
   
   
-  MARL Framework
+  Guide
 
         </a>
       </li>
@@ -273,44 +292,14 @@
     
     
       <li class="md-tabs__item">
-        <a href="../opencda/core/" class="md-tabs__link">
+        <a href="../marl/pcma/" class="md-tabs__link">
           
   
   
-  OpenCDA Integration
+  Reference
 
         </a>
       </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../api/opencda/overview/" class="md-tabs__link">
-          
-  
-  
-  API Reference
-
-        </a>
-      </li>
-    
-  
-
     
   
 
@@ -327,7 +316,7 @@
   
     
   
-  About Us
+  About
 
       </a>
     </li>
@@ -390,63 +379,6 @@
       
   
   
-    
-  
-  
-  
-    
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Home
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
@@ -457,7 +389,7 @@
   <span class="md-ellipsis">
     
   
-    OpenCDA-MARL
+    Home
   
 
     
@@ -469,25 +401,24 @@
     </li>
   
 
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-    
     
       
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
       
         
-          
-          
+        
+      
+      
         
       
     
@@ -496,10 +427,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_1_2" id="__nav_1_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -517,8 +448,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_1_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -623,143 +554,32 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#opencda-scenarios" class="md-nav__link">
+  <a href="#1-one-training-run" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OpenCDA Scenarios
+        1. One training run
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="OpenCDA Scenarios">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#single-vehicle-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Single Vehicle Tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#cooperative-driving-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cooperative Driving Tests
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#advanced-scenarios" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Advanced Scenarios
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configuration-customization" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration &amp; Customization
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#opencda-marl" class="md-nav__link">
+  <a href="#2-as-a-library" class="md-nav__link">
     <span class="md-ellipsis">
       
-        OpenCDA-MARL
+        2. As a library
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="OpenCDA-MARL">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#quick-test" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Test
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#agent-types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Agent Types
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rl-algorithms" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        RL Algorithms
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#configuration-customization_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration &amp; Customization
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#traffic-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Traffic Configuration
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#more-information" class="md-nav__link">
+  <a href="#3-change-one-thing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        More Information
+        3. Change one thing
       
     </span>
   </a>
@@ -782,285 +602,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../faq/" class="md-nav__link">
+      <a href="../carla-version-support/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    FAQ
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MARL Framework
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    MARL Framework
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/sumo_training/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    SUMO Training
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/updates/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Updates
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Changelog-MARL
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Changelog-MARL
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../marl/changelog/v1.0.0/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    v1.0.0
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../contributing/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributing
+    CARLA Version Support
   
 
     
@@ -1113,7 +662,7 @@
   <span class="md-ellipsis">
     
   
-    OpenCDA Integration
+    Guide
   
 
     
@@ -1129,7 +678,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    OpenCDA Integration
+    Guide
   
 
           </label>
@@ -1142,14 +691,70 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/core/" class="md-nav__link">
+      <a href="../marl/architecture/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Core Components
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../run-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Run Experiments
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../marl/throughput/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Throughput
   
 
     
@@ -1185,17 +790,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_2" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
         
           
-          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Changelog-MARL
+    Customize
   
 
     
@@ -1206,12 +811,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Changelog-MARL
+    Customize
   
 
           </label>
@@ -1224,14 +829,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/" class="md-nav__link">
+      <a href="../marl/replace_component/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overview
+    Replace a Component
   
 
     
@@ -1252,14 +857,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/architecture_changes/" class="md-nav__link">
+      <a href="../marl/custom_algorithms/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Architecture Changes
+    Add an Algorithm
   
 
     
@@ -1280,14 +885,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/api_changes/" class="md-nav__link">
+      <a href="../marl/custom_planner/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    API Changes
+    A Planner
   
 
     
@@ -1308,14 +913,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/platform_changes/" class="md-nav__link">
+      <a href="../marl/custom_agent/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Platform Changes
+    An Agent Type
   
 
     
@@ -1336,14 +941,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/config_changes/" class="md-nav__link">
+      <a href="../marl/custom_intent_provider/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Config Changes
+    An Intent Provider
   
 
     
@@ -1364,14 +969,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/breaking_changes/" class="md-nav__link">
+      <a href="../marl/custom_observation_extractor/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Breaking Changes
+    An Observation Extractor
   
 
     
@@ -1392,104 +997,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/changelog/migration_and_docs/" class="md-nav__link">
+      <a href="../marl/custom_reward_calculator/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Migration & Docs
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Integration
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Integration
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../opencda/scenarios/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Scenario Testing
+    A Reward Calculator
   
 
     
@@ -1510,42 +1025,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../opencda/traffic_generation/" class="md-nav__link">
+      <a href="../marl/custom_profiles/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Traffic Generation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../opencda/yaml_define/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    YAML Configuration
+    Profile Tables
   
 
     
@@ -1606,7 +1093,7 @@
   <span class="md-ellipsis">
     
   
-    API Reference
+    Reference
   
 
     
@@ -1622,61 +1109,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    API Reference
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    OpenCDA Core
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_1">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    OpenCDA Core
+    Reference
   
 
           </label>
@@ -1689,14 +1122,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/opencda/overview/" class="md-nav__link">
+      <a href="../marl/pcma/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Overview
+    PCMA Learners
   
 
     
@@ -1717,14 +1150,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/opencda/cav_world/" class="md-nav__link">
+      <a href="../opencda/marl_patches/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    CavWorld
+    OpenCDA Patch Ledger
   
 
     
@@ -1745,328 +1178,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/opencda/perception_manager/" class="md-nav__link">
+      <a href="../contributing/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    PerceptionManager
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda/vehicle_manager/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    VehicleManager
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda/scenario_manager/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    ScenarioManager
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda/localization_manager/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    LocalizationManager
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda/behavior_agent/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    BehaviorAgent
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda/v2x_manager/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    V2XManager
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    MARL Extension
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    MARL Extension
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/overview/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/coordinator/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Coordinator
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/scenario/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Scenario
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/adapters/vehicle_adapter/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Vehicle Adapter
+    Contributing
   
 
     
@@ -2102,17 +1221,17 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2_5" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_4" >
         
           
-          <label class="md-nav__link" for="__nav_4_2_5" id="__nav_4_2_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
             
   
   
   <span class="md-ellipsis">
     
   
-    Core Components
+    Changelog
   
 
     
@@ -2123,12 +1242,12 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_4_2_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4_2_5">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
             <span class="md-nav__icon md-icon"></span>
             
   
-    Core Components
+    Changelog
   
 
           </label>
@@ -2141,14 +1260,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/opencda-marl/agent_manager/" class="md-nav__link">
+      <a href="../marl/changelog/v2.1.0/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Agent Manager
+    v2.1.0
   
 
     
@@ -2169,134 +1288,14 @@
   
   
     <li class="md-nav__item">
-      <a href="../api/opencda-marl/map_manager/" class="md-nav__link">
+      <a href="../marl/changelog/v1.0.0/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Map Manager
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/environment/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Environment Interface
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/traffic_config/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Traffic Configuration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/benchmark/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Benchmark System
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api/opencda-marl/training/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Training Infrastructure
+    v1.0.0
   
 
     
@@ -2339,7 +1338,7 @@
   <span class="md-ellipsis">
     
   
-    About Us
+    About
   
 
     
@@ -2372,480 +1371,104 @@
   
 
 
-<h1 id="quick-start-guide">Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permanent link">&para;</a></h1>
-<p>Get started with OpenCDA for cooperative driving automation research and OpenCDA-MARL for multi-agent reinforcement learning scenarios.</p>
-<hr />
-<h2 id="opencda-scenarios">OpenCDA Scenarios<a class="headerlink" href="#opencda-scenarios" title="Permanent link">&para;</a></h2>
-<p><strong>What it provides</strong>: Pre-configured benchmark scenarios for cooperative driving research</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>&lt;scenario_name&gt;<span class="w"> </span><span class="o">[</span>--apply_ml<span class="o">]</span><span class="w"> </span><span class="o">[</span>--record<span class="o">]</span>
+<h1 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h1>
+<p>Run a bundled learner untouched, watch it live, then change one thing.
+<a href="../installation/">Installation</a> comes first — though for the SUMO path
+below that is just the repository and <code>pixi install</code>, no CARLA involved.</p>
+<h2 id="1-one-training-run">1. One training run<a class="headerlink" href="#1-one-training-run" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>opencda.py<span class="w"> </span>-t<span class="w"> </span>sumo-marl/intersection/route_speed_only_pcmappo<span class="w"> </span>--marl
 </span></code></pre></div>
-<p><strong>Parameters</strong>:</p>
-<ul>
-<li><code>-t</code>: Scenario name (must have matching <code>.py</code> in <code>configs/opencda/scenario_testing/</code> and <code>.yaml</code> in <code>configs/opencda/</code>)</li>
-<li><code>--apply_ml</code>: Enable ML models (requires PyTorch)</li>
-<li><code>--record</code>: Record simulation for replay</li>
-</ul>
-<p><strong>Note</strong>: Version argument (<code>-v</code>) has been removed. OpenCDA now uses CARLA 0.9.15 exclusively.</p>
-<hr />
-<h3 id="single-vehicle-tests">Single Vehicle Tests<a class="headerlink" href="#single-vehicle-tests" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="single-vehicle-tests-highway-navigation" name="__tabbed_1" type="radio" /><input id="single-vehicle-tests-urban-with-ml" name="__tabbed_1" type="radio" /><input id="single-vehicle-tests-sumo-co-simulation" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="single-vehicle-tests-highway-navigation">Highway Navigation</label><label for="single-vehicle-tests-urban-with-ml">Urban with ML</label><label for="single-vehicle-tests-sumo-co-simulation">SUMO Co-simulation</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Basic 2-lane highway test (no ML required)</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>single_2lanefree_carla
+<p>That is PCMAPPO learning speed control at a signal-free intersection on
+SUMO — headless, around 10 ms per step, nothing to start beforehand.
+Starting the run starts the <strong>web monitor</strong> and prints its URL
+(<code>http://127.0.0.1:8765</code>): losses and episode summaries as they happen,
+and a <em>Traffic view</em> drawing the intersection schematically with the
+learning agents in it. Checkpoints, metrics and evaluation summaries land
+under <code>artifacts/</code> (<a href="../run-experiments/">Run Experiments</a> maps every
+output).</p>
+<p>Swap the profile to change the experiment — <code>route_learn_path_pcmappo</code>
+adds the path action, <code>marl/intersection/rule_based --marl</code> runs a
+no-learner baseline on CARLA. <code>opencda_marl/_bundled/configs/&lt;family&gt;/&lt;scenario&gt;/</code>
+lists what ships — the profiles are package data, so a pip install has
+exactly the same ones.</p>
+<h2 id="2-as-a-library">2. As a library<a class="headerlink" href="#2-as-a-library" title="Permanent link">&para;</a></h2>
+<p>The engine is a wheel with the SUMO scenario family bundled, so an
+environment with the dependencies runs scenarios without a repository
+checkout:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span>&lt;opencda-marl<span class="w"> </span>wheel<span class="w"> </span>or<span class="w"> </span>checkout&gt;<span class="w">            </span><span class="c1"># SUMO runs out of the box</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"&lt;opencda-marl checkout&gt;[carla]"</span><span class="w">            </span><span class="c1"># + libraries for CARLA runs from that checkout</span>
 </span></code></pre></div>
-<p><strong>Features</strong>:</p>
-<ul>
-<li>100 km/h target speed</li>
-<li>Safe traffic interaction</li>
-<li>Localization, planning, control modules active</li>
-<li>Perception disabled by default (no PyTorch needed)</li>
-</ul>
-<p><img alt="Highway Test" src="../images/single_2lanefree_carla.gif" /></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Town06 with YOLOv8/YOLOv5 detection</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>single_town06_carla<span class="w"> </span>--apply_ml
+<p><code>pixi run wheel</code> builds the wheel (<code>dist/opencda_marl-*.whl</code>); there is no
+PyPI release yet. The wheel's own CLI and environment port drive SUMO
+only. <code>[carla]</code> installs the libraries CARLA scenarios need when they run
+from a repository checkout (<code>python opencda.py -t &lt;ref&gt; --marl</code>), because
+those scenarios read their maps from the working tree; <code>carla</code> itself
+comes with your simulator. The faster <code>libsumo</code> binding is optional:
+without it SUMO runs over TraCI, about 13× slower per step, and the
+fallback warning names the matching <code>pip install libsumo==&lt;SUMO version&gt;</code>.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>opencda-marl<span class="w"> </span>run<span class="w"> </span>-t<span class="w"> </span>sumo-marl/intersection/route_speed_only_pcmappo
 </span></code></pre></div>
-<p><strong>Features</strong>:</p>
-<ul>
-<li>Full perception pipeline with ML</li>
-<li>Urban environment navigation</li>
-<li>Camera-LiDAR fusion</li>
-<li><strong>Requires</strong>: PyTorch, CUDA (recommended)</li>
-</ul>
-<p><img alt="Town06 ML" src="../images/single_town06_carla_2.gif" /></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Town06 with SUMO traffic generation</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>single_town06_cosim<span class="w"> </span>--apply_ml
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>opencda-marl<span class="w"> </span>list<span class="w">          </span><span class="c1"># registered algorithms, and from where</span>
 </span></code></pre></div>
-<p><strong>Features</strong>:</p>
-<ul>
-<li>SUMO-generated traffic flow</li>
-<li>More realistic traffic patterns</li>
-<li>ML-based 3D object detection</li>
-<li><strong>Requires</strong>: PyTorch, SUMO</li>
-</ul>
-<p><img alt="SUMO Cosim" src="../images/town06_cosim.gif" /></p>
-</div>
-</div>
-</div>
-<p><strong>Tip</strong>: Bounding boxes in non-ML mode come from CARLA ground truth. With <code>--apply_ml</code>, they're from the detection model.</p>
-<hr />
-<h3 id="cooperative-driving-tests">Cooperative Driving Tests<a class="headerlink" href="#cooperative-driving-tests" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:4"><input checked="checked" id="cooperative-driving-tests-platoon-stability" name="__tabbed_2" type="radio" /><input id="cooperative-driving-tests-platoon-joining" name="__tabbed_2" type="radio" /><input id="cooperative-driving-tests-platoon-back-join" name="__tabbed_2" type="radio" /><input id="cooperative-driving-tests-sumo-platoon" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="cooperative-driving-tests-platoon-stability">Platoon Stability</label><label for="cooperative-driving-tests-platoon-joining">Platoon Joining</label><label for="cooperative-driving-tests-platoon-back-join">Platoon Back-Join</label><label for="cooperative-driving-tests-sumo-platoon">SUMO Platoon</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Test platoon stability under speed changes</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>platoon_stability_2lanefree_carla
+<p>The bundled configs are the last config root searched: <code>--config-root DIR</code>
+(repeatable) adds your own in front, and a profile placed there inherits
+the family default and scenario base from the bundle. That is the whole
+mechanism an external research package uses to ship its experiments — see
+<a href="../marl/custom_algorithms/">Add an Algorithm</a>.</p>
+<p>The wheel also carries the framework paper's <strong>baseline checkpoints</strong>:
+<code>MARL.training.load_checkpoint: ral/sac_300vph</code> resolves inside the
+package, and <code>opencda_marl/_bundled/checkpoints/ral/manifest.json</code> lists
+every entry with the profile and recording it pairs with — a fixed
+reference point for comparing your own learner against.</p>
+<h2 id="3-change-one-thing">3. Change one thing<a class="headerlink" href="#3-change-one-thing" title="Permanent link">&para;</a></h2>
+<p>Configuration merges three layers — the family's <code>default.yaml</code>, the
+scenario's <code>base.yaml</code>, then the profile — and a profile states only what
+it changes (a section left empty, such as <code>outputs:</code>, inherits the lower
+layers' block rather than clearing it). A new experiment is a new profile:
+it inherits the scenario (map, traffic, SUMO settings; the SUMO base runs
+headless) but names its learner's action space, objective and observation
+features, because those belong to the profile, not to the scenario:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># my_configs/sumo-marl/intersection/my_quick.yaml</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="c1"># (the family default and the scenario base are inherited from the bundle)</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">scenario</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">simulation</span><span class="p">:</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">max_episodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nt">MARL</span><span class="p">:</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">"pcmasac"</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="nt">reward_profile</span><span class="p">:</span><span class="w"> </span><span class="s">"competitive_intersection_v2"</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nt">objective_mode</span><span class="p">:</span><span class="w"> </span><span class="s">"competitive_ordering_v1"</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="nt">state_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">11</span><span class="w">                 </span><span class="c1"># 9 features + 2 preference entries</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="nt">action_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="nt">action_space</span><span class="p">:</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">speed_only</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">  </span><span class="nt">preference</span><span class="p">:</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="nt">profile</span><span class="p">:</span><span class="w"> </span><span class="s">"balanced"</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="nt">assignment</span><span class="p">:</span><span class="w"> </span><span class="s">"entry_direction"</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">    </span><span class="nt">injection</span><span class="p">:</span><span class="w"> </span><span class="s">"state_augmentation"</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">    </span><span class="nt">dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">  </span><span class="nt">pcmasac</span><span class="p">:</span>
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">    </span><span class="nt">features</span><span class="p">:</span>
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">      </span><span class="nt">rel_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="w">      </span><span class="nt">rel_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="w">      </span><span class="nt">position_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="w">      </span><span class="nt">position_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="w">      </span><span class="nt">lane_position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="w">      </span><span class="nt">heading_angle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a><span class="w">      </span><span class="nt">dist_to_intersection</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="w">      </span><span class="nt">dist_to_front_vehicle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="w">      </span><span class="nt">waypoint_buffer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 </span></code></pre></div>
-<p><strong>Features</strong>:
-- 4-vehicle platoon
-- Dynamic speed changes
-- Time gap maintenance
-- Stability verification</p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Cooperative merge and platoon joining</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>platoon_joining_2lanefree_carla
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>opencda.py<span class="w"> </span>-t<span class="w"> </span>sumo-marl/intersection/my_quick<span class="w"> </span>--marl<span class="w"> </span>--marl-config-root<span class="w"> </span>my_configs
 </span></code></pre></div>
-<p><strong>Features</strong>:
-- Mainline platoon with traffic
-- Cooperative merging from ramp
-- V2X communication
-- Real-time formation adjustment</p>
-<p><img alt="Platoon Joining" src="../images/platoon_joining_2lanefree.gif" /></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># Join platoon from behind with ML</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>platoon_joining_town06_carla<span class="w"> </span>--apply_ml
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- Overtaking maneuvers
-- YOLOv8/YOLOv5 detection
-- Complex urban scenario
-- <strong>Requires</strong>: PyTorch</p>
-<p><img alt="Back Join" src="../images/platoon_joining_town06.gif" /></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># Platoon with SUMO co-simulation</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>platoon_joining_2lanefree_cosim
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- SUMO traffic integration
-- Realistic traffic patterns
-- <strong>Requires</strong>: SUMO</p>
-<p><img alt="SUMO Platoon" src="../images/platoon_joining_cosim.gif" /></p>
-</div>
-</div>
-</div>
-<hr />
-<h3 id="advanced-scenarios">Advanced Scenarios<a class="headerlink" href="#advanced-scenarios" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="advanced-scenarios-cooperative-perception" name="__tabbed_3" type="radio" /><input id="advanced-scenarios-intersection-management" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="advanced-scenarios-cooperative-perception">Cooperative Perception</label><label for="advanced-scenarios-intersection-management">Intersection Management</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># V2X-enabled perception sharing</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>cooperception_cavs_town05<span class="w"> </span>--apply_ml
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- Shared object detection via V2X
-- Extended perception range
-- Occlusion handling
-- Multi-vehicle fusion</p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Cooperative intersection navigation</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>start<span class="w"> </span>-t<span class="w"> </span>intersection_town05<span class="w"> </span>--apply_ml
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- Traffic light compliance
-- V2I communication
-- Conflict resolution
-- Safety validation</p>
-</div>
-</div>
-</div>
-<p><strong>Performance</strong>: Most scenarios run at 20 FPS simulation time on modern GPUs</p>
-<hr />
-<h3 id="configuration-customization">Configuration &amp; Customization<a class="headerlink" href="#configuration-customization" title="Permanent link">&para;</a></h3>
-<p><strong>What you can modify</strong>: Scenarios, vehicle behaviors, perception models</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="4:3"><input checked="checked" id="configuration-customization-yaml-configuration" name="__tabbed_4" type="radio" /><input id="configuration-customization-custom-ml-models" name="__tabbed_4" type="radio" /><input id="configuration-customization-scenario-creation" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="configuration-customization-yaml-configuration">YAML Configuration</label><label for="configuration-customization-custom-ml-models">Custom ML Models</label><label for="configuration-customization-scenario-creation">Scenario Creation</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Example: Modify perception settings</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nt">vehicle</span><span class="p">:</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">sensing</span><span class="p">:</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="nt">perception</span><span class="p">:</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">      </span><span class="nt">activate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Enable ML perception</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">      </span><span class="nt">camera</span><span class="p">:</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">        </span><span class="nt">fov</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">        </span><span class="nt">image_size_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">800</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">        </span><span class="nt">image_size_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">600</span>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="nt">localization</span><span class="p">:</span>
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">      </span><span class="nt">gnss</span><span class="p">:</span>
-</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">        </span><span class="nt">noise_alt_stddev</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w">  </span><span class="c1"># Add GPS noise</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># Add custom detection model</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opencda.customize.ml_libs.ml_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLManager</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="k">class</span><span class="w"> </span><span class="nc">CustomDetector</span><span class="p">(</span><span class="n">MLManager</span><span class="p">):</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">load_your_model</span><span class="p">()</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-python highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># Create new scenario</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">opencda.scenario_testing.scenario_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScenarioManager</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="k">def</span><span class="w"> </span><span class="nf">custom_scenario</span><span class="p">():</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">scenario_manager</span> <span class="o">=</span> <span class="n">ScenarioManager</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">apply_ml</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
-</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="c1"># Spawn vehicles</span>
-</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="n">cavs</span> <span class="o">=</span> <span class="n">scenario_manager</span><span class="o">.</span><span class="n">create_vehicle_manager</span><span class="p">([</span><span class="s1">&#39;custom&#39;</span><span class="p">])</span>
-</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
-</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    <span class="c1"># Run simulation</span>
-</span><span id="__span-12-11"><a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-</span><span id="__span-12-12"><a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>        <span class="n">scenario_manager</span><span class="o">.</span><span class="n">tick</span><span class="p">()</span>
-</span><span id="__span-12-13"><a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>        <span class="c1"># Custom logic here</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<p><strong>Tips</strong>:</p>
-<ul>
-<li>Check <code>configs/opencda/{config_yaml}.yaml</code> for configuration examples</li>
-<li>Use <code>opencda/customize/</code> for custom implementations</li>
-<li>See <a href="../opencda/yaml_define/">YAML Configuration Guide</a> for all options</li>
-</ul>
-<hr />
-<h2 id="opencda-marl">OpenCDA-MARL<a class="headerlink" href="#opencda-marl" title="Permanent link">&para;</a></h2>
-<p><strong>What it provides</strong>: Multi-Agent Reinforcement Learning capabilities for cooperative driving research</p>
-<h3 id="quick-test">Quick Test<a class="headerlink" href="#quick-test" title="Permanent link">&para;</a></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># Run MARL intersection scenario with rule-based agents</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test
-</span></code></pre></div>
-<p><strong>Optional parameters</strong>:</p>
-<ul>
-<li><code>--gui</code>: Enable GUI visualization</li>
-<li><code>-t &lt;scenario_name&gt;</code>: Scenario name (<code>.yaml</code> in <code>configs/marl/</code>)</li>
-</ul>
-<p><strong>Example with GUI</strong>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test-gui
-</span></code></pre></div>
-<p><img alt="MARL Rule-based Simulation" src="../images/MARL-rule-based-simulation.gif" /></p>
-<h3 id="agent-types">Agent Types<a class="headerlink" href="#agent-types" title="Permanent link">&para;</a></h3>
-<p><strong>What you can choose</strong>: Different agent implementations for intersection scenarios</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:4"><input checked="checked" id="agent-types-configuration-method" name="__tabbed_5" type="radio" /><input id="agent-types-rule-based-agent" name="__tabbed_5" type="radio" /><input id="agent-types-behavior-agent" name="__tabbed_5" type="radio" /><input id="agent-types-vanilla-agent" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="agent-types-configuration-method">Configuration Method</label><label for="agent-types-rule-based-agent">Rule-based Agent</label><label for="agent-types-behavior-agent">Behavior Agent</label><label for="agent-types-vanilla-agent">Vanilla Agent</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># Set agent type in any config file</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;rule_based&quot;</span><span class="w">  </span><span class="c1"># or &quot;behavior&quot;, &quot;vanilla&quot;, &quot;marl&quot;</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1"># Override agent behavior parameters</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span><span class="nt">marl</span><span class="p">:</span>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">    </span><span class="nt">max_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">65</span><span class="w">           </span><span class="c1"># Custom max speed</span>
-</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">    </span><span class="nt">emergency_param</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span><span class="w">    </span><span class="c1"># Safety threshold</span>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="nt">ignore_traffic_light</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># 3-stage rule-based intersection navigation</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>intersection_rule_based
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- Deterministic behavior
-- Safety-first approach
-- No training required
-- Predictable performance</p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Enhanced safety agent with collision avoidance</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>intersection_behavior
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- Enhanced safety mechanisms
-- Dynamic collision avoidance
-- Adaptive speed control</p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Basic agent with standard safety features</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>intersection_vanilla
-</span></code></pre></div>
-<p><strong>Features</strong>:
-- Standard safety features
-- Basic collision detection
-- Simple control logic</p>
-</div>
-</div>
-</div>
-<hr />
-<h3 id="rl-algorithms">RL Algorithms<a class="headerlink" href="#rl-algorithms" title="Permanent link">&para;</a></h3>
-<p><strong>What's implemented</strong>: Reinforcement learning agents for intersection control</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="6:5"><input checked="checked" id="rl-algorithms-q-learning" name="__tabbed_6" type="radio" /><input id="rl-algorithms-deep-q-network-dqn" name="__tabbed_6" type="radio" /><input id="rl-algorithms-matd3-twin-delayed-ddpg" name="__tabbed_6" type="radio" /><input id="rl-algorithms-masac-soft-actor-critic" name="__tabbed_6" type="radio" /><input id="rl-algorithms-mappo-multi-agent-ppo" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="rl-algorithms-q-learning">Q-Learning</label><label for="rl-algorithms-deep-q-network-dqn">Deep Q-Network (DQN)</label><label for="rl-algorithms-matd3-twin-delayed-ddpg">MATD3 (Twin Delayed DDPG)</label><label for="rl-algorithms-masac-soft-actor-critic">MASAC (Soft Actor Critic)</label><label for="rl-algorithms-mappo-multi-agent-ppo">MAPPO (Multi-Agent PPO)</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1"># Q-table based learning (balanced configuration)</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>qbalanced
-</span></code></pre></div>
-<p><strong>Configuration</strong>:
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="nt">MARL</span><span class="p">:</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;q_learning&quot;</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span><span class="nt">q_learning</span><span class="p">:</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="nt">speed_actions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">15</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">35</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">65</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Discrete actions</span>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">    </span><span class="nt">state_features</span><span class="p">:</span>
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">      </span><span class="nt">distance_to_intersection</span><span class="p">:</span>
-</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">        </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">15</span><span class="p p-Indicator">]</span>
-</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">      </span><span class="nt">speed</span><span class="p">:</span>
-</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">        </span><span class="nt">bins</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">30</span><span class="p p-Indicator">]</span>
-</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">    </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">    </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
-</span></code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Neural network Q-learning</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>dqn
-</span></code></pre></div>
-<p><strong>Configuration</strong>:
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="nt">MARL</span><span class="p">:</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dqn&quot;</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="nt">state_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w">  </span><span class="c1"># Continuous state space</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">  </span><span class="nt">dqn</span><span class="p">:</span>
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="nt">speed_actions</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">30</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">45</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">60</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Discrete actions</span>
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">    </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="nt">memory_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50000</span>
-</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">    </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-</span></code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1"># Continuous control with TD3</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>td3_simple
-</span></code></pre></div>
-<p><strong>Configuration</strong>:
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="nt">MARL</span><span class="p">:</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;td3&quot;</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">  </span><span class="nt">state_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">9</span><span class="w">  </span><span class="c1"># 9D feature space</span>
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">  </span><span class="nt">action_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w">  </span><span class="c1"># Continuous speed control</span>
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="w">  </span><span class="nt">td3</span><span class="p">:</span>
-</span><span id="__span-24-9"><a id="__codelineno-24-9" name="__codelineno-24-9" href="#__codelineno-24-9"></a><span class="w">    </span><span class="nt">learning_rate_actor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-24-10"><a id="__codelineno-24-10" name="__codelineno-24-10" href="#__codelineno-24-10"></a><span class="w">    </span><span class="nt">learning_rate_critic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-24-11"><a id="__codelineno-24-11" name="__codelineno-24-11" href="#__codelineno-24-11"></a><span class="w">    </span><span class="nt">exploration_noise</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
-</span></code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1"># Soft Actor Critic with auto-tuning entropy</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>sac
-</span></code></pre></div>
-<p><strong>Configuration</strong>:
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span><span class="nt">marl</span><span class="p">:</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">    </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;sac&quot;</span>
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">    </span><span class="nt">sac</span><span class="p">:</span>
-</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">      </span><span class="nt">learning_rate_actor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">      </span><span class="nt">learning_rate_critic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">      </span><span class="nt">learning_rate_alpha</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">      </span><span class="nt">auto_entropy_tuning</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">      </span><span class="nt">target_entropy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-1.0</span>
-</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">      </span><span class="nt">init_alpha</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
-</span></code></pre></div></p>
-</div>
-<div class="tabbed-block">
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1"># Multi-Agent PPO with CTDE</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>pixi<span class="w"> </span>run<span class="w"> </span>marl-quick-test<span class="w"> </span>-t<span class="w"> </span>mappo
-</span></code></pre></div>
-<p><strong>Configuration</strong>:
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="nt">marl</span><span class="p">:</span>
-</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">    </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mappo&quot;</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="nt">mappo</span><span class="p">:</span>
-</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">      </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
-</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">      </span><span class="nt">tau</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.005</span>
-</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">      </span><span class="nt">alpha</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
-</span></code></pre></div></p>
-</div>
-</div>
-</div>
-<h3 id="configuration-customization_1">Configuration &amp; Customization<a class="headerlink" href="#configuration-customization_1" title="Permanent link">&para;</a></h3>
-<p><strong>What you can modify</strong>: Override default settings for specific scenarios</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="7:3"><input checked="checked" id="configuration-customization_1-config-hierarchy" name="__tabbed_7" type="radio" /><input id="configuration-customization_1-agent-behavior-override" name="__tabbed_7" type="radio" /><input id="configuration-customization_1-algorithm-parameters" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="configuration-customization_1-config-hierarchy">Config Hierarchy</label><label for="configuration-customization_1-agent-behavior-override">Agent Behavior Override</label><label for="configuration-customization_1-algorithm-parameters">Algorithm Parameters</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1"># configs/marl/default.yaml provides base settings</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span><span class="nt">behavior</span><span class="p">:</span>
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="w">    </span><span class="nt">max_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">45</span><span class="w">        </span><span class="c1"># Default from base config</span>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="w">    </span><span class="nt">emergency_param</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span>
-</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="w">    </span><span class="nt">ignore_traffic_light</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>
-</span><span id="__span-29-8"><a id="__codelineno-29-8" name="__codelineno-29-8" href="#__codelineno-29-8"></a><span class="c1"># Your scenario config can override specific fields</span>
-</span><span id="__span-29-9"><a id="__codelineno-29-9" name="__codelineno-29-9" href="#__codelineno-29-9"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-29-10"><a id="__codelineno-29-10" name="__codelineno-29-10" href="#__codelineno-29-10"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-29-11"><a id="__codelineno-29-11" name="__codelineno-29-11" href="#__codelineno-29-11"></a><span class="w">  </span><span class="nt">marl</span><span class="p">:</span>
-</span><span id="__span-29-12"><a id="__codelineno-29-12" name="__codelineno-29-12" href="#__codelineno-29-12"></a><span class="w">    </span><span class="nt">max_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">65</span><span class="w">        </span><span class="c1"># Override: faster for RL training</span>
-</span><span id="__span-29-13"><a id="__codelineno-29-13" name="__codelineno-29-13" href="#__codelineno-29-13"></a><span class="w">    </span><span class="nt">ignore_traffic_light</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">  </span><span class="c1"># Override: focus on intersection</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># Customize agent behavior in any scenario config</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;rule_based&quot;</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">  </span><span class="nt">rule_based</span><span class="p">:</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">    </span><span class="nt">max_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w">                    </span><span class="c1"># Custom speed limit</span>
-</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">    </span><span class="nt">junction_approach_distance</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80.0</span><span class="w"> </span><span class="c1"># Longer approach distance</span>
-</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">    </span><span class="nt">time_headway</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.5</span><span class="w">               </span><span class="c1"># Tighter following</span>
-</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>
-</span><span id="__span-30-9"><a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="c1"># Works for all agent types</span>
-</span><span id="__span-30-10"><a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-30-11"><a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">  </span><span class="nt">vanilla</span><span class="p">:</span>
-</span><span id="__span-30-12"><a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">    </span><span class="nt">collision_time_ahead</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w">  </span><span class="c1"># More conservative</span>
-</span><span id="__span-30-13"><a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="w">    </span><span class="nt">emergency_param</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span><span class="w">       </span><span class="c1"># Earlier emergency braking</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="c1"># Fine-tune RL algorithm parameters</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="nt">MARL</span><span class="p">:</span>
-</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dqn&quot;</span>
-</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">  </span><span class="nt">dqn</span><span class="p">:</span>
-</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="w">    </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0005</span><span class="w">      </span><span class="c1"># Slower learning</span>
-</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="w">    </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.05</span><span class="w">              </span><span class="c1"># Less exploration</span>
-</span><span id="__span-31-10"><a id="__codelineno-31-10" name="__codelineno-31-10" href="#__codelineno-31-10"></a><span class="w">    </span><span class="nt">memory_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100000</span><span class="w">        </span><span class="c1"># Larger replay buffer</span>
-</span><span id="__span-31-11"><a id="__codelineno-31-11" name="__codelineno-31-11" href="#__codelineno-31-11"></a>
-</span><span id="__span-31-12"><a id="__codelineno-31-12" name="__codelineno-31-12" href="#__codelineno-31-12"></a><span class="c1"># Or switch algorithms easily</span>
-</span><span id="__span-31-13"><a id="__codelineno-31-13" name="__codelineno-31-13" href="#__codelineno-31-13"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-31-14"><a id="__codelineno-31-14" name="__codelineno-31-14" href="#__codelineno-31-14"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span>
-</span><span id="__span-31-15"><a id="__codelineno-31-15" name="__codelineno-31-15" href="#__codelineno-31-15"></a>
-</span><span id="__span-31-16"><a id="__codelineno-31-16" name="__codelineno-31-16" href="#__codelineno-31-16"></a><span class="nt">MARL</span><span class="p">:</span>
-</span><span id="__span-31-17"><a id="__codelineno-31-17" name="__codelineno-31-17" href="#__codelineno-31-17"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;q_learning&quot;</span><span class="w">      </span><span class="c1"># Change from DQN to Q-learning</span>
-</span><span id="__span-31-18"><a id="__codelineno-31-18" name="__codelineno-31-18" href="#__codelineno-31-18"></a><span class="w">  </span><span class="nt">q_learning</span><span class="p">:</span>
-</span><span id="__span-31-19"><a id="__codelineno-31-19" name="__codelineno-31-19" href="#__codelineno-31-19"></a><span class="w">    </span><span class="nt">epsilon</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span><span class="w">               </span><span class="c1"># More exploration for Q-table</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<hr />
-<h3 id="traffic-configuration">Traffic Configuration<a class="headerlink" href="#traffic-configuration" title="Permanent link">&para;</a></h3>
-<p><strong>What you can modify</strong>: Traffic flow settings and vehicle spawn patterns</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="8:3"><input checked="checked" id="traffic-configuration-traffic-modes" name="__tabbed_8" type="radio" /><input id="traffic-configuration-traffic-flows" name="__tabbed_8" type="radio" /><input id="traffic-configuration-custom-configuration" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="traffic-configuration-traffic-modes">Traffic Modes</label><label for="traffic-configuration-traffic-flows">Traffic Flows</label><label for="traffic-configuration-custom-configuration">Custom Configuration</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Replay recorded traffic patterns</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="nt">scenario</span><span class="p">:</span>
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">  </span><span class="nt">traffic</span><span class="p">:</span>
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;replay&quot;</span>
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">    </span><span class="nt">replay_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;recordings/lite_2minL.json&quot;</span>
-</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">    </span><span class="nt">base_speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">45.0</span><span class="w">  </span><span class="c1"># km/h base speed</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="c1"># Configure directional traffic flows</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="nt">scenario</span><span class="p">:</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">  </span><span class="nt">traffic</span><span class="p">:</span>
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span><span class="nt">flows</span><span class="p">:</span>
-</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;north&quot;</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">        </span><span class="nt">rate_vph</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200</span><span class="w">        </span><span class="c1"># Vehicles per hour</span>
-</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">        </span><span class="nt">lanes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span><span class="w">     </span><span class="c1"># Lane indices</span>
-</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="w">        </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;north&quot;</span>
-</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w">        </span><span class="nt">speed_variation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
-</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">        </span><span class="nt">middle_peak</span><span class="p">:</span>
-</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">          </span><span class="nt">intensity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span><span class="w">     </span><span class="c1"># Peak density multiplier</span>
-</span><span id="__span-33-12"><a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">          </span><span class="nt">position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span><span class="w">      </span><span class="c1"># Peak timing (0.0-1.0)</span>
-</span><span id="__span-33-13"><a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">          </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span><span class="w">         </span><span class="c1"># Peak duration</span>
-</span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="c1"># Create custom scenario configuration</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="nt">agents</span><span class="p">:</span>
-</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">  </span><span class="nt">agent_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;marl&quot;</span><span class="w">  </span><span class="c1"># or &quot;rule_based&quot;, &quot;behavior&quot;, &quot;vanilla&quot;</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>
-</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="nt">MARL</span><span class="p">:</span>
-</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="w">  </span><span class="nt">algorithm</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;dqn&quot;</span><span class="w">    </span><span class="c1"># or &quot;q_learning&quot;, &quot;td3&quot;</span>
-</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>
-</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="nt">scenario</span><span class="p">:</span>
-</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="w">  </span><span class="nt">simulation</span><span class="p">:</span>
-</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="w">    </span><span class="nt">max_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2400</span><span class="w">   </span><span class="c1"># Simulation duration</span>
-</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="w">    </span><span class="nt">max_episodes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span><span class="w"> </span><span class="c1"># Training episodes</span>
-</span></code></pre></div>
-</div>
-</div>
-</div>
-<hr />
-<h2 id="more-information">More Information<a class="headerlink" href="#more-information" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>OpenCDA Users</strong>: Explore <a href="../opencda/scenarios/">scenario testing</a> and <a href="../api/opencda/overview/">API documentation</a></li>
-<li><strong>MARL Researchers</strong>: Check <a href="../marl/architecture/">MARL architecture</a> and <a href="../marl/updates/">development updates</a></li>
-<li><strong>Contributors</strong>: See <a href="../contributing/">contributing guide</a></li>
-<li><strong>Related Documentation</strong>:<ul>
-<li><a href="../installation/">Installation</a></li>
-<li><a href="../opencda/core/">OpenCDA</a></li>
-<li><a href="../api/opencda/overview/">API Reference</a></li>
-<li><a href="https://opencda.readthedocs.io/en/latest/">OpenCDA Official Documentation</a></li>
-<li><a href="https://carla.readthedocs.io/en/latest/">Carla Official Documentation</a></li>
-</ul>
-</li>
-</ul>
+<p>The scenario's base traffic with the observation of
+<code>route_speed_only_pcmappo</code>, a different learner (PCMASAC with its default
+hyperparameters), five episodes. Every knob the layers
+expose — action space, rewards, traffic, outputs — is mapped in
+<a href="../marl/architecture/">Architecture</a>; when the thing you want to change
+is not a knob but a component, that page's seam tables say which kind to
+register, and <a href="../marl/replace_component/">Replace a Component</a> is the
+door: the mechanism on one page, a worked example per kind behind it.</p>
 
 
 
@@ -2866,7 +1489,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 30, 2026 23:56:11 UTC">January 30, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 24, 2026 00:39:06 UTC">October 24, 2026</span>
   </span>
 
     
@@ -3008,11 +1631,9 @@
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.expand", "navigation.top", "navigation.tracking", "navigation.instant", "navigation.instant.prefetch", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.code.annotate", "content.tabs.link", "content.tooltips", "toc.follow", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
         <script src="../javascripts/mathjax.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
