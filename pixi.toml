@@ -3,7 +3,7 @@ authors = ["AXIBA <leolihao@arizona.edu>"]
 channels = ["conda-forge", "pytorch", "nvidia"]
 name = "OpenCDA"
 platforms = [{ platform = "win-64", cuda = "12.8" }, { platform = "linux-64", cuda = "12.8", glibc = "2.31" }]
-version = "2.1.0"
+version = "2.2.0"
 
 [activation.env]
 CARLA_VERSION = "0.9.16"
@@ -23,6 +23,8 @@ verify = "python scripts/verify.py"
 # The engine wheel, from a clean build tree, every member checked against the
 # source (a stale build/ can ship files that no longer exist):
 wheel = "python scripts/build_wheel.py"
+# The public wheel (no UCLA-licensed paths), the only build a package index may carry:
+wheel-public = "python scripts/build_wheel.py --public"
 monitor-list = "python -m opencda_marl.telemetry.monitor list --root artifacts"
 tb = "tensorboard --logdir=artifacts"
 

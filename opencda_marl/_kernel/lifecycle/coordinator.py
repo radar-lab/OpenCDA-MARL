@@ -15,6 +15,25 @@ import traceback
 
 from opencda_marl.utils.config_merger import normalize_run_config
 
+
+def require_opencda_core() -> None:
+    """Raise a pointed ImportError when the vendored OpenCDA core is absent.
+
+    The public wheel ships without it (UCLA's licence does not allow the core to
+    travel in a package), so a CARLA or co-simulation run needs a repository
+    checkout, which brings the core along.
+    """
+    try:
+        import opencda  # noqa: F401
+    except ImportError as exc:
+        raise ImportError(
+            "The CARLA backend needs the OpenCDA core, which the public opencda-marl wheel "
+            "does not ship. Run from a repository checkout "
+            "(git clone https://github.com/radar-lab/OpenCDA-MARL, then "
+            "`python opencda.py -t <scenario> --marl`), or install the full build with "
+            "`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git`."
+        ) from exc
+
 # Backend imports are lazy: the SUMO path must run from a pip-installed
 # wheel with neither the carla client nor the vendored `opencda` core (nor
 # matplotlib) present; each branch imports what it actually drives.
@@ -282,6 +301,7 @@ class MARLCoordinator:
             # CARLA mode (standard)
             logger.info("Initializing CARLA MARL environment")
 
+            require_opencda_core()
             from opencda.core.common.cav_world import CavWorld
 
             from opencda_marl._kernel.sensing.carla_monitor import CarlaMonitor

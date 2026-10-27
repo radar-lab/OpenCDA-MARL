@@ -30,9 +30,13 @@ so this runs without a repository checkout; torch is installed as a
 dependency but this path never imports it:
 
 ```bash
-pixi run wheel                           # builds dist/opencda_marl-*.whl (no PyPI release yet)
-pip install dist/opencda_marl-*.whl      # SUMO runs out of the box
+pixi run wheel --public                  # builds dist/public/opencda_marl-*.whl, without the UCLA-licensed paths
+pip install dist/public/opencda_marl-*.whl   # SUMO runs out of the box
 ```
+
+The full build, which also carries the vendored OpenCDA core, installs from Git
+(`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git@v2.2.0`); it is never uploaded to
+a package index, because UCLA's licence does not allow the core to be transferred to others.
 
 ```python
 from opencda_marl.envs.parallel_env import OpenCDAMARLParallelEnv

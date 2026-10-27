@@ -7,11 +7,14 @@ from __future__ import annotations
 
 import os
 from collections.abc import Mapping
-from typing import Any, Optional, Dict
+from typing import TYPE_CHECKING, Any, Optional, Dict
 
 from loguru import logger
 
-from opencda.core.common.cav_world import CavWorld
+if TYPE_CHECKING:
+    # A type annotation only: the SUMO path never needs the vendored OpenCDA
+    # core, and the public wheel does not ship it.
+    from opencda.core.common.cav_world import CavWorld
 
 
 #: Route-intent modes that never need the MARL manager: the disabled states

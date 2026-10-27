@@ -6,7 +6,7 @@ message: >-
   use them.
 title: OpenCDA-MARL
 type: software
-version: 2.1.0
+version: 2.2.0
 repository-code: https://github.com/radar-lab/OpenCDA-MARL
 url: https://radar-lab.github.io/OpenCDA-MARL/
 license: Apache-2.0

@@ -27,6 +27,10 @@ upstream commit before the OpenCDA-MARL authors' own work began (`0f86f6c0`,
 2025-09-15). The changes made to the vendored files are recorded in
 [docs/opencda/marl_patches.md](docs/opencda/marl_patches.md).
 
+The public `opencda-marl` wheel (`pixi run wheel --public`) omits every path listed
+here; the full build, which includes them, stays in Git and is never uploaded to a
+package index.
+
 Paths under these terms:
 
 - `opencda/`: the vendored core, with its assets and scenario scripts. The

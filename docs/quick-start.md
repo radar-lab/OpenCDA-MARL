@@ -36,9 +36,14 @@ pip install <opencda-marl wheel or checkout>            # SUMO runs out of the b
 pip install "<opencda-marl checkout>[carla]"            # + libraries for CARLA runs from that checkout
 ```
 
-`pixi run wheel` builds the wheel (`dist/opencda_marl-*.whl`); there is no
-PyPI release yet. The wheel's own CLI and environment port drive SUMO
-only. `[carla]` installs the libraries CARLA scenarios need when they run
+There are two builds. `pixi run wheel --public` builds the **public wheel**
+(`dist/public/opencda_marl-*.whl`), which leaves out everything UCLA's licence
+covers (the vendored OpenCDA core and what is derived from it): it runs SUMO,
+the library, the plugins and the baselines, and it is the only build a package
+index may carry. `pixi run wheel` builds the **full wheel**, with the core, for
+installing from Git (`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git@v2.2.0`);
+it is never uploaded. The wheel's own CLI and environment port drive SUMO
+only, and CARLA needs a `git clone` of the repository, which brings the core. `[carla]` installs the libraries CARLA scenarios need when they run
 from a repository checkout (`python opencda.py -t <ref> --marl`), because
 those scenarios read their maps from the working tree; `carla` itself
 comes with your simulator. The faster `libsumo` binding is optional:
