@@ -29,9 +29,6 @@ from opencda.scenario_testing.utils.customized_map_api import \
 from opencda import CARLA_VERSION
 
 # <OpenCDA-MARL>
-from loguru import logger
-
-
 def is_client_timeout(error):
     """Whether ``error`` is the CARLA client's RPC time-out ("time-out of
     20000ms while waiting for the simulator, ...")."""
@@ -40,32 +37,25 @@ def is_client_timeout(error):
         'time-out' in message or 'timed out' in message)
 
 
-def build_world_with_retry(build, client, timeout):
-    """Run ``build()`` (a world load or an OpenDRIVE world generation) and
-    retry it once if the client times out waiting for the simulator.
+# Generating the bundled OpenDRIVE worlds takes 20 to 37 s on a windowed
+# server; the configured world.timeout (10 to 20 s) is meant for ordinary calls.
+WORLD_BUILD_TIMEOUT = 90.0
 
-    On a loaded machine a world build can outlast ``world.timeout``. The
-    server keeps working on the timed-out request, so the retry waits up to
-    twice the timeout; the client's timeout is restored afterwards. A second
-    time-out, or any other error, propagates.
+
+def build_world_with_retry(build, client, timeout):
+    """Run ``build()`` (a world load or an OpenDRIVE world generation) with
+    the client timeout raised to ``max(timeout, WORLD_BUILD_TIMEOUT)``, then
+    restore ``timeout``, also on error.
+
+    A retry after a time-out does not help: the server keeps working on the
+    first request and the second one queues behind it. Any error, a time-out
+    included, propagates.
     """
+    client.set_timeout(max(float(timeout), WORLD_BUILD_TIMEOUT))
     try:
         return build()
-    except RuntimeError as error:
-        if not is_client_timeout(error):
-            raise
-        retry_timeout = 2.0 * float(timeout)
-        logger.warning(
-            f"CARLA world build timed out after {float(timeout):g} s "
-            f"(world.timeout): {error}. Retrying once with a "
-            f"{retry_timeout:g} s timeout.")
-    client.set_timeout(retry_timeout)
-    try:
-        world = build()
     finally:
         client.set_timeout(timeout)
-    logger.info("CARLA world build succeeded on the retry.")
-    return world
 # </OpenCDA-MARL>
 
 
@@ -234,7 +224,7 @@ class ScenarioManager:
         if xodr_path:
             # <OpenCDA-MARL>
             # Skip unused navmesh builds on every vehicle-only world reload,
-            # and retry the build once when the client times out.
+            # and give the build a longer client timeout than ordinary calls.
             self.world = build_world_with_retry(
                 lambda: load_customized_world(
                     xodr_path, self.client,

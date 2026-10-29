@@ -13,6 +13,7 @@ import carla
 from opencda.core.common.vehicle_manager import VehicleManager
 
 from opencda_marl._kernel.adapter.vehicle_defaults import get_vehicle_manager_defaults
+from opencda_marl._kernel.lifecycle.sensor_rig import SensorRig
 from opencda_marl.api.exceptions import CollisionException
 from opencda_marl._kernel.sensing.marl_collision_sensor import MARLCollisionSensor
 
@@ -485,7 +486,11 @@ class MARLVehicleAdapter:
         except Exception as e:
             logger.warning(f"Failed to detach vehicle manager for "
                            f"{self.actor_id}: {e}")
+        rig = SensorRig.from_vehicle_manager(vm)
         try:
             vm.destroy()
         finally:
+            # Same net as MARLAgentManager.cleanup: a sensor the vendored
+            # teardown left alive is destroyed before the handle is dropped.
+            rig.stop_and_destroy()
             self.vm = None

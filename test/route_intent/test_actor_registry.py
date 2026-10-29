@@ -392,3 +392,143 @@ def test_sensor_rig_stop_precedes_destroy_and_isolates_failures():
     # Every sensor is destroyed regardless of the stop() failure.
     assert all(not s.is_alive for s in sensors)
     assert all(s.stopped for s in sensors[1:])
+
+
+# --------------------------------------------------------------------- #
+# Sensor release: the handle that listen()ed must be stopped and destroyed
+# --------------------------------------------------------------------- #
+class _ListeningSensor:
+    """A sensor handle like CARLA's: ``is_alive`` is per handle, and dropping
+    a handle that is still alive and listening makes the client warn."""
+
+    _next_id = 9000
+
+    def __init__(self):
+        self.id = _ListeningSensor._next_id
+        _ListeningSensor._next_id += 1
+        self.is_alive = True
+        self.calls = []
+
+    def stop(self):
+        self.calls.append("stop")
+
+    def destroy(self):
+        self.calls.append("destroy")
+        self.is_alive = False
+        return True
+
+
+class _InertManager:
+    """A vendored manager whose destroy() swallowed its own failure."""
+
+    def destroy(self):
+        pass
+
+
+def _vm_with_sensors():
+    sensors = [_ListeningSensor() for _ in range(3)]
+    gnss, imu, collision = sensors
+    vm = type("VM", (), {})()
+    vm.localizer = _InertManager()
+    vm.localizer.gnss = _Wrapper(gnss)
+    vm.localizer.imu = _Wrapper(imu)
+    vm.safety_manager = _InertManager()
+    vm.safety_manager.imu_sensor = None
+    vm.safety_manager.sensors = [_Wrapper(collision)]
+    vm.perception_manager = _InertManager()
+    vm.perception_manager.rgb_camera = []
+    vm.perception_manager.lidar = None
+    vm.destroy = lambda: None  # VehicleManager.destroy over inert managers
+    return vm, sensors
+
+
+def _assert_stopped_then_destroyed(sensors):
+    for sensor in sensors:
+        assert sensor.calls == ["stop", "destroy"]
+
+
+def _adapter_cls_with(vm, fail_in_set_destination=False):
+    from opencda_marl._kernel.adapter.vehicle_adapter import MARLVehicleAdapter
+
+    class FakeAdapter(MARLVehicleAdapter):
+        def __init__(self, **kwargs):
+            self.vehicle = kwargs["vehicle"]
+            self.actor_id = self.vehicle.id
+            self.cav_world = type("CW", (), {
+                "remove_vehicle_manager": lambda self, vm: None})()
+            self.vm = vm
+
+        def set_destination(self, *args, **kwargs):
+            if fail_in_set_destination:
+                raise RuntimeError("no route")
+
+    return FakeAdapter
+
+
+def _agent_manager_with_adapter(world, vm):
+    mgr = _bare_agent_manager(world)
+    mgr._dropped_spawns = 0
+    mgr._event_logs = []
+    mgr.cav_world = type("CW", (), {
+        "remove_vehicle_manager": lambda self, vm: None})()
+    vehicle = mgr.registry.spawn_vehicle(object(), object())
+    mgr._vehicle_adapters.append(_adapter_cls_with(vm)(vehicle=vehicle))
+    return mgr
+
+
+def test_agent_manager_cleanup_stops_and_destroys_sensors_its_managers_left():
+    world = FakeWorld()
+    vm, sensors = _vm_with_sensors()
+    mgr = _agent_manager_with_adapter(world, vm)
+
+    mgr.cleanup()
+    _assert_stopped_then_destroyed(sensors)
+
+
+def test_episode_reset_stops_and_destroys_sensors():
+    world = FakeWorld()
+    vm, sensors = _vm_with_sensors()
+    mgr = _agent_manager_with_adapter(world, vm)
+
+    mgr.reset()
+    _assert_stopped_then_destroyed(sensors)
+
+
+def test_adapter_destroy_stops_and_destroys_sensors_its_managers_left():
+    vm, sensors = _vm_with_sensors()
+    vehicle = FakeActor("vehicle.test")
+    adapter = _adapter_cls_with(vm)(vehicle=vehicle)
+
+    adapter.destroy()
+    _assert_stopped_then_destroyed(sensors)
+    assert adapter.vm is None
+
+
+def test_spawn_setup_failure_after_the_vm_exists_destroys_its_sensors(monkeypatch):
+    import opencda_marl._kernel.agent_manager as am
+
+    world = FakeWorld()
+    mgr = _bare_agent_manager(world)
+    vm, sensors = _vm_with_sensors()
+    vm.update_info = lambda: None
+    monkeypatch.setattr(am, "MARLVehicleAdapter",
+                        _adapter_cls_with(vm, fail_in_set_destination=True))
+
+    with pytest.raises(RuntimeError, match="no route"):
+        mgr._spawn_vehicles([_FakeSpawnEvent()])
+    _assert_stopped_then_destroyed(sensors)
+
+
+def test_world_reload_cleanup_reaches_the_sensors():
+    from types import SimpleNamespace
+    from opencda_marl._kernel.lifecycle.world_manager import WorldManager
+
+    world = FakeWorld()
+    vm, sensors = _vm_with_sensors()
+    mgr = _agent_manager_with_adapter(world, vm)
+    coordinator = SimpleNamespace(
+        carla_world=world,
+        scenario_manager=SimpleNamespace(agent_manager=mgr, traffic_manager=None))
+
+    WorldManager({}, coordinator)._cleanup_carla_resources()
+    _assert_stopped_then_destroyed(sensors)

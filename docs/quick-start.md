@@ -41,7 +41,7 @@ There are two builds. `pixi run wheel --public` builds the **public wheel**
 covers (the vendored OpenCDA core and what is derived from it): it runs SUMO,
 the library, the plugins and the baselines, and it is the only build a package
 index may carry. `pixi run wheel` builds the **full wheel**, with the core, for
-installing from Git (`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git@v2.2.0`);
+installing from Git (`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git@v2.2.1`);
 it is never uploaded. The wheel's own CLI and environment port drive SUMO
 only, and CARLA needs a `git clone` of the repository, which brings the core. `[carla]` installs the libraries CARLA scenarios need when they run
 from a repository checkout (`python opencda.py -t <ref> --marl`), because

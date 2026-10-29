@@ -8,6 +8,7 @@ Copyright (c) 2025-2026 Lihao Guo and the Radar Lab, University of Arizona
 SPDX-License-Identifier: Apache-2.0
 '''
 import math
+import zlib
 from opencda_marl._kernel.traffic._sumo_lib import traci  # libsumo by default; OPENCDA_SUMO_LIB=traci to fall back
 from typing import Dict, List, Tuple, Any, Optional
 from loguru import logger
@@ -17,6 +18,15 @@ try:
     import carla as _carla
 except Exception:  # pragma: no cover - fallback for CARLA-free tooling
     _carla = None
+
+
+def _stable_id(name: str) -> int:
+    """CARLA-style integer id for a SUMO edge or junction name.
+
+    ``hash()`` of a string differs per process (PYTHONHASHSEED), and the planner
+    breaks ties by ``road_id``, so a frozen cell gave different results run to run.
+    """
+    return zlib.crc32(name.encode())
 
 
 # Mock CARLA classes for compatibility
@@ -359,7 +369,7 @@ class SumoWaypoint:
                 road_id, lane_ref, is_junction, junction = self.road_id, self.lane_id, self.is_junction, self.junction_id
             else:
                 internal = edge_id.startswith(":")
-                road_id, lane_ref, is_junction = hash(edge_id) % 10000, -lane_index - 1, internal
+                road_id, lane_ref, is_junction = _stable_id(edge_id), -lane_index - 1, internal
                 junction = edge_id[1:].rsplit("_", 2)[0] if internal else None
             return [SumoWaypoint(edge_id, lane_index, (x, y), road_id, lane_ref, is_junction, junction)]
         except Exception as e:  # noqa: BLE001 - the planner's walk must not die on one lane
@@ -403,7 +413,7 @@ class SumoWaypoint:
                 road_id, lane_ref, is_junction, junction = self.road_id, self.lane_id, self.is_junction, self.junction_id
             else:
                 internal = edge_id.startswith(":")
-                road_id, lane_ref, is_junction = hash(edge_id) % 10000, -lane_index - 1, internal
+                road_id, lane_ref, is_junction = _stable_id(edge_id), -lane_index - 1, internal
                 junction = edge_id[1:].rsplit("_", 2)[0] if internal else None
             return [SumoWaypoint(edge_id, lane_index, (x, y), road_id, lane_ref, is_junction, junction)]
         except Exception as e:  # noqa: BLE001 - the planner's walk must not die on one lane
@@ -423,7 +433,7 @@ class SumoJunction:
     NET_OFFSET = (99.80, 100.00)
 
     def __init__(self, junction_id: str):
-        self.id = int(junction_id) if junction_id.isdigit() else hash(junction_id) % 10000
+        self.id = int(junction_id) if junction_id.isdigit() else _stable_id(junction_id)
         self.junction_id = junction_id
 
         # Get junction position and shape (in SUMO coordinates)
@@ -499,7 +509,7 @@ class SumoJunction:
                 entry_pos = shape[-1]
                 entry_wp = SumoWaypoint(
                     entry_edge, lane_idx, entry_pos,
-                    hash(entry_edge) % 10000, -lane_idx - 1, False
+                    _stable_id(entry_edge), -lane_idx - 1, False
                 )
 
                 # Find connected outgoing edges
@@ -515,7 +525,7 @@ class SumoJunction:
                         exit_pos = exit_shape[0]
                         exit_wp = SumoWaypoint(
                             exit_edge, exit_lane_idx, exit_pos,
-                            hash(exit_edge) % 10000, -exit_lane_idx - 1, False
+                            _stable_id(exit_edge), -exit_lane_idx - 1, False
                         )
 
                         connections.append((entry_wp, exit_wp))
@@ -645,7 +655,7 @@ class SumoMap:
 
                 wp = SumoWaypoint(
                     edge_id, lane_idx, mid_point,
-                    road_id=hash(edge_id) % 10000,
+                    road_id=_stable_id(edge_id),
                     lane_id=-lane_idx - 1,  # Negative like CARLA
                     is_junction=is_junction,
                     junction_id=to_junction_id if is_junction else None

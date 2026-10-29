@@ -15,9 +15,21 @@ import importlib
 import os
 import sys
 import traceback
+
+# On Windows `import torch` fails with WinError 127 (shm.dll) once cv2, open3d
+# or matplotlib.pyplot are loaded, so torch goes first when it is installed.
+try:
+    import torch  # noqa: F401
+except ImportError:
+    pass
+
 from omegaconf import OmegaConf
 
 os.environ.setdefault("LOGURU_LEVEL", "INFO")
+# The Qt behind OpenCV's windows logs "qt.qpa.screen: Unable to open monitor
+# interface" for each display it cannot query on multi-monitor setups; other
+# Qt categories and an explicit user setting stay untouched.
+os.environ.setdefault("QT_LOGGING_RULES", "qt.qpa.screen=false")
 
 from loguru import logger
 

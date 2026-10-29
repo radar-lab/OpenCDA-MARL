@@ -30,6 +30,8 @@ def seed_everything(seed: Optional[int], *, deterministic_torch: bool = False) -
     seed = int(seed)
     random.seed(seed)
     np.random.seed(seed)
+    # Reaches child processes only: this interpreter's string hashing is fixed at
+    # start-up, so code here must never depend on ``hash(str)`` or set order.
     os.environ.setdefault("PYTHONHASHSEED", str(seed))
     try:
         import torch

@@ -124,6 +124,7 @@ nav:
       - OpenCDA Patch Ledger: opencda/marl_patches.md
       - Contributing: contributing.md
       - Changelog:
+          - v2.2.1: marl/changelog/v2.2.1.md
           - v2.2.0: marl/changelog/v2.2.0.md
           - v2.1.0: marl/changelog/v2.1.0.md
           - v1.0.0: marl/changelog/v1.0.0.md

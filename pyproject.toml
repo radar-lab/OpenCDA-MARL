@@ -76,7 +76,7 @@ Homepage = "https://radar-lab.github.io/OpenCDA-MARL/"
 Documentation = "https://radar-lab.github.io/OpenCDA-MARL/"
 Repository = "https://github.com/radar-lab/OpenCDA-MARL"
 Issues = "https://github.com/radar-lab/OpenCDA-MARL/issues"
-Changelog = "https://radar-lab.github.io/OpenCDA-MARL/marl/changelog/v2.2.0/"
+Changelog = "https://radar-lab.github.io/OpenCDA-MARL/marl/changelog/v2.2.1/"
 
 [tool.setuptools.dynamic]
 version = { attr = "opencda_marl.__version__" }

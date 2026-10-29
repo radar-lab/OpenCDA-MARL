@@ -60,7 +60,7 @@ class MARLScenarioManager(BaseScenarioManager):
                 cav_world=cav_world
             )
         except Exception as e:
-            # The world build already retried once on a client time-out
+            # The world build already ran under a raised client time-out
             # (sim_api.build_world_with_retry); say what to change.
             hint = (
                 "; the CARLA server did not answer in time: check that it is "

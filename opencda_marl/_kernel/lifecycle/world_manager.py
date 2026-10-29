@@ -27,6 +27,15 @@ if TYPE_CHECKING:
     from opencda_marl._kernel.envs.marl_env import MARLEnv
 
 
+#: Floor for the client time-out while ``reload_world`` runs. On a windowed
+#: server a reload takes 10 to 35 s, longer than the usual ``world.timeout``.
+RELOAD_TIMEOUT_S = 120.0
+
+
+class WorldResetError(RuntimeError):
+    """The CARLA world could not be reloaded; the run cannot continue."""
+
+
 class TrainingStateSnapshot:
     """
     Captures all training state that must survive CARLA world reset.
@@ -508,6 +517,9 @@ class WorldManager:
         Called after each episode ends. Check if world reset is needed.
 
         This is the ONLY safe time to reset - never mid-episode.
+
+        Raises:
+            WorldResetError: a triggered reset failed and the world is unusable
         """
         self.epochs_since_reset += 1
 
@@ -535,7 +547,12 @@ class WorldManager:
                 logger.success(f"World reset #{self.total_resets} completed. "
                               f"Reason: {reset_reason}")
             else:
-                logger.error(f"World reset FAILED. Training may continue to slow down.")
+                # A failed reload leaves a dead world: the next tick would
+                # time out or abort natively, so stop the run here.
+                raise WorldResetError(
+                    f"World reset #{self.total_resets + 1} failed ({reset_reason}); "
+                    "the CARLA world is no longer usable, stopping the run. "
+                    "See the errors above for the cause.")
 
     def reload_world(self) -> bool:
         """
@@ -712,9 +729,10 @@ class WorldManager:
         Returns:
             True if successful, False otherwise
         """
+        client = self.coordinator.carla_client
+        configured = float(self.coordinator.config.get('world', {}).get('timeout', 20.0))
+        client.set_timeout(max(configured, RELOAD_TIMEOUT_S))
         try:
-            client = self.coordinator.carla_client
-
             # reload_world() clears server memory and reloads current map
             # This is the key call that fixes the slowdown!
             client.reload_world()
@@ -735,6 +753,8 @@ class WorldManager:
         except Exception as e:
             logger.error(f"reload_world() failed: {e}")
             return False
+        finally:
+            client.set_timeout(configured)
 
     def _apply_world_settings(self):
         """Reapply world settings after reload."""

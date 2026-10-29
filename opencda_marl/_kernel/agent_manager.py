@@ -545,6 +545,7 @@ class MARLAgentManager:
                 self._requeue_or_drop(event, reason="collision at spawn")
                 continue
 
+            adapter = None
             try:
                 # Mixed autonomy: the spawn event carries this vehicle's
                 # population (agent type). Homogeneous runs carry none and
@@ -591,6 +592,12 @@ class MARLAgentManager:
             except Exception:
                 # The vehicle (and any sensors its managers already
                 # attached) must not outlive a failed setup.
+                if adapter is not None:
+                    try:
+                        adapter.destroy()
+                    except Exception as exc:
+                        logger.warning(
+                            f"Adapter destroy failed after a setup failure: {exc}")
                 self.registry.abort_spawn(vehicle)
                 raise
 
@@ -728,6 +735,7 @@ class MARLAgentManager:
                 actor_id = getattr(adapter, "actor_id", "unknown")
                 logger.warning(
                     f"Failed to detach vehicle manager for {actor_id}: {exc}")
+            rig = SensorRig.from_vehicle_manager(vm)
             for component_name in ("perception_manager",
                                    "localizer",
                                    "safety_manager"):
@@ -739,6 +747,10 @@ class MARLAgentManager:
                 except Exception as exc:
                     logger.warning(
                         f"{component_name}.destroy failed during cleanup: {exc}")
+            # The vendored managers swallow some of their own failures; a
+            # sensor they left alive must be stopped and destroyed through
+            # this handle before it is dropped.
+            rig.stop_and_destroy()
 
         # Phase 2: batch vehicle destroy; destruction materializes on the
         # next tick in synchronous mode.

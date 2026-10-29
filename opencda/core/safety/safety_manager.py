@@ -30,6 +30,7 @@ class SafetyManager:
         self.cav_world = weakref.ref(cav_world)()
         self.print_message = params['print_message']
         # <OpenCDA-MARL>
+        self._printed_warnings = frozenset()
         # Sensor-actor economy: the safety IMU duplicates the localization
         # IMU and its data deque is only consumed by OpenCDA's comfort
         # evaluator; make it opt-in (params['imu']: default True keeps stock
@@ -57,15 +58,17 @@ class SafetyManager:
         self.status_queue.append((self.cav_world.global_clock, status_dict))
         # print hazard message
         if self.print_message:
-            print_flag = False
-            # only print message when it has hazard
-            for key, val in status_dict.items():
-                if val:
-                    print_flag = True
-                    break
-            if print_flag:
+            # <OpenCDA-MARL>
+            # Print when the set of triggered warnings changes, not on every
+            # tick of a warning that persists (one line per tick for a whole
+            # route otherwise).
+            warnings = frozenset(
+                key for key, val in status_dict.items() if val)
+            if warnings and warnings != self._printed_warnings:
                 print("Safety Warning from the safety manager:")
                 print(status_dict)
+            self._printed_warnings = warnings
+            # </OpenCDA-MARL>
 
     def destroy(self):
         # <OpenCDA-MARL>

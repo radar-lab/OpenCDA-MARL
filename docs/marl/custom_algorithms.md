@@ -35,7 +35,7 @@ pip install dist/public/opencda_marl-*.whl   # SUMO runs out of the box
 ```
 
 The full build, which also carries the vendored OpenCDA core, installs from Git
-(`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git@v2.2.0`); it is never uploaded to
+(`pip install git+https://github.com/radar-lab/OpenCDA-MARL.git@v2.2.1`); it is never uploaded to
 a package index, because UCLA's licence does not allow the core to be transferred to others.
 
 ```python

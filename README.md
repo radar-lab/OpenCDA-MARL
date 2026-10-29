@@ -64,6 +64,11 @@ external package uses, and a test keeps the kernel from importing them. See
 
 ## What's New in OpenCDA-MARL
 
+### v2.2.1
+
+A fix release for the defects found in the first live run of 2.1.0 and for a hash-seed dependence in frozen SUMO
+evaluation ([changelog](https://radar-lab.github.io/OpenCDA-MARL/marl/changelog/v2.2.1/), including what stays open).
+
 ### v2.2.0
 
 * **On PyPI**: `pip install opencda-marl` installs a public wheel without any UCLA-licensed path (the vendored OpenCDA
