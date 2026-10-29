@@ -1274,6 +1274,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../marl/changelog/v2.2.1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    v2.2.1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../marl/changelog/v2.2.0/" class="md-nav__link">
         
   
@@ -1449,7 +1477,7 @@
 </tr>
 <tr>
 <td><code>opencda/scenario_testing/utils/customized_map_api.py</code>, <code>sim_api.py</code></td>
-<td>Disable pedestrian navigation generation for vehicle-only OpenDRIVE worlds, preventing repeated world reloads from accumulating RecastBuilder jobs. <code>world.pedestrian_navigation: true</code> enables it for scenarios that need AI walkers; road geometry and vehicle physics settings are unchanged. <code>ScenarioManager</code> takes <code>carla_version</code> as a keyword defaulting to <code>opencda.CARLA_VERSION</code> (the scenario scripts no longer pass it), reads the client host, port, timeout and fixed delta from the world config with the stock values as defaults, and starts background autopilots on the Traffic Manager's own port. <code>build_world_with_retry</code> runs the OpenDRIVE generation (xodr branch) or <code>client.load_world</code> (town branch); on a CARLA client time-out it logs a warning, retries once with twice <code>world.timeout</code>, then restores the client timeout; any other error, or a second time-out, propagates. <code>is_client_timeout</code> detects the RPC time-out. The town branch re-raises a time-out instead of reporting the map as missing. Adds a loguru import.</td>
+<td>Disable pedestrian navigation generation for vehicle-only OpenDRIVE worlds, preventing repeated world reloads from accumulating RecastBuilder jobs. <code>world.pedestrian_navigation: true</code> enables it for scenarios that need AI walkers; road geometry and vehicle physics settings are unchanged. <code>ScenarioManager</code> takes <code>carla_version</code> as a keyword defaulting to <code>opencda.CARLA_VERSION</code> (the scenario scripts no longer pass it), reads the client host, port, timeout and fixed delta from the world config with the stock values as defaults, and starts background autopilots on the Traffic Manager's own port. <code>build_world_with_retry</code> runs the OpenDRIVE generation (xodr branch) or <code>client.load_world</code> (town branch) with the client timeout raised to <code>max(world.timeout, 90 s)</code> (<code>WORLD_BUILD_TIMEOUT</code>), then restores <code>world.timeout</code>, also on error; it does not retry (a retry queues behind the still-running first request), and every error, a time-out included, propagates. <code>is_client_timeout</code> detects the RPC time-out. The town branch re-raises a time-out instead of reporting the map as missing.</td>
 </tr>
 <tr>
 <td><code>opencda/core/actuation/control_manager.py</code></td>
@@ -1469,7 +1497,7 @@
 </tr>
 <tr>
 <td><code>opencda/core/safety/safety_manager.py</code></td>
-<td>Hardens <code>destroy()</code>: per-sensor isolation so one sensor's failure cannot skip the rest; adds the loguru import for the warnings. Accepts <code>collision_sensor_cls</code> (install a specialised collision sensor at construction instead of spawn-then-swap) and an opt-out <code>params['imu']</code> for the duplicate safety IMU (default <code>True</code> = stock behavior).</td>
+<td>Prints a warning only when the set of triggered warnings changes, not on every tick it persists (<code>print_message</code>). Hardens <code>destroy()</code>: per-sensor isolation so one sensor's failure cannot skip the rest; adds the loguru import for the warnings. Accepts <code>collision_sensor_cls</code> (install a specialised collision sensor at construction instead of spawn-then-swap) and an opt-out <code>params['imu']</code> for the duplicate safety IMU (default <code>True</code> = stock behavior).</td>
 </tr>
 <tr>
 <td><code>opencda/customize/ml_libs/ml_manager.py</code></td>
@@ -1596,7 +1624,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 24, 2026 00:39:06 UTC">October 24, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 29, 2026 01:40:47 UTC">October 29, 2026</span>
   </span>
 
     
